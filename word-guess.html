@@ -58,6 +58,74 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 <div id="kb"></div></div>
 <div class="ov" id="ov"><div class="card"><h1 id="ovT">🔠 Word Guess</h1><div class="stars" id="ovS"></div><p id="ovP">Guess the secret 5-letter word in 6 tries.<br>🟩 right spot &nbsp; 🟨 wrong spot &nbsp; ⬜ not in word</p><button class="btn" id="go">▶ Play</button></div></div>
 <script>
+/* ===== DUO helper v1 (shared, pasted inline into each game as its own <script> BEFORE the game script) ===== */
+const Duo=(()=>{
+const KEY='duo_names',S={mode:null,names:['Player 1','Player 2'],scores:[null,null],turn:0,hw:true,cpuR:[0,100],lvl:'easy',start:null,game:'',unit:''};
+let pill=null,ac=null;
+function css(){if(document.getElementById('duoCss'))return;const s=document.createElement('style');s.id='duoCss';s.textContent=
+'.duoOv{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(6,30,70,.88);padding:14px;font-family:"Fredoka","Trebuchet MS","Comic Sans MS",sans-serif}'+
+'.duoCard{background:linear-gradient(#2f8cff,#0b4fb3);border:5px solid #ffe14a;border-radius:26px;padding:18px 20px;max-width:min(92vw,420px);width:100%;color:#fff;text-align:center;box-shadow:0 8px 0 #06244d;animation:duoPop .35s}'+
+'@keyframes duoPop{0%{transform:scale(.6)}70%{transform:scale(1.05)}}'+
+'.duoCard h2{margin:0 0 8px;font-size:clamp(22px,6vw,32px);text-shadow:0 3px 0 #0b3a78}.duoCard p{margin:6px 0;font-size:clamp(15px,4vw,19px);font-weight:600}'+
+'.duoCard .big{font-size:clamp(34px,10vw,52px);line-height:1.1}'+
+'.duoCard input{width:100%;box-sizing:border-box;font:600 20px inherit;font-family:inherit;padding:10px 14px;border-radius:14px;border:3px solid #fff;margin:6px 0;color:#0b3a78;text-align:center}'+
+'.duoCard label{display:block;text-align:left;font-weight:700;margin-top:6px;font-size:15px}'+
+'.duoB{font:700 clamp(18px,5vw,24px) inherit;font-family:inherit;margin:8px 4px 0;padding:.45em 1.3em;min-height:46px;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}'+
+'.duoB.o{background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9560b;text-shadow:0 2px 0 #a9560b}.duoB.g{background:linear-gradient(#8a9bb5,#5d6f8a);box-shadow:0 5px 0 #3b4a63;text-shadow:none}'+
+'.duoB:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.3)}'+
+'.duoMenu{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 0}.duoMenu .duoB{margin:0}'+
+'.duoPill{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:8000;background:#0b3a78;color:#fff;border:3px solid #ffe14a;border-radius:999px;padding:3px 14px;font:700 clamp(13px,3.6vw,17px) "Fredoka","Trebuchet MS",sans-serif;box-shadow:0 3px 0 #06244d;pointer-events:none;white-space:nowrap;max-width:62vw;overflow:hidden;text-overflow:ellipsis}';
+document.head.appendChild(s)}
+function beep(f,d){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type='triangle';g.gain.setValueAtTime(.12,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+(d||.15));o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+(d||.15))}catch(e){}}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function modal(html,buttons){css();return new Promise(res=>{const ov=document.createElement('div');ov.className='duoOv';ov.innerHTML='<div class="duoCard">'+html+'<div class="duoMenu"></div></div>';const m=ov.querySelector('.duoMenu');
+ buttons.forEach(([label,cls,val])=>{const b=document.createElement('button');b.className='duoB '+(cls||'');b.innerHTML=label;b.onclick=()=>{const out=typeof val==='function'?val(ov):val;ov.remove();res(out)};m.appendChild(b)});
+ document.body.appendChild(ov);const i=ov.querySelector('input');if(i){i.focus();i.select()}})}
+function saved(){try{const a=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(a))return a}catch(e){}return null}
+function save(a){try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}}
+function clean(v,d){v=(v||'').trim().slice(0,14);return v||d}
+const api={
+ /* Ask both player names. Resolves to [n1,n2] or null if cancelled. opts.cpu=true asks only P1 name (P2 is "Computer"). opts.t1/t2 = labels */
+ askNames(opts){opts=opts||{};const sv=saved()||['',''];
+  const html='<div class="big">'+(opts.cpu?'🤖':'👥')+'</div><h2>'+(opts.cpu?'Your name':'Who is playing?')+'</h2>'+
+   '<label>'+esc(opts.t1||'Player 1')+'</label><input id="duoN1" maxlength="14" placeholder="Player 1" value="'+esc(sv[0]||'')+'">'+
+   (opts.cpu?'':'<label>'+esc(opts.t2||'Player 2')+'</label><input id="duoN2" maxlength="14" placeholder="Player 2" value="'+esc(sv[1]||'')+'">');
+  return modal(html,[['▶ Start','',ov=>{const a=clean(ov.querySelector('#duoN1').value,'Player 1');const b=opts.cpu?'🤖 Computer':clean(ov.querySelector('#duoN2')&&ov.querySelector('#duoN2').value,'Player 2');if(!opts.cpu)save([a,b]);else save([a,sv[1]||'']);return [a,b]}],['Cancel','g',null]])},
+ /* "Pass the device" screen for hot-seat turns / hidden information. Resolves when tapped. */
+ cover(name,msg){beep(660,.12);return modal('<div class="big">🔄</div><h2>Pass to '+esc(name)+'</h2><p>'+esc(msg||'Tap when you are ready')+'</p>',[['I am '+esc(name),'',true]])},
+ /* Add "2 Players" and "vs Computer" buttons into an element (start menu/overlay).
+    o={game:'snake', start:fn(), hw:true(higher wins)|false(lower wins, e.g. time), cpu:[lo,hi] typical score range for the computer (e.g. [40,160]), unit:' pts', noTwo:false, noCpu:false} */
+ addButtons(el,o){css();const wrap=document.createElement('div');wrap.className='duoMenu';
+  if(!o.noTwo){const b=document.createElement('button');b.className='duoB o';b.innerHTML='👥 2 Players';b.onclick=async()=>{const n=await api.askNames();if(n)api.begin(Object.assign({},o,{mode:'two',names:n}))};wrap.appendChild(b)}
+  if(!o.noCpu&&o.cpu){const b=document.createElement('button');b.className='duoB o';b.innerHTML='🤖 vs Computer';b.onclick=async()=>{const lv=await modal('<div class="big">🤖</div><h2>Computer level</h2>',[['😊 Easy','',  'easy'],['🧠 Hard','o','hard'],['Cancel','g',null]]);if(!lv)return;const n=await api.askNames({cpu:true});if(n)api.begin(Object.assign({},o,{mode:'cpu',names:n,lvl:lv}))};wrap.appendChild(b)}
+  el.appendChild(wrap);return wrap},
+ begin(o){S.mode=o.mode;S.names=o.names.slice();S.scores=[null,null];S.turn=0;S.hw=o.hw!==false;S.cpuR=o.cpu||[0,100];S.lvl=o.lvl||'easy';S.start=o.start;S.game=o.game||'';S.unit=o.unit||'';S.fmt=o.fmt||null;
+  api.pill();if(o.start)o.start()},
+ active(){return !!S.mode},
+ mode(){return S.mode},
+ player(){return S.names[S.turn]},
+ names(){return S.names.slice()},
+ pill(){css();if(!S.mode){if(pill){pill.remove();pill=null}return}if(!pill){pill=document.createElement('div');pill.className='duoPill';document.body.appendChild(pill)}
+  pill.textContent=S.mode==='two'?'👤 '+S.names[S.turn]+'  ('+(S.turn+1)+'/2)':'👤 '+S.names[0]+'  vs  🤖'},
+ fmt(v){return S.fmt?S.fmt(v):(Math.round(v*100)/100)+S.unit},
+ cpuScore(){const [lo,hi]=S.cpuR,mid=(lo+hi)/2,r=Math.random();let v;
+  if(S.hw)v=S.lvl==='easy'?lo+r*(mid-lo):mid+r*(hi-mid);else v=S.lvl==='easy'?mid+r*(hi-mid):lo+r*(mid-lo);return (hi-lo)>20?Math.round(v):Math.round(v*100)/100},
+ /* Call when a round ends with the player's score. Returns true if Duo took over (the game must NOT show its own game-over overlay). */
+ finish(score){if(!S.mode)return false;const sc=Number(score)||0;
+  if(S.mode==='two'){S.scores[S.turn]=sc;
+   if(S.turn===0){S.turn=1;api.pill();setTimeout(()=>{modal('<div class="big">✅</div><h2>'+esc(S.names[0])+' scored '+esc(api.fmt(sc))+'</h2><p>Now it is <b>'+esc(S.names[1])+'</b>\'s turn. Beat that!</p>',[['▶ '+esc(S.names[1])+': Go!','',true]]).then(()=>{if(S.start)S.start()})},700);return true}
+   const [a,b]=S.scores,aw=S.hw?a>b:a<b,bw=S.hw?b>a:b<a;const win=aw?0:bw?1:-1;
+   setTimeout(()=>{beep(880,.2);modal('<div class="big">'+(win<0?'🤝':'🏆')+'</div><h2>'+(win<0?'It is a tie!':esc(S.names[win])+' wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(a))+'</b></p><p>'+esc(S.names[1])+': <b>'+esc(api.fmt(b))+'</b></p>',[['🔁 Rematch','',1],['🏠 Menu','o',0]]).then(r=>{if(r){S.scores=[null,null];S.turn=0;api.pill();if(S.start)S.start()}else api.end(true)})},700);return true}
+  /* vs computer */
+  const c=api.cpuScore(),win=S.hw?(sc>c?0:sc<c?1:-1):(sc<c?0:sc>c?1:-1);
+  setTimeout(()=>{beep(win===0?880:300,.25);modal('<div class="big">'+(win===0?'🏆':win<0?'🤝':'🤖')+'</div><h2>'+(win===0?esc(S.names[0])+' wins!':win<0?'Tie!':'Computer wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(sc))+'</b></p><p>🤖 Computer: <b>'+esc(api.fmt(c))+'</b></p>',[['🔁 Play again','',1],['🏠 Menu','o',0]]).then(r=>{if(r){api.pill();if(S.start)S.start()}else api.end(true)})},700);return true},
+ /* Leave duo mode. If reload, the page reloads to the game's normal start menu. */
+ end(reload){S.mode=null;api.pill();if(reload)location.reload()}
+};
+return api})();
+/* ===== end DUO ===== */
+</script>
+<script>
 const $=s=>document.querySelector(s);
 let muted=false;try{muted=localStorage.getItem('wg_mute')==='1'}catch(e){}
 let AC;function beep(f,d=.1,t='sine',v=.12){if(muted)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
@@ -74,10 +142,10 @@ function build(){board.innerHTML='';for(let r=0;r<6;r++){const d=document.create
 $('#kb').innerHTML='';['qwertyuiop','asdfghjkl','⏎zxcvbnm⌫'].forEach(rw=>{const d=document.createElement('div');d.className='row';[...rw].forEach(ch=>{const b=document.createElement('button');b.className='k'+('⏎⌫'.includes(ch)?' w':'');b.textContent=ch;b.dataset.k=ch;b.onclick=()=>press(ch);d.appendChild(b)});$('#kb').appendChild(d)})}
 function upd(){$('#sc').textContent=score;$('#bs').textContent=best;$('#st').textContent=streak;$('#pn').textContent='Puzzle #'+pn}
 function newRound(){let w;do{w=WORDS[Math.floor(Math.random()*WORDS.length)]}while(w===last);target=last=w;pn++;row=0;col=0;grid=['','','','','',''];over=false;busy=false;build();$('#msg').textContent='';upd()}
-function startGame(){score=0;streak=0;pn=0;best=load('wg_best');$('#ov').classList.add('hide');newRound()}
+function startGame(){D.m=null;D.tok++;score=0;streak=0;pn=0;best=load('wg_best');$('#ov').classList.add('hide');newRound()}
 function cell(r,c){return board.children[r].children[c]}
 function msg(t){$('#msg').textContent=t}
-function press(k){if(over||busy||!$('#ov').classList.contains('hide'))return;
+function press(k,ai){if(D.m&&(D.lock||D.cpuG)&&!ai)return;if(over||busy||!$('#ov').classList.contains('hide'))return;
 if(k==='⌫'||k==='Backspace'){if(col>0){col--;const x=cell(row,col);x.textContent='';x.classList.remove('f');grid[row]=grid[row].slice(0,-1)}}
 else if(k==='⏎'||k==='Enter')submit();
 else if(/^[a-z]$/.test(k)&&col<5){const x=cell(row,col);x.textContent=k;x.classList.add('f');grid[row]+=k;col++;beep(500,.04)}}
@@ -86,9 +154,55 @@ function submit(){if(col<5){const r=board.children[row];r.classList.remove('shak
 msg('');busy=true;const g=grid[row],res=evalG(g,target),rw=row;
 res.forEach((s,i)=>setTimeout(()=>{const x=cell(rw,i);x.classList.add('flip');setTimeout(()=>{x.classList.remove('f','flip');x.classList.add(s);beep(s==='correct'?784:s==='present'?600:300,.08,'triangle');const kb=document.querySelector('.k[data-k="'+g[i]+'"]');if(kb&&!kb.classList.contains('correct')&&!(kb.classList.contains('present')&&s==='absent')){kb.classList.remove('present','absent');kb.classList.add(s)}},150)},i*300));
 setTimeout(()=>{if(g===target)win();else if(rw===5)lose();else{row++;col=0;busy=false}},5*300+250)}
-function win(){over=true;const pts=(6-row)*20+20+streak*10;score+=pts;streak++;if(score>best){best=score;save('wg_best',best)}upd();board.children[row].classList.add('win');jingle([523,659,784,1047]);const r=board.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,['⭐','✨','🎉','🟩'],24);msg('🎉 +'+pts+' points!');setTimeout(askNext,1200)}
-function lose(){over=true;streak=0;upd();jingle([330,262,196]);msg('The word was '+target.toUpperCase());setTimeout(askNext,1500)}
+function win(){over=true;if(D.m){board.children[row].classList.add('win');jingle([523,659,784,1047]);msg('🎉 Solved!');setTimeout(()=>duoEnd(true),1400);return}const pts=(6-row)*20+20+streak*10;score+=pts;streak++;if(score>best){best=score;save('wg_best',best)}upd();board.children[row].classList.add('win');jingle([523,659,784,1047]);const r=board.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,['⭐','✨','🎉','🟩'],24);msg('🎉 +'+pts+' points!');setTimeout(askNext,1200)}
+function lose(){over=true;if(D.m){jingle([330,262,196]);msg('The word was '+target.toUpperCase());setTimeout(()=>duoEnd(false),1500);return}streak=0;upd();jingle([330,262,196]);msg('The word was '+target.toUpperCase());setTimeout(askNext,1500)}
 function askNext(){$('#ovS').textContent=streak?(row<=1?'⭐⭐⭐':row<=3?'⭐⭐':'⭐'):'💪';$('#ovT').textContent=streak?'🔥 Streak: '+streak:'😅 So close!';$('#ovP').innerHTML='Score: <b>'+score+'</b> &nbsp; Best: <b>'+best+'</b><br>Word: <b>'+target.toUpperCase()+'</b>';$('#go').textContent=streak?'▶ Next word':'🔁 Play again';$('#ov').classList.remove('hide');$('#go').onclick=streak?()=>{$('#ov').classList.add('hide');newRound()}:startGame}
+/* ===== 2-player / vs Computer (secret word duel) ===== */
+const D={m:null,names:['Player 1','Player 2'],sc:[0,0],r:0,lvl:'easy',tok:0,lock:false,cpuG:false,hist:[]};
+let dpill=null;
+const KEEP={};
+const escH=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const EXTRA5=`abbey acorn adapt admit adopt alien alley amber ample angle ankle apron arrow attic audio avoid awake bagel basic basin batch beans bible bikes bingo bison blade bleak blush boots bound bowls brass bride broom bugle cacti camel canal canoe cargo carol cedar chart chunk cider clamp clash clove clown coral crisp crust cubic daisy delta diary diner disco ditch dodge donut draft drift drill drums dusty eagle easel elder elite ember fairy feral ferry fiber flock flute folks forge forth frost fudge gamer gecko gleam glide gloom goose gravy greed grill grove gummy habit harsh haste hatch hazel hedge hippo hobby hover igloo image jelly jewel joker kayak koala lace1 lakes lance laser latch layer leafy leapt lilac limit llama lodge lunar lunch mango marsh medal melon mercy merit mocha model money motor mount mural noble north novel nurse oasis olive onion opera orbit otter outer paint panda panel paper party pasta patch peach pearl pedal penny piano pilot pinch pixel plain plate plaza plush poems poker polar pouch power prize proud pulse punch puppy quest quick quilt radar radio raise ranch rapid raven reach relax rider ridge rival roast rocky rough round royal rugby salad sauce scarf scene scout shape share sharp sheep shelf shell shine shiny shirt shoes shore short shout sight silly skate skill sleep slice slide small snack snail snake sneak solid sound south space spare spark speed spice spike spoon sport squad stack stage stamp stand stare start steam steel stick stone storm story stove straw strip study stuff sunny super swamp sweet swift swing sword table taste teach tempo thank theme thick thing think throw thumb tiger toast token topic torch total touch tough towel tower toxic trace track trade trail train treat trend trick tulip tummy twist ultra uncle under union unity upper urban usual valid value vapor vault video vigor villa vines viola vital vivid vocal voice waltz watch whale wheat wheel while white whole width witch woman world worry worth wrist yacht young youth zesty zippy`.split(/\s+/).filter(w=>/^[a-z]{5}$/.test(w));
+const ALL=[...new Set(WORDS.concat(EXTRA5))];
+const setter=()=>D.m==='cpu'?1-(D.r%2):D.r%2;
+function modal2(html,buttons,init){return new Promise(res=>{const ov=document.createElement('div');ov.className='duoOv';ov.innerHTML='<div class="duoCard">'+html+'<div class="duoMenu"></div></div>';const m=ov.querySelector('.duoMenu');let first=null;
+ buttons.forEach(([label,cls,fn])=>{const b=document.createElement('button');b.className='duoB '+(cls||'');b.innerHTML=label;b.onclick=()=>{const out=typeof fn==='function'?fn(ov):fn;if(out===KEEP)return;ov.remove();res(out)};if(!first)first=b;m.appendChild(b)});
+ document.body.appendChild(ov);if(init)init(ov,first)})}
+function askWord(name){return modal2('<div class="big">🤫</div><h2>'+escH(name)+', pick a secret word</h2><p>Exactly 5 letters, A-Z only. Keep it hidden!</p><label>Secret word</label><input id="wgW" type="password" maxlength="5" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="•••••"><p id="wgErr" style="color:#ffe14a;min-height:1.3em"></p>',
+ [['🔒 Lock it in','',ov=>{const wi=ov.querySelector('#wgW'),er=ov.querySelector('#wgErr');const w=((wi&&wi.value)||'').trim().toLowerCase();if(!/^[a-z]{5}$/.test(w)){if(er)er.textContent='Type a 5-letter word (A-Z only).';return KEEP}return w}],
+  ['👁 Show / hide','g',ov=>{const wi=ov.querySelector('#wgW');if(wi)wi.type=wi.type==='password'?'text':'password';return KEEP}],['Cancel','g',null]],
+ (ov,first)=>{const wi=ov.querySelector('#wgW');if(wi){wi.onkeydown=e=>{if(e.key==='Enter'&&first)first.onclick()};wi.focus()}})}
+function dHud(){if(!dpill){dpill=document.createElement('div');dpill.className='pill';dpill.id='dpill';dpill.style.cssText='white-space:normal;text-align:center;max-width:96vw';$('#top').appendChild(dpill);document.querySelectorAll('#top .pill').forEach(p=>{if(p!==dpill)p.style.display='none'})}
+ const g=1-setter();dpill.textContent='🎯 '+D.names[g]+' guesses  |  '+D.names[0]+' '+D.sc[0]+' - '+D.sc[1]+' '+D.names[1]}
+function beginRound(w){D.tok++;target=last=w;row=0;col=0;grid=['','','','','',''];over=false;busy=false;D.lock=false;D.cpuG=false;D.hist=[];build();$('#msg').textContent='';$('#ov').classList.add('hide')}
+function consistent(w){return D.hist.every(([g,r])=>evalG(g,w).join()===r.join())}
+function cpuGuess(){const tried=new Set(D.hist.map(h=>h[0]));let c=ALL.filter(w=>!tried.has(w)&&consistent(w));
+ if(D.lvl==='easy'&&Math.random()<.65)c=ALL.filter(w=>!tried.has(w));
+ if(!c.length)c=ALL.filter(w=>!tried.has(w));
+ if(D.lvl==='hard'&&c.length>2){const f={};c.forEach(w=>new Set(w).forEach(ch=>f[ch]=(f[ch]||0)+1));let b=null,bs=-1;c.forEach(w=>{const s=[...new Set(w)].reduce((a,ch)=>a+f[ch],0);if(s>bs){bs=s;b=w}});return b}
+ return c[Math.floor(Math.random()*c.length)]}
+function cpuTick(tok){if(tok!==D.tok||over)return;if(busy){setTimeout(()=>cpuTick(tok),300);return}
+ const g=cpuGuess();[...g].forEach((ch,i)=>setTimeout(()=>{if(tok===D.tok&&!over)press(ch,true)},300+i*250));
+ setTimeout(()=>{if(tok!==D.tok||over)return;D.hist.push([g,evalG(g,target)]);submit();cpuTick(tok)},300+5*250+300)}
+async function duoRound(){const s=setter(),g=1-s;dHud();D.lock=true;let w;
+ if(D.m==='two'){await Duo.cover(D.names[s],'Choose a secret word. '+D.names[g]+', look away!');w=await askWord(D.names[s]);if(!w){duoQuit();return}await Duo.cover(D.names[g],'Guess '+D.names[s]+'\'s word!')}
+ else if(s===0){w=await askWord(D.names[0]);if(!w){duoQuit();return}}
+ else{w=WORDS[Math.floor(Math.random()*WORDS.length)];await modal2('<div class="big">🤖</div><h2>Computer picked a word</h2><p>5 letters, 6 tries. Good luck!</p>',[['▶ Guess it!','',true]])}
+ beginRound(w);
+ if(D.m==='cpu'&&g===1){D.cpuG=true;D.lock=true;cpuTick(D.tok)}}
+function duoQuit(){D.m=null;D.lock=false;D.tok++;$('#ov').classList.remove('hide');if(dpill){dpill.remove();dpill=null;document.querySelectorAll('#top .pill').forEach(p=>p.style.display='')}}
+async function duoEnd(solved){const g=1-setter();const pts=solved?(6-row)*20+20:0;D.sc[g]+=pts;dHud();
+ await modal2('<div class="big">'+(solved?'🎉':'😵')+'</div><h2>'+(solved?escH(D.names[g])+' got it!':escH(D.names[g])+' ran out of tries')+'</h2><p>The word was <b>'+escH(target.toUpperCase())+'</b></p><p>'+escH(D.names[g])+': <b>+'+pts+'</b></p>',[['Next ▶','',true]]);
+ D.r++;if(D.r<2){duoRound();return}
+ const a=D.sc[0],b=D.sc[1],win=a>b?0:b>a?1:-1;
+ const r=await modal2('<div class="big">'+(win<0?'🤝':'🏆')+'</div><h2>'+(win<0?'It is a tie!':escH(D.names[win])+' wins!')+'</h2><p>'+escH(D.names[0])+': <b>'+a+'</b></p><p>'+escH(D.names[1])+': <b>'+b+'</b></p>',[['🔁 Rematch','',1],['🏠 Menu','o',0]]);
+ if(r){D.sc=[0,0];D.r=0;duoRound()}else location.reload()}
+async function duoStart(mode){let lvl='easy';
+ if(mode==='cpu'){lvl=await modal2('<div class="big">🤖</div><h2>Computer level</h2>',[['😊 Easy','','easy'],['🧠 Hard','o','hard'],['Cancel','g',null]]);if(!lvl)return}
+ const n=await Duo.askNames({cpu:mode==='cpu'});if(!n)return;
+ D.m=mode;D.names=n;D.sc=[0,0];D.r=0;D.lvl=lvl;D.tok++;duoRound()}
+(function(){const card=document.querySelector('#ov .card');Duo.addButtons(document.createElement('div'),{start(){}});
+ [['👥 2 Players','r','two'],['🤖 vs Computer','r','cpu']].forEach(([t,cl,m])=>{const b=document.createElement('button');b.className='btn '+cl;b.innerHTML=t;b.onclick=()=>duoStart(m);card.appendChild(b)})})();
 $('#go').onclick=startGame;build();best=load('wg_best');score=0;streak=0;upd();
-document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;if(e.key==='Enter'&&!$('#ov').classList.contains('hide')){$('#go').click();e.preventDefault();return}const k=e.key.length===1?e.key.toLowerCase():e.key;press(k)});
+document.addEventListener('keydown',e=>{if(document.querySelector('.duoOv'))return;if(e.ctrlKey||e.metaKey||e.altKey)return;if(e.key==='Enter'&&!$('#ov').classList.contains('hide')){$('#go').click();e.preventDefault();return}const k=e.key.length===1?e.key.toLowerCase():e.key;press(k)});
 </script></body></html>

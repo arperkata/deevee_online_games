@@ -29,6 +29,7 @@ a.c:hover .e,a.c:focus-visible .e{animation:bounce .6s infinite}
 .t{font-size:clamp(17px,4.4vw,22px);font-weight:700;margin:2px 0;line-height:1.15;text-shadow:0 2px 0 rgba(6,36,77,.6);position:relative}
 .d{font-size:clamp(13px,3.3vw,15px);color:#fff;min-height:2.6em;line-height:1.3;text-shadow:0 1px 0 rgba(6,36,77,.6);position:relative;margin-bottom:6px}
 .s{display:inline-block;margin-top:auto;background:#0b3a78;color:#ffe14a;border-radius:999px;padding:3px 12px;font-size:13px;font-weight:700;position:relative;border:2px solid rgba(255,255,255,.8)}
+.m{display:block;margin-top:6px;font-size:12px;font-weight:700;background:#fff;color:#0b3a78;border-radius:999px;padding:2px 10px;position:relative;box-shadow:0 2px 0 rgba(6,36,77,.45)}
 .k-arcade{--a:#ff7a1a;--b:#ff2e63}
 .k-puzzle{--a:#8a4dff;--b:#2f7bff}
 .k-words{--a:#16c784;--b:#0a8fb8}
@@ -49,7 +50,7 @@ a.c:hover .e,a.c:focus-visible .e{animation:bounce .6s infinite}
 </style></head><body>
 <header>
 <h1>🎮 Brain Games Arcade</h1>
-<p class="sub"><b id="total">35</b> quick games for kids and grown-ups · works on phone, tablet and PC</p>
+<p class="sub"><b id="total">155</b> quick games for kids and grown-ups · works on phone, tablet and PC</p>
 <input id="q" type="search" placeholder="🔍 Search games..." aria-label="Search games">
 <div id="tabs"></div>
 </header>
@@ -213,14 +214,15 @@ const G=[
 ["mega-777-slots.html","Mega 777 Slots","7️⃣","Classic reels with hold and jackpot","Play coins","slots"],
 ["treasure-chest-picker.html","Treasure Chest Picker","🧰","Open chests, dodge skulls, cash out","Play coins","slots"]
 ];
-const CATS=[["all","⭐ All"],["arcade","🕹️ Arcade"],["puzzle","🧩 Puzzle"],["strategy","♟️ Strategy"],["memory","🧠 Memory"],["focus","🎯 Focus & Reflex"],["words","🔤 Words & Math"],["cards","🃏 Cards & Dice"],["kids","🧸 Kids Learn"],["creative","🎨 Creative"],["slots","🎰 Slots (play coins)"]];
+const D2=new Set(["aim-trainer.html","alphabet-sky.html","asteroids.html","ball-sort.html","ball-tracker.html","balloon-pop.html","battleship.html","block-blast.html","boggle-grid.html","bounce-keepy.html","breakthrough.html","brick-breaker.html","bubble-pop-math.html","bubble-shooter.html","candy-match.html","card-battle-arena.html","card-war.html","catch-the-right-one.html","checkers.html","chimp-test.html","clock-time.html","coin-counter.html","color-cards.html","color-clash.html","color-echo.html","color-flood.html","color-mixer.html","color-switch.html","connect-four.html","count-animals.html","countdown-numbers.html","dice-yahtzee.html","dino-runner.html","doodle-hop.html","dots-and-boxes.html","equation-builder.html","farkle-dice.html","fidget-spinner.html","flanker-arrows.html","flappy-bird.html","flow-connect.html","fox-and-geese.html","frogger.html","fruit-merge.html","fruit-slicer.html","go-fish.html","gomoku.html","gravity-flip.html","hangman.html","helix-drop.html","hex-game.html","hidden-emoji-scene.html","higher-or-lower.html","jewel-columns.html","jigsaw-puzzle.html","kenken-mini.html","klondike-solitaire.html","laser-dodge.html","lights-out.html","ludo-race.html","make-24.html","mancala.html","math-blitz.html","maze-runner.html","memory-match.html","merge-tiles.html","mine-sweeper.html","mini-chess.html","mini-crossword.html","mini-sudoku.html","mirror-draw.html","missing-vowels.html","n-back.html","nine-mens-morris.html","nonogram-picross.html","number-drop.html","number-memory.html","number-pyramid.html","number-sequence.html","odd-one-out.html","pac-maze.html","pattern-matrix.html","peg-solitaire.html","pentomino-fit.html","pig-dice.html","pipe-connect.html","plant-defense.html","pong.html","quick-count.html","quick-quiz.html","reaction-test.html","reversi-othello.html","rhythm-tap.html","rps-lizard-spock.html","rush-hour-cars.html","schulte-table.html","sequence-echo-grid.html","shade-finder.html","shape-rotation.html","shape-sorter.html","sky-hop.html","slide-puzzle.html","snake.html","snakes-and-ladders.html","sokoban-push.html","space-invaders.html","space-shooter.html","spelling-hive.html","stack-tower.html","sudoku-classic.html","tangram-lite.html","tap-tiles.html","ten-by-ten.html","territory-grab.html","tetris.html","tic-tac-toe.html","tile-match-triple.html","tower-of-hanoi.html","twenty-one.html","tycoon-dash.html","typing-rain.html","ultimate-tic-tac-toe.html","visual-memory-grid.html","water-sort.html","whack-a-mole.html","whats-missing.html","word-guess.html","word-ladder.html","word-scramble.html","word-search.html"]);
+const CATS=[["all","⭐ All"],["duo","👥 2 Players / vs CPU"],["arcade","🕹️ Arcade"],["puzzle","🧩 Puzzle"],["strategy","♟️ Strategy"],["memory","🧠 Memory"],["focus","🎯 Focus & Reflex"],["words","🔤 Words & Math"],["cards","🃏 Cards & Dice"],["kids","🧸 Kids Learn"],["creative","🎨 Creative"],["slots","🎰 Slots (play coins)"]];
 let cat='all';const $=id=>document.getElementById(id);
 $('total').textContent=G.length;
 $('tabs').innerHTML=CATS.map(([k,l])=>`<button class="tab" data-k="${k}">${l}</button>`).join('');
 function render(){
   const q=$('q').value.toLowerCase().trim();
-  const list=G.filter(x=>(cat==='all'||x[5]===cat)&&(!q||(x[1]+x[3]+x[4]).toLowerCase().includes(q)));
-  $('g').innerHTML=list.map((x,i)=>`<a class="c k-${x[5]}" style="animation-delay:${Math.min(i,12)*30}ms" href="${x[0]}"><div class="e">${x[2]}</div><div class="t">${x[1]}</div><div class="d">${x[3]}</div><span class="s">${x[4]}</span></a>`).join('');
+  const list=G.filter(x=>(cat==='all'||(cat==='duo'?D2.has(x[0]):x[5]===cat))&&(!q||(x[1]+x[3]+x[4]).toLowerCase().includes(q)));
+  $('g').innerHTML=list.map((x,i)=>`<a class="c k-${x[5]}" style="animation-delay:${Math.min(i,12)*30}ms" href="${x[0]}"><div class="e">${x[2]}</div><div class="t">${x[1]}</div><div class="d">${x[3]}</div><span class="s">${x[4]}</span>${D2.has(x[0])?'<span class="m">👥 2P · 🤖 CPU</span>':''}</a>`).join('');
   $('cnt').textContent=list.length?'':'No games found 🙈';
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.k===cat));
 }

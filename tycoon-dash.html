@@ -60,7 +60,7 @@ body{background:linear-gradient(#27a2e8,#bdeafc) fixed}
 .tl.corner{background:linear-gradient(#ffe58a,#f5b800)}
 #ctr{grid-area:2/2/7/7;background:linear-gradient(#fff,#dff0ff);color:#1b4f86;text-shadow:none;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;padding:4px;font-size:clamp(11px,calc(var(--bs)/26),17px);min-height:0}
 #chips{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
-.chip{border:3px solid;border-radius:999px;padding:0 7px;font-weight:bold;background:#fff;white-space:nowrap}
+.chip{max-width:48%;overflow:hidden;text-overflow:ellipsis;border:3px solid;border-radius:999px;padding:0 7px;font-weight:bold;background:#fff;white-space:nowrap}
 .chip.on{background:#ffe58a;transform:scale(1.08)}.chip.out{text-decoration:line-through;background:#ddd}
 #dice{display:flex;gap:calc(var(--bs)/22)}
 #msg{font-weight:bold;text-align:center;line-height:1.15;min-height:2.3em;display:flex;align-items:center;max-width:100%}
@@ -71,6 +71,74 @@ body{background:linear-gradient(#27a2e8,#bdeafc) fixed}
 <div id="top"><div class="pill" id="pRound">🏙 Tycoon Dash</div><div class="pill" id="pPool">🅿️ Pool 0</div><div class="pill">🏆 Wins <b id="bw">0</b></div></div>
 <div id="main"><div id="board"><div id="ctr"><div id="chips"></div><div id="dice"></div><div id="msg"></div><button class="btn" id="roll">🎲 Roll</button></div></div></div>
 <div class="ov" id="ov"><div class="card"><h1 id="ovT">🏙 Tycoon Dash</h1><div class="stars" id="ovS"></div><p id="ovP"></p><div id="ovB" style="display:contents"></div></div></div>
+<script>
+/* ===== DUO helper v1 (shared, pasted inline into each game as its own <script> BEFORE the game script) ===== */
+const Duo=(()=>{
+const KEY='duo_names',S={mode:null,names:['Player 1','Player 2'],scores:[null,null],turn:0,hw:true,cpuR:[0,100],lvl:'easy',start:null,game:'',unit:''};
+let pill=null,ac=null;
+function css(){if(document.getElementById('duoCss'))return;const s=document.createElement('style');s.id='duoCss';s.textContent=
+'.duoOv{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(6,30,70,.88);padding:14px;font-family:"Fredoka","Trebuchet MS","Comic Sans MS",sans-serif}'+
+'.duoCard{background:linear-gradient(#2f8cff,#0b4fb3);border:5px solid #ffe14a;border-radius:26px;padding:18px 20px;max-width:min(92vw,420px);width:100%;color:#fff;text-align:center;box-shadow:0 8px 0 #06244d;animation:duoPop .35s}'+
+'@keyframes duoPop{0%{transform:scale(.6)}70%{transform:scale(1.05)}}'+
+'.duoCard h2{margin:0 0 8px;font-size:clamp(22px,6vw,32px);text-shadow:0 3px 0 #0b3a78}.duoCard p{margin:6px 0;font-size:clamp(15px,4vw,19px);font-weight:600}'+
+'.duoCard .big{font-size:clamp(34px,10vw,52px);line-height:1.1}'+
+'.duoCard input{width:100%;box-sizing:border-box;font:600 20px inherit;font-family:inherit;padding:10px 14px;border-radius:14px;border:3px solid #fff;margin:6px 0;color:#0b3a78;text-align:center}'+
+'.duoCard label{display:block;text-align:left;font-weight:700;margin-top:6px;font-size:15px}'+
+'.duoB{font:700 clamp(18px,5vw,24px) inherit;font-family:inherit;margin:8px 4px 0;padding:.45em 1.3em;min-height:46px;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}'+
+'.duoB.o{background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9560b;text-shadow:0 2px 0 #a9560b}.duoB.g{background:linear-gradient(#8a9bb5,#5d6f8a);box-shadow:0 5px 0 #3b4a63;text-shadow:none}'+
+'.duoB:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.3)}'+
+'.duoMenu{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 0}.duoMenu .duoB{margin:0}'+
+'.duoPill{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:8000;background:#0b3a78;color:#fff;border:3px solid #ffe14a;border-radius:999px;padding:3px 14px;font:700 clamp(13px,3.6vw,17px) "Fredoka","Trebuchet MS",sans-serif;box-shadow:0 3px 0 #06244d;pointer-events:none;white-space:nowrap;max-width:62vw;overflow:hidden;text-overflow:ellipsis}';
+document.head.appendChild(s)}
+function beep(f,d){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type='triangle';g.gain.setValueAtTime(.12,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+(d||.15));o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+(d||.15))}catch(e){}}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function modal(html,buttons){css();return new Promise(res=>{const ov=document.createElement('div');ov.className='duoOv';ov.innerHTML='<div class="duoCard">'+html+'<div class="duoMenu"></div></div>';const m=ov.querySelector('.duoMenu');
+ buttons.forEach(([label,cls,val])=>{const b=document.createElement('button');b.className='duoB '+(cls||'');b.innerHTML=label;b.onclick=()=>{const out=typeof val==='function'?val(ov):val;ov.remove();res(out)};m.appendChild(b)});
+ document.body.appendChild(ov);const i=ov.querySelector('input');if(i){i.focus();i.select()}})}
+function saved(){try{const a=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(a))return a}catch(e){}return null}
+function save(a){try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}}
+function clean(v,d){v=(v||'').trim().slice(0,14);return v||d}
+const api={
+ /* Ask both player names. Resolves to [n1,n2] or null if cancelled. opts.cpu=true asks only P1 name (P2 is "Computer"). opts.t1/t2 = labels */
+ askNames(opts){opts=opts||{};const sv=saved()||['',''];
+  const html='<div class="big">'+(opts.cpu?'🤖':'👥')+'</div><h2>'+(opts.cpu?'Your name':'Who is playing?')+'</h2>'+
+   '<label>'+esc(opts.t1||'Player 1')+'</label><input id="duoN1" maxlength="14" placeholder="Player 1" value="'+esc(sv[0]||'')+'">'+
+   (opts.cpu?'':'<label>'+esc(opts.t2||'Player 2')+'</label><input id="duoN2" maxlength="14" placeholder="Player 2" value="'+esc(sv[1]||'')+'">');
+  return modal(html,[['▶ Start','',ov=>{const a=clean(ov.querySelector('#duoN1').value,'Player 1');const b=opts.cpu?'🤖 Computer':clean(ov.querySelector('#duoN2')&&ov.querySelector('#duoN2').value,'Player 2');if(!opts.cpu)save([a,b]);else save([a,sv[1]||'']);return [a,b]}],['Cancel','g',null]])},
+ /* "Pass the device" screen for hot-seat turns / hidden information. Resolves when tapped. */
+ cover(name,msg){beep(660,.12);return modal('<div class="big">🔄</div><h2>Pass to '+esc(name)+'</h2><p>'+esc(msg||'Tap when you are ready')+'</p>',[['I am '+esc(name),'',true]])},
+ /* Add "2 Players" and "vs Computer" buttons into an element (start menu/overlay).
+    o={game:'snake', start:fn(), hw:true(higher wins)|false(lower wins, e.g. time), cpu:[lo,hi] typical score range for the computer (e.g. [40,160]), unit:' pts', noTwo:false, noCpu:false} */
+ addButtons(el,o){css();const wrap=document.createElement('div');wrap.className='duoMenu';
+  if(!o.noTwo){const b=document.createElement('button');b.className='duoB o';b.innerHTML='👥 2 Players';b.onclick=async()=>{const n=await api.askNames();if(n)api.begin(Object.assign({},o,{mode:'two',names:n}))};wrap.appendChild(b)}
+  if(!o.noCpu&&o.cpu){const b=document.createElement('button');b.className='duoB o';b.innerHTML='🤖 vs Computer';b.onclick=async()=>{const lv=await modal('<div class="big">🤖</div><h2>Computer level</h2>',[['😊 Easy','',  'easy'],['🧠 Hard','o','hard'],['Cancel','g',null]]);if(!lv)return;const n=await api.askNames({cpu:true});if(n)api.begin(Object.assign({},o,{mode:'cpu',names:n,lvl:lv}))};wrap.appendChild(b)}
+  el.appendChild(wrap);return wrap},
+ begin(o){S.mode=o.mode;S.names=o.names.slice();S.scores=[null,null];S.turn=0;S.hw=o.hw!==false;S.cpuR=o.cpu||[0,100];S.lvl=o.lvl||'easy';S.start=o.start;S.game=o.game||'';S.unit=o.unit||'';S.fmt=o.fmt||null;
+  api.pill();if(o.start)o.start()},
+ active(){return !!S.mode},
+ mode(){return S.mode},
+ player(){return S.names[S.turn]},
+ names(){return S.names.slice()},
+ pill(){css();if(!S.mode){if(pill){pill.remove();pill=null}return}if(!pill){pill=document.createElement('div');pill.className='duoPill';document.body.appendChild(pill)}
+  pill.textContent=S.mode==='two'?'👤 '+S.names[S.turn]+'  ('+(S.turn+1)+'/2)':'👤 '+S.names[0]+'  vs  🤖'},
+ fmt(v){return S.fmt?S.fmt(v):(Math.round(v*100)/100)+S.unit},
+ cpuScore(){const [lo,hi]=S.cpuR,mid=(lo+hi)/2,r=Math.random();let v;
+  if(S.hw)v=S.lvl==='easy'?lo+r*(mid-lo):mid+r*(hi-mid);else v=S.lvl==='easy'?mid+r*(hi-mid):lo+r*(mid-lo);return (hi-lo)>20?Math.round(v):Math.round(v*100)/100},
+ /* Call when a round ends with the player's score. Returns true if Duo took over (the game must NOT show its own game-over overlay). */
+ finish(score){if(!S.mode)return false;const sc=Number(score)||0;
+  if(S.mode==='two'){S.scores[S.turn]=sc;
+   if(S.turn===0){S.turn=1;api.pill();setTimeout(()=>{modal('<div class="big">✅</div><h2>'+esc(S.names[0])+' scored '+esc(api.fmt(sc))+'</h2><p>Now it is <b>'+esc(S.names[1])+'</b>\'s turn. Beat that!</p>',[['▶ '+esc(S.names[1])+': Go!','',true]]).then(()=>{if(S.start)S.start()})},700);return true}
+   const [a,b]=S.scores,aw=S.hw?a>b:a<b,bw=S.hw?b>a:b<a;const win=aw?0:bw?1:-1;
+   setTimeout(()=>{beep(880,.2);modal('<div class="big">'+(win<0?'🤝':'🏆')+'</div><h2>'+(win<0?'It is a tie!':esc(S.names[win])+' wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(a))+'</b></p><p>'+esc(S.names[1])+': <b>'+esc(api.fmt(b))+'</b></p>',[['🔁 Rematch','',1],['🏠 Menu','o',0]]).then(r=>{if(r){S.scores=[null,null];S.turn=0;api.pill();if(S.start)S.start()}else api.end(true)})},700);return true}
+  /* vs computer */
+  const c=api.cpuScore(),win=S.hw?(sc>c?0:sc<c?1:-1):(sc<c?0:sc>c?1:-1);
+  setTimeout(()=>{beep(win===0?880:300,.25);modal('<div class="big">'+(win===0?'🏆':win<0?'🤝':'🤖')+'</div><h2>'+(win===0?esc(S.names[0])+' wins!':win<0?'Tie!':'Computer wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(sc))+'</b></p><p>🤖 Computer: <b>'+esc(api.fmt(c))+'</b></p>',[['🔁 Play again','',1],['🏠 Menu','o',0]]).then(r=>{if(r){api.pill();if(S.start)S.start()}else api.end(true)})},700);return true},
+ /* Leave duo mode. If reload, the page reloads to the game's normal start menu. */
+ end(reload){S.mode=null;api.pill();if(reload)location.reload()}
+};
+return api})();
+/* ===== end DUO ===== */
+</script>
 <script>
 const KEY='tycoon-dash';
 const $=s=>document.querySelector(s),R=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -100,30 +168,30 @@ const pr=(g,e,n,p)=>({t:'prop',g,e,n,pr:p,o:null});
 const TL=[{t:'start',e:'🏁',n:'START',c:1},pr(0,'🥐','Bakery Row',60),{t:'card',e:'❓',n:'Surprise'},pr(0,'🍦','Ice-Cream Lane',60),{t:'fee',e:'💸',n:'Fee'},pr(1,'🧁','Cupcake Court',100),{t:'rest',e:'⏸️',n:'Time-Out',c:1},pr(1,'🎡','Fairground',100),{t:'card',e:'❓',n:'Surprise'},pr(2,'🎳','Bowling Alley',140),pr(2,'🎬','Cinema Circle',140),{t:'bonus',e:'🎁',n:'Bonus'},{t:'free',e:'🅿️',n:'Free Spot',c:1},pr(3,'🏖️','Beach Walk',180),pr(3,'🏄','Surf Street',180),{t:'card',e:'❓',n:'Surprise'},pr(4,'🏔️','Mountain Pass',220),pr(4,'⛷️','Ski Slope',220),{t:'jail',e:'🚔',n:'Go to Time-Out',c:1},pr(5,'🏰','Castle Hill',260),{t:'fee',e:'💸',n:'Fee'},pr(5,'🛸','Saucer Square',260),pr(6,'🚀','Rocket Plaza',320),pr(6,'👑','Crown Avenue',320)];
 const rentOf=t=>{const own=t.o,full=TL.filter(x=>x.g===t.g).every(x=>x.o===own);return Math.round(t.pr*.15)*(full?2:1)};
 const CARDS=[['🎂 Birthday! Collect 30 from every player','bday'],['🍀 Lucky find! +80','g80'],['🔧 Repair bill! Pay 60','p60'],['🚀 Zoom to START! Collect 200','start'],['👟 Hop forward 3 squares','f3'],['🔙 Slide back 2 squares','b2'],['🚔 Straight to Time-Out! Skip your next turn','jail'],['🎟️ Raffle win! +150','g150'],['🍕 Pizza party! Pay each player 20','pizza'],['📉 Tax audit! Pay 10% of your points','tax']];
-let pls=[],cur=0,round=1,gen=0,over=true,pool=0,mode=1,wins=0,bestW=0,rollRes=null,die=[];
+let pn=['You','Player 2'];const NM=i=>TOK[i]+' '+(pls[i]?pls[i].n:'');let pls=[],cur=0,round=1,gen=0,over=true,pool=0,mode=1,wins=0,bestW=0,rollRes=null,die=[];
 const board=$('#board');
 for(let i=0;i<24;i++){const [r,c]=i<7?[7,7-i]:i<13?[7-(i-6),1]:i<19?[1,i-12+1]:[i-18+1,7];const t=TL[i],d=document.createElement('div');d.className='tl'+(t.c?' corner':'');d.style.gridArea=r+'/'+c;
 d.innerHTML=(t.t==='prop'?'<i class="band" style="background:'+GC[t.g]+'"></i>':'')+'<span class="em">'+t.e+'</span>'+(t.pr?'<span class="pr">'+t.pr+'</span>':t.n.length<9?'<span class="pr">'+t.n+'</span>':'')+'<span class="ob"></span><div class="tk"></div>';d.onclick=()=>info(i);board.appendChild(d);t.el=d}
 die=[mkDie($('#dice'),'var(--dsz)'),mkDie($('#dice'),'var(--dsz)','gold')];
 function msg(t){$('#msg').textContent=t}
 function info(i){const t=TL[i];if(over)return;msg(t.e+' '+t.n+(t.pr?' - cost '+t.pr+', rent '+Math.round(t.pr*.15)+(t.o!=null?' (owner '+TOK[t.o]+')':''):''))}
-function ui(){$('#chips').innerHTML=pls.map((p,i)=>'<div class="chip'+(i===cur&&!over?' on':'')+(p.out?' out':'')+'" style="border-color:'+PCOL[i]+'">'+TOK[i]+' '+p.cash+'</div>').join('');
+function ui(){$('#chips').innerHTML=pls.map((p,i)=>'<div class="chip'+(i===cur&&!over?' on':'')+(p.out?' out':'')+'" style="border-color:'+PCOL[i]+'">'+TOK[i]+' '+p.n+' '+p.cash+'</div>').join('');
 TL.forEach((t,i)=>{if(t.pr){t.el.classList.toggle('own',t.o!=null);if(t.o!=null)t.el.style.setProperty('--oc',PCOL[t.o]);t.el.querySelector('.ob').textContent=t.o!=null?TOK[t.o]:''}t.el.querySelector('.tk').innerHTML=pls.map(p=>!p.out&&p.pos===i?'<span>'+TOK[pls.indexOf(p)]+'</span>':'').join('')});
 $('#pRound').textContent='🏙 Round '+Math.min(round,ROUNDS)+'/'+ROUNDS;$('#pPool').textContent='🅿️ Pool '+pool;$('#bw').textContent=wins;const p=pls[cur];$('#roll').disabled=!(rollRes&&p&&!p.ai)}
 const worth=p=>p.cash+TL.filter(t=>t.o===pls.indexOf(p)).reduce((s,t)=>s+t.pr,0);
 const ask=(title,html,btns)=>new Promise(res=>ov(title,'',html,btns.map(([l,c],i)=>[l,c,()=>{ovHide();res(i)}])));
 async function run(){const g=++gen,chk=()=>{if(g!==gen)throw CANCEL};
 const chipEl=p=>$('#chips').children[pls.indexOf(p)]||$('#chips');
-const bankrupt=async(p,cr)=>{p.out=true;p.cash=0;TL.forEach(t=>{if(t.o===pls.indexOf(p))t.o=cr?pls.indexOf(cr):null});beep(120,.5,'sawtooth');msg('💥 '+TOK[pls.indexOf(p)]+' is bankrupt!');ui();await sleep(1500);chk()};
+const bankrupt=async(p,cr)=>{p.out=true;p.cash=0;TL.forEach(t=>{if(t.o===pls.indexOf(p))t.o=cr?pls.indexOf(cr):null});beep(120,.5,'sawtooth');msg('💥 '+NM(pls.indexOf(p))+' is bankrupt!');ui();await sleep(1500);chk()};
 const pay=async(p,a,to)=>{p.cash-=a;if(to)to.cash+=a;floatEl(chipEl(p),'-'+a,'#ff8a8a');beep(220,.15,'square');ui();if(p.cash<0)await bankrupt(p,to)};
 const gain=(p,a)=>{p.cash+=a;floatEl(chipEl(p),'+'+a,'#7dff7d');beep(700,.1,'triangle');ui()};
 const step=async(p,k)=>{const d=k>0?1:-1;for(let i=0;i<Math.abs(k);i++){p.pos=(p.pos+d+24)%24;if(d>0&&p.pos===0){gain(p,200);msg('🏁 Passed START: +200!')}beep(400+i*30,.05);ui();await sleep(190);chk()}};
 const note=async(p,title,text)=>{if(!p.ai)await ask(title,text,[['👍 OK','']]);else{msg(title+' '+text);await sleep(1800)}chk()};
 const land=async(p,depth)=>{const t=TL[p.pos],pi=pls.indexOf(p);
 if(t.t==='prop'){if(t.o==null){const can=p.cash>=t.pr;if(!can){msg(t.e+' '+t.n+': not enough points');await sleep(1000)}else{let buy;const full=TL.filter(x=>x.g===t.g&&x.o===pi).length===TL.filter(x=>x.g===t.g).length-1;
-if(!p.ai)buy=(await ask(t.e+' '+t.n,'Cost <b>'+t.pr+'</b> pts - rent <b>'+Math.round(t.pr*.15)+'</b> (double with both of its colour)<br>You have <b>'+p.cash+'</b>',[['💰 Buy it!',''],['⏭ Skip','o']]))===0;else{buy=p.cash-t.pr>=120||(full&&p.cash-t.pr>=30);msg(TOK[pi]+' '+(buy?'buys ':'passes on ')+t.n);await sleep(1000)}chk();
-if(buy){p.cash-=t.pr;t.o=pi;jingle([523,659,784]);burstEl(t.el,['⭐','✨','💰'],8);msg(TOK[pi]+' now owns '+t.n+'!');ui();await sleep(700)}}}
-else if(t.o!==pi){const o=pls[t.o],a=rentOf(t);msg(TOK[pi]+' pays '+a+' rent to '+TOK[t.o]);await sleep(500);chk();await pay(p,a,o);if(!p.out)await sleep(500)}else{msg('🏡 Your own place!');await sleep(600)}}
+if(!p.ai)buy=(await ask(t.e+' '+t.n,'Cost <b>'+t.pr+'</b> pts - rent <b>'+Math.round(t.pr*.15)+'</b> (double with both of its colour)<br>You have <b>'+p.cash+'</b>',[['💰 Buy it!',''],['⏭ Skip','o']]))===0;else{buy=p.cash-t.pr>=120||(full&&p.cash-t.pr>=30);msg(NM(pi)+(buy?' buys ':' passes on ')+t.n);await sleep(1000)}chk();
+if(buy){p.cash-=t.pr;t.o=pi;jingle([523,659,784]);burstEl(t.el,['⭐','✨','💰'],8);msg(NM(pi)+' now owns '+t.n+'!');ui();await sleep(700)}}}
+else if(t.o!==pi){const o=pls[t.o],a=rentOf(t);msg(NM(pi)+' pays '+a+' rent to '+NM(t.o));await sleep(500);chk();await pay(p,a,o);if(!p.out)await sleep(500)}else{msg('🏡 Your own place!');await sleep(600)}}
 else if(t.t==='card'){const c=CARDS[R(0,CARDS.length-1)];await note(p,'❓ Surprise!',c[0]);const k=c[1],others=pls.filter(x=>x!==p&&!x.out);
 if(k==='bday'){for(const o of others){await pay(o,30,p)}}else if(k==='g80')gain(p,80);else if(k==='g150')gain(p,150);else if(k==='p60')await pay(p,60,null);else if(k==='tax')await pay(p,Math.round(p.cash/10),null);
 else if(k==='pizza'){for(const o of others){if(!p.out)await pay(p,20,o)}}else if(k==='start'){const f=(24-p.pos)%24;await step(p,f||24)}
@@ -134,18 +202,19 @@ else if(t.t==='free'){if(pool>0){msg('🅿️ Free Spot! You scoop the pool: +'+
 else if(t.t==='jail'){msg('🚔 Go to Time-Out! Skip next turn');beep(200,.3,'sawtooth');p.pos=6;p.skip=true;ui();await sleep(1000)}
 else{msg(t.e+' '+t.n);await sleep(500)}chk()};
 try{while(!over){const p=pls[cur];ui();
-if(p.skip){p.skip=false;msg(TOK[cur]+' is in Time-Out - skips this turn');await sleep(1200);chk()}
-else{if(!p.ai){msg((mode===0?'P'+(cur+1)+' ':'')+TOK[cur]+' Your turn - roll!');await new Promise(r=>{rollRes=r;ui()});rollRes=null}else{msg(TOK[cur]+' CPU is rolling...');await sleep(800)}chk();$('#roll').disabled=true;
-const a=R(1,6),b=R(1,6);await Promise.all([die[0].show(a,800),die[1].show(b,950)]);chk();msg(TOK[cur]+' rolled '+(a+b)+(a===b?' (doubles!)':''));await sleep(300);chk();await step(p,a+b);await land(p,0)}
+if(p.skip){p.skip=false;msg(NM(cur)+' is in Time-Out - skips this turn');await sleep(1200);chk()}
+else{if(!p.ai){msg(NM(cur)+': your turn - roll!');await new Promise(r=>{rollRes=r;ui()});rollRes=null}else{msg(NM(cur)+' is rolling...');await sleep(800)}chk();$('#roll').disabled=true;
+const a=R(1,6),b=R(1,6);await Promise.all([die[0].show(a,800),die[1].show(b,950)]);chk();msg(NM(cur)+' rolled '+(a+b)+(a===b?' (doubles!)':''));await sleep(300);chk();await step(p,a+b);await land(p,0)}
 if(pls.filter(x=>!x.out).length<2)return finish();
 const prev=cur;do{cur=(cur+1)%pls.length}while(pls[cur].out);if(cur<=prev){round++;if(round>ROUNDS)return finish()}}}catch(e){if(e!==CANCEL)throw e}}
 function finish(){over=true;ui();const rk=pls.map((p,i)=>({p,i,w:p.out?-1:worth(p)})).sort((a,b)=>b.w-a.w),top=rk[0].i;
-const me=rk.findIndex(r=>r.i===0),human=mode!==0;let title,stars;if(!human){title='🏆 '+TOK[top]+' P'+(top+1)+' wins!';stars='⭐⭐⭐'}else if(top===0){title='🏆 You win!';stars='⭐⭐⭐';wins++;save('wins',wins)}else{title=TOK[top]+' CPU wins';stars=me===1?'⭐⭐':'⭐'}
+const me=rk.findIndex(r=>r.i===0),human=mode!==0;let title,stars;if(!human){title='🏆 '+pls[top].n+' wins!';stars='⭐⭐⭐'}else if(top===0){title='🏆 '+pls[0].n+' wins!';stars='⭐⭐⭐';wins++;save('wins',wins)}else{title='🤖 Computer'+(pls.length>2?' '+top:'')+' wins';stars=me===1?'⭐⭐':'⭐'}
 const mw=pls[0].out?0:worth(pls[0]);if(human&&mw>bestW){bestW=mw;save('bestW',bestW)}
 jingle([392,523,659,784,1047]);if(top===0||!human)burst(innerWidth/2,innerHeight/3,['💰','⭐','🎉','🏙️'],26);
-setTimeout(()=>ov(title,stars,'Net worth (cash + property):<br>'+rk.map(r=>TOK[r.i]+(r.i===0?' You':' P'+(r.i+1))+': <b>'+(r.w<0?'bankrupt':r.w)+'</b>').join('<br>')+(human?'<br>🌟 Best: <b>'+bestW+'</b>':''),[['▶ Play Again','',()=>start(mode)],['🏠 Menu','o',menu]]),900)}
-function start(m){mode=m;const n=m===0?2:m+1;pls=[];for(let i=0;i<n;i++)pls.push({pos:0,cash:800,ai:m===0?false:i>0,out:false,skip:false});TL.forEach(t=>t.o=null);cur=0;round=1;pool=0;over=false;rollRes=null;wins=load('wins');bestW=load('bestW');die.forEach(d=>d.show(1,0));ovHide();ui();run()}
-function menu(){gen++;over=true;rollRes=null;ui();ov('🏙 Tycoon Dash','','Lap the 24-square city! Buy places, collect rent, draw Surprise cards. Pass START for +200. Play-points only - after '+ROUNDS+' rounds the richest player wins!',[['🤖 vs 1 CPU','',()=>start(1)],['🤖 vs 2 CPU','b',()=>start(2)],['🤖 vs 3 CPU','p',()=>start(3)],['👫 Pass &amp; Play (2 players)','o',()=>start(0)]])}
+setTimeout(()=>ov(title,stars,'Net worth (cash + property):<br>'+rk.map(r=>TOK[r.i]+' '+pls[r.i].n+': <b>'+(r.w<0?'bankrupt':r.w)+'</b>').join('<br>')+(human?'<br>🌟 Best: <b>'+bestW+'</b>':''),[['▶ Play Again','',()=>start(mode)],['🏠 Menu','o',menu]]),900)}
+function start(m,nm){if(nm)pn=nm;mode=m;const n=m===0?2:m+1;pls=[];for(let i=0;i<n;i++)pls.push({n:m===0?pn[i]:i===0?pn[0]:'🤖 Computer'+(m>1?' '+i:''),pos:0,cash:800,ai:m===0?false:i>0,out:false,skip:false});TL.forEach(t=>t.o=null);cur=0;round=1;pool=0;over=false;rollRes=null;wins=load('wins');bestW=load('bestW');die.forEach(d=>d.show(1,0));ovHide();ui();run()}
+async function vs(m){const n=await Duo.askNames({cpu:true});if(n)start(m,n)}
+function menu(){gen++;over=true;rollRes=null;ui();ov('🏙 Tycoon Dash','','Lap the 24-square city! Buy places, collect rent, draw Surprise cards. Pass START for +200. Play-points only - after '+ROUNDS+' rounds the richest player wins!',[['🤖 vs 1 Computer','',()=>vs(1)],['🤖 vs 2 Computers','b',()=>vs(2)],['🤖 vs 3 Computers','p',()=>vs(3)],['👥 2 Players','o',async()=>{const n=await Duo.askNames();if(n)start(0,n)}]])}
 $('#roll').onclick=()=>{if(rollRes&&!$('#roll').disabled){const f=rollRes;rollRes=null;beep(500,.05);f()}};
 addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();$('#roll').onclick()}});
 function fit(){const s=Math.max(260,Math.floor(Math.min(innerWidth-12,innerHeight-$('#top').offsetHeight-16)));board.style.setProperty('--bs',s+'px')}addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,200));

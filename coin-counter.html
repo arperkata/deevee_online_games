@@ -86,10 +86,80 @@ button{font-family:inherit}
 </div>
 <div class="ov" id="ov"><div class="card"><div id="ovE" class="big"></div><h1 id="ovT"></h1><div class="stars" id="ovS"></div><p id="ovP"></p><button class="btn" id="go">▶ Play!</button></div></div>
 <script>
+/* ===== DUO helper v1 (shared, pasted inline into each game as its own <script> BEFORE the game script) ===== */
+const Duo=(()=>{
+const KEY='duo_names',S={mode:null,names:['Player 1','Player 2'],scores:[null,null],turn:0,hw:true,cpuR:[0,100],lvl:'easy',start:null,game:'',unit:''};
+let pill=null,ac=null;
+function css(){if(document.getElementById('duoCss'))return;const s=document.createElement('style');s.id='duoCss';s.textContent=
+'.duoOv{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(6,30,70,.88);padding:14px;font-family:"Fredoka","Trebuchet MS","Comic Sans MS",sans-serif}'+
+'.duoCard{background:linear-gradient(#2f8cff,#0b4fb3);border:5px solid #ffe14a;border-radius:26px;padding:18px 20px;max-width:min(92vw,420px);width:100%;color:#fff;text-align:center;box-shadow:0 8px 0 #06244d;animation:duoPop .35s}'+
+'@keyframes duoPop{0%{transform:scale(.6)}70%{transform:scale(1.05)}}'+
+'.duoCard h2{margin:0 0 8px;font-size:clamp(22px,6vw,32px);text-shadow:0 3px 0 #0b3a78}.duoCard p{margin:6px 0;font-size:clamp(15px,4vw,19px);font-weight:600}'+
+'.duoCard .big{font-size:clamp(34px,10vw,52px);line-height:1.1}'+
+'.duoCard input{width:100%;box-sizing:border-box;font:600 20px inherit;font-family:inherit;padding:10px 14px;border-radius:14px;border:3px solid #fff;margin:6px 0;color:#0b3a78;text-align:center}'+
+'.duoCard label{display:block;text-align:left;font-weight:700;margin-top:6px;font-size:15px}'+
+'.duoB{font:700 clamp(18px,5vw,24px) inherit;font-family:inherit;margin:8px 4px 0;padding:.45em 1.3em;min-height:46px;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}'+
+'.duoB.o{background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9560b;text-shadow:0 2px 0 #a9560b}.duoB.g{background:linear-gradient(#8a9bb5,#5d6f8a);box-shadow:0 5px 0 #3b4a63;text-shadow:none}'+
+'.duoB:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.3)}'+
+'.duoMenu{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 0}.duoMenu .duoB{margin:0}'+
+'.duoPill{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:8000;background:#0b3a78;color:#fff;border:3px solid #ffe14a;border-radius:999px;padding:3px 14px;font:700 clamp(13px,3.6vw,17px) "Fredoka","Trebuchet MS",sans-serif;box-shadow:0 3px 0 #06244d;pointer-events:none;white-space:nowrap;max-width:62vw;overflow:hidden;text-overflow:ellipsis}';
+document.head.appendChild(s)}
+function beep(f,d){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type='triangle';g.gain.setValueAtTime(.12,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+(d||.15));o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+(d||.15))}catch(e){}}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function modal(html,buttons){css();return new Promise(res=>{const ov=document.createElement('div');ov.className='duoOv';ov.innerHTML='<div class="duoCard">'+html+'<div class="duoMenu"></div></div>';const m=ov.querySelector('.duoMenu');
+ buttons.forEach(([label,cls,val])=>{const b=document.createElement('button');b.className='duoB '+(cls||'');b.innerHTML=label;b.onclick=()=>{const out=typeof val==='function'?val(ov):val;ov.remove();res(out)};m.appendChild(b)});
+ document.body.appendChild(ov);const i=ov.querySelector('input');if(i){i.focus();i.select()}})}
+function saved(){try{const a=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(a))return a}catch(e){}return null}
+function save(a){try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}}
+function clean(v,d){v=(v||'').trim().slice(0,14);return v||d}
+const api={
+ /* Ask both player names. Resolves to [n1,n2] or null if cancelled. opts.cpu=true asks only P1 name (P2 is "Computer"). opts.t1/t2 = labels */
+ askNames(opts){opts=opts||{};const sv=saved()||['',''];
+  const html='<div class="big">'+(opts.cpu?'🤖':'👥')+'</div><h2>'+(opts.cpu?'Your name':'Who is playing?')+'</h2>'+
+   '<label>'+esc(opts.t1||'Player 1')+'</label><input id="duoN1" maxlength="14" placeholder="Player 1" value="'+esc(sv[0]||'')+'">'+
+   (opts.cpu?'':'<label>'+esc(opts.t2||'Player 2')+'</label><input id="duoN2" maxlength="14" placeholder="Player 2" value="'+esc(sv[1]||'')+'">');
+  return modal(html,[['▶ Start','',ov=>{const a=clean(ov.querySelector('#duoN1').value,'Player 1');const b=opts.cpu?'🤖 Computer':clean(ov.querySelector('#duoN2')&&ov.querySelector('#duoN2').value,'Player 2');if(!opts.cpu)save([a,b]);else save([a,sv[1]||'']);return [a,b]}],['Cancel','g',null]])},
+ /* "Pass the device" screen for hot-seat turns / hidden information. Resolves when tapped. */
+ cover(name,msg){beep(660,.12);return modal('<div class="big">🔄</div><h2>Pass to '+esc(name)+'</h2><p>'+esc(msg||'Tap when you are ready')+'</p>',[['I am '+esc(name),'',true]])},
+ /* Add "2 Players" and "vs Computer" buttons into an element (start menu/overlay).
+    o={game:'snake', start:fn(), hw:true(higher wins)|false(lower wins, e.g. time), cpu:[lo,hi] typical score range for the computer (e.g. [40,160]), unit:' pts', noTwo:false, noCpu:false} */
+ addButtons(el,o){css();const wrap=document.createElement('div');wrap.className='duoMenu';
+  if(!o.noTwo){const b=document.createElement('button');b.className='duoB o';b.innerHTML='👥 2 Players';b.onclick=async()=>{const n=await api.askNames();if(n)api.begin(Object.assign({},o,{mode:'two',names:n}))};wrap.appendChild(b)}
+  if(!o.noCpu&&o.cpu){const b=document.createElement('button');b.className='duoB o';b.innerHTML='🤖 vs Computer';b.onclick=async()=>{const lv=await modal('<div class="big">🤖</div><h2>Computer level</h2>',[['😊 Easy','',  'easy'],['🧠 Hard','o','hard'],['Cancel','g',null]]);if(!lv)return;const n=await api.askNames({cpu:true});if(n)api.begin(Object.assign({},o,{mode:'cpu',names:n,lvl:lv}))};wrap.appendChild(b)}
+  el.appendChild(wrap);return wrap},
+ begin(o){S.mode=o.mode;S.names=o.names.slice();S.scores=[null,null];S.turn=0;S.hw=o.hw!==false;S.cpuR=o.cpu||[0,100];S.lvl=o.lvl||'easy';S.start=o.start;S.game=o.game||'';S.unit=o.unit||'';S.fmt=o.fmt||null;
+  api.pill();if(o.start)o.start()},
+ active(){return !!S.mode},
+ mode(){return S.mode},
+ player(){return S.names[S.turn]},
+ names(){return S.names.slice()},
+ pill(){css();if(!S.mode){if(pill){pill.remove();pill=null}return}if(!pill){pill=document.createElement('div');pill.className='duoPill';document.body.appendChild(pill)}
+  pill.textContent=S.mode==='two'?'👤 '+S.names[S.turn]+'  ('+(S.turn+1)+'/2)':'👤 '+S.names[0]+'  vs  🤖'},
+ fmt(v){return S.fmt?S.fmt(v):(Math.round(v*100)/100)+S.unit},
+ cpuScore(){const [lo,hi]=S.cpuR,mid=(lo+hi)/2,r=Math.random();let v;
+  if(S.hw)v=S.lvl==='easy'?lo+r*(mid-lo):mid+r*(hi-mid);else v=S.lvl==='easy'?mid+r*(hi-mid):lo+r*(mid-lo);return (hi-lo)>20?Math.round(v):Math.round(v*100)/100},
+ /* Call when a round ends with the player's score. Returns true if Duo took over (the game must NOT show its own game-over overlay). */
+ finish(score){if(!S.mode)return false;const sc=Number(score)||0;
+  if(S.mode==='two'){S.scores[S.turn]=sc;
+   if(S.turn===0){S.turn=1;api.pill();setTimeout(()=>{modal('<div class="big">✅</div><h2>'+esc(S.names[0])+' scored '+esc(api.fmt(sc))+'</h2><p>Now it is <b>'+esc(S.names[1])+'</b>\'s turn. Beat that!</p>',[['▶ '+esc(S.names[1])+': Go!','',true]]).then(()=>{if(S.start)S.start()})},700);return true}
+   const [a,b]=S.scores,aw=S.hw?a>b:a<b,bw=S.hw?b>a:b<a;const win=aw?0:bw?1:-1;
+   setTimeout(()=>{beep(880,.2);modal('<div class="big">'+(win<0?'🤝':'🏆')+'</div><h2>'+(win<0?'It is a tie!':esc(S.names[win])+' wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(a))+'</b></p><p>'+esc(S.names[1])+': <b>'+esc(api.fmt(b))+'</b></p>',[['🔁 Rematch','',1],['🏠 Menu','o',0]]).then(r=>{if(r){S.scores=[null,null];S.turn=0;api.pill();if(S.start)S.start()}else api.end(true)})},700);return true}
+  /* vs computer */
+  const c=api.cpuScore(),win=S.hw?(sc>c?0:sc<c?1:-1):(sc<c?0:sc>c?1:-1);
+  setTimeout(()=>{beep(win===0?880:300,.25);modal('<div class="big">'+(win===0?'🏆':win<0?'🤝':'🤖')+'</div><h2>'+(win===0?esc(S.names[0])+' wins!':win<0?'Tie!':'Computer wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(sc))+'</b></p><p>🤖 Computer: <b>'+esc(api.fmt(c))+'</b></p>',[['🔁 Play again','',1],['🏠 Menu','o',0]]).then(r=>{if(r){api.pill();if(S.start)S.start()}else api.end(true)})},700);return true},
+ /* Leave duo mode. If reload, the page reloads to the game's normal start menu. */
+ end(reload){S.mode=null;api.pill();if(reload)location.reload()}
+};
+return api})();
+/* ===== end DUO ===== */
+</script>
+<script>
 
 const KEY='coin-counter.html',TOTAL=10,MASCOT='🐷',TITLE='Coin Counter',INTRO='Count the star coins! Then build the amount you are asked for. Just for fun - play coins only!';
 const $=s=>document.querySelector(s);
-const rnd=n=>Math.floor(Math.random()*n),pick=a=>a[rnd(a.length)];
+let _sd=0,_st=0,_dc=0;const _rf=()=>{if(!_sd)return Math.random();_st=(_st+0x6D2B79F5)>>>0;let t=_st;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296};
+function duoSeed(){if(Duo.active()&&Duo.mode()==='two'){if(_dc!==1)_sd=1+Math.floor(Math.random()*1e9);_dc=_dc===1?2:1}else _sd=0;_st=_sd}
+const rnd=n=>Math.floor(_rf()*n),pick=a=>a[rnd(a.length)];
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
 function load(k){try{return +localStorage.getItem(k)||0}catch(e){return 0}}
 function save(k,v){try{localStorage.setItem(k,v)}catch(e){}}
@@ -118,13 +188,14 @@ function cheer(msg,el){say(pick(PRAISE)+(msg?' '+msg:''));jingle([523,659,784,10
 function solved(first,el,msg){if(busy)return;busy=true;let p;if(first){clean++;streak++;p=10+Math.min(streak,5)*2}else{streak=0;p=3}addScore(p,el);cheer(msg,el);const t=tok;setTimeout(()=>{if(t===tok)next()},1900)}
 function miss(el,msg){tried=true;streak=0;upd();beep(240,.25,'triangle');shake(el);say(msg||pick(RETRY))}
 function next(){if(round>=TOTAL)return finish();round++;tried=false;busy=false;tok++;upd();newRound(round)}
-function finish(){busy=true;tok++;const r=clean/TOTAL,st=r>=.8?3:r>=.5?2:1;if(score>best){best=score;save(KEY+':best',best)}upd();
+function finish(){busy=true;tok++;if(Duo.active()){upd();if(Duo.finish(score))return}const r=clean/TOTAL,st=r>=.8?3:r>=.5?2:1;if(score>best){best=score;save(KEY+':best',best)}upd();
  $('#ovE').textContent=['🌟','🎉','🏆'][st-1];$('#ovT').textContent=['Good try!','Great job!','Superstar!'][st-1];$('#ovS').textContent='⭐'.repeat(st)+'☆'.repeat(3-st);
  $('#ovP').innerHTML='⭐ '+score+' points &nbsp; 🏆 Best '+best+'<br>'+clean+' of '+TOTAL+' on the first try!';$('#go').textContent='▶ Play Again';$('#ov').classList.remove('hide');
  jingle([523,659,784,1047,1319]);speak('You did it! Great playing!');say('You did it! '+MASCOT)}
-function begin(){$('#ov').classList.add('hide');score=0;round=0;streak=0;clean=0;tok++;if(window.reset)reset();upd();next()}
+function begin(){duoSeed();if(_sd){lastTarget=0;}$('#ov').classList.add('hide');score=0;round=0;streak=0;clean=0;tok++;if(window.reset)reset();upd();next()}
 $('#go').onclick=()=>{beep(520,.08);begin()};
 $('#mc').textContent=MASCOT;$('#ovE').textContent=MASCOT;$('#ovT').textContent=TITLE;$('#ovP').textContent=INTRO;upd();
+(()=>{const w=document.createElement('div');$('#go').parentNode.appendChild(w);Duo.addButtons(w,{game:'coin-counter',start:begin,cpu:[80,170],hw:true,unit:' pts'})})();
 addEventListener('resize',()=>window.fit&&fit());addEventListener('orientationchange',()=>setTimeout(()=>window.fit&&fit(),150));
 
 const tray=$('#tray'),purse=$('#purse'),root=document.documentElement;
@@ -139,7 +210,7 @@ function render(){
  const s=sum(have);fit();
  if(mode==='make'){$('#cur').textContent='⭐ '+s;$('#cur').classList.toggle('over',s>target)}
 }
-function newRound(r){
+function newRound(r){if(_sd)_st=(_sd+r*104729)>>>0;
  have=[];purse.innerHTML='';
  if(r<=3){
   mode='count';$('#tg').textContent='How many ⭐ in all?';$('#cur').classList.add('hide');

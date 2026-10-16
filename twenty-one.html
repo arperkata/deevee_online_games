@@ -74,7 +74,7 @@ button.go:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
 @media(orientation:landscape) and (max-height:520px){#stage{flex-direction:row}#ctl{width:170px;justify-content:center}#bets,#acts{flex-direction:column}}
 </style></head><body>
 <a class="home" href="index.html">⌂ Home</a>
-<div id="top"><h1>Twenty-One</h1><span class="pill">Points <b id="pts">100</b></span><span class="pill">Bet <b id="bt">10</b></span><span class="pill">Streak <b id="st">0</b>🔥</span><span class="pill">Best <b id="bs">0</b></span><button class="btn o" id="cash">💰 Cash out</button><button class="mute" id="mute">🔊</button></div>
+<div id="top"><h1>Twenty-One</h1><span class="pill">Points <b id="pts">100</b></span><span class="pill">Bet <b id="bt">10</b></span><span class="pill">Streak <b id="st">0</b>🔥</span><span class="pill">Best <b id="bs">0</b></span><span class="pill" id="duelInfo" style="display:none"></span><button class="btn o" id="cash">💰 Cash out</button><button class="mute" id="mute">🔊</button></div>
 <div id="stage"><div id="table">
 <div class="zone"><span class="pill" id="dt">Dealer</span><div class="hand" id="dh"></div></div>
 <div id="banner"></div>
@@ -83,7 +83,75 @@ button.go:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
 <div id="ctl"><div id="bets"><button class="chip c5" data-b="5">5</button><button class="chip c10" data-b="10">10</button><button class="chip c25" data-b="25">25</button><button class="chip c50" data-b="50">50</button><button class="btn g" id="deal">Deal</button></div>
 <div id="acts"><button class="btn g" id="hit">Hit</button><button class="btn r" id="stand">Stand</button><button class="btn o" id="dbl">Double</button></div></div></div>
 <canvas id="fx"></canvas>
-<div id="msg"><div id="box"><div id="em"></div><div id="mt"></div><div id="stars"></div><div id="ms"></div><button class="go" id="again">Play</button></div></div>
+<div id="msg"><div id="box"><div id="em"></div><div id="mt"></div><div id="stars"></div><div id="ms"></div><button class="go" id="again">Play</button><button class="go" id="menuB" style="display:none;background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9560b;text-shadow:0 2px 0 #a9560b;margin-left:8px">Menu</button></div></div>
+<script>
+/* ===== DUO helper v1 (shared, pasted inline into each game as its own <script> BEFORE the game script) ===== */
+const Duo=(()=>{
+const KEY='duo_names',S={mode:null,names:['Player 1','Player 2'],scores:[null,null],turn:0,hw:true,cpuR:[0,100],lvl:'easy',start:null,game:'',unit:''};
+let pill=null,ac=null;
+function css(){if(document.getElementById('duoCss'))return;const s=document.createElement('style');s.id='duoCss';s.textContent=
+'.duoOv{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(6,30,70,.88);padding:14px;font-family:"Fredoka","Trebuchet MS","Comic Sans MS",sans-serif}'+
+'.duoCard{background:linear-gradient(#2f8cff,#0b4fb3);border:5px solid #ffe14a;border-radius:26px;padding:18px 20px;max-width:min(92vw,420px);width:100%;color:#fff;text-align:center;box-shadow:0 8px 0 #06244d;animation:duoPop .35s}'+
+'@keyframes duoPop{0%{transform:scale(.6)}70%{transform:scale(1.05)}}'+
+'.duoCard h2{margin:0 0 8px;font-size:clamp(22px,6vw,32px);text-shadow:0 3px 0 #0b3a78}.duoCard p{margin:6px 0;font-size:clamp(15px,4vw,19px);font-weight:600}'+
+'.duoCard .big{font-size:clamp(34px,10vw,52px);line-height:1.1}'+
+'.duoCard input{width:100%;box-sizing:border-box;font:600 20px inherit;font-family:inherit;padding:10px 14px;border-radius:14px;border:3px solid #fff;margin:6px 0;color:#0b3a78;text-align:center}'+
+'.duoCard label{display:block;text-align:left;font-weight:700;margin-top:6px;font-size:15px}'+
+'.duoB{font:700 clamp(18px,5vw,24px) inherit;font-family:inherit;margin:8px 4px 0;padding:.45em 1.3em;min-height:46px;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}'+
+'.duoB.o{background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9560b;text-shadow:0 2px 0 #a9560b}.duoB.g{background:linear-gradient(#8a9bb5,#5d6f8a);box-shadow:0 5px 0 #3b4a63;text-shadow:none}'+
+'.duoB:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.3)}'+
+'.duoMenu{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 0}.duoMenu .duoB{margin:0}'+
+'.duoPill{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:8000;background:#0b3a78;color:#fff;border:3px solid #ffe14a;border-radius:999px;padding:3px 14px;font:700 clamp(13px,3.6vw,17px) "Fredoka","Trebuchet MS",sans-serif;box-shadow:0 3px 0 #06244d;pointer-events:none;white-space:nowrap;max-width:62vw;overflow:hidden;text-overflow:ellipsis}';
+document.head.appendChild(s)}
+function beep(f,d){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type='triangle';g.gain.setValueAtTime(.12,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+(d||.15));o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+(d||.15))}catch(e){}}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function modal(html,buttons){css();return new Promise(res=>{const ov=document.createElement('div');ov.className='duoOv';ov.innerHTML='<div class="duoCard">'+html+'<div class="duoMenu"></div></div>';const m=ov.querySelector('.duoMenu');
+ buttons.forEach(([label,cls,val])=>{const b=document.createElement('button');b.className='duoB '+(cls||'');b.innerHTML=label;b.onclick=()=>{const out=typeof val==='function'?val(ov):val;ov.remove();res(out)};m.appendChild(b)});
+ document.body.appendChild(ov);const i=ov.querySelector('input');if(i){i.focus();i.select()}})}
+function saved(){try{const a=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(a))return a}catch(e){}return null}
+function save(a){try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}}
+function clean(v,d){v=(v||'').trim().slice(0,14);return v||d}
+const api={
+ /* Ask both player names. Resolves to [n1,n2] or null if cancelled. opts.cpu=true asks only P1 name (P2 is "Computer"). opts.t1/t2 = labels */
+ askNames(opts){opts=opts||{};const sv=saved()||['',''];
+  const html='<div class="big">'+(opts.cpu?'🤖':'👥')+'</div><h2>'+(opts.cpu?'Your name':'Who is playing?')+'</h2>'+
+   '<label>'+esc(opts.t1||'Player 1')+'</label><input id="duoN1" maxlength="14" placeholder="Player 1" value="'+esc(sv[0]||'')+'">'+
+   (opts.cpu?'':'<label>'+esc(opts.t2||'Player 2')+'</label><input id="duoN2" maxlength="14" placeholder="Player 2" value="'+esc(sv[1]||'')+'">');
+  return modal(html,[['▶ Start','',ov=>{const a=clean(ov.querySelector('#duoN1').value,'Player 1');const b=opts.cpu?'🤖 Computer':clean(ov.querySelector('#duoN2')&&ov.querySelector('#duoN2').value,'Player 2');if(!opts.cpu)save([a,b]);else save([a,sv[1]||'']);return [a,b]}],['Cancel','g',null]])},
+ /* "Pass the device" screen for hot-seat turns / hidden information. Resolves when tapped. */
+ cover(name,msg){beep(660,.12);return modal('<div class="big">🔄</div><h2>Pass to '+esc(name)+'</h2><p>'+esc(msg||'Tap when you are ready')+'</p>',[['I am '+esc(name),'',true]])},
+ /* Add "2 Players" and "vs Computer" buttons into an element (start menu/overlay).
+    o={game:'snake', start:fn(), hw:true(higher wins)|false(lower wins, e.g. time), cpu:[lo,hi] typical score range for the computer (e.g. [40,160]), unit:' pts', noTwo:false, noCpu:false} */
+ addButtons(el,o){css();const wrap=document.createElement('div');wrap.className='duoMenu';
+  if(!o.noTwo){const b=document.createElement('button');b.className='duoB o';b.innerHTML='👥 2 Players';b.onclick=async()=>{const n=await api.askNames();if(n)api.begin(Object.assign({},o,{mode:'two',names:n}))};wrap.appendChild(b)}
+  if(!o.noCpu&&o.cpu){const b=document.createElement('button');b.className='duoB o';b.innerHTML='🤖 vs Computer';b.onclick=async()=>{const lv=await modal('<div class="big">🤖</div><h2>Computer level</h2>',[['😊 Easy','',  'easy'],['🧠 Hard','o','hard'],['Cancel','g',null]]);if(!lv)return;const n=await api.askNames({cpu:true});if(n)api.begin(Object.assign({},o,{mode:'cpu',names:n,lvl:lv}))};wrap.appendChild(b)}
+  el.appendChild(wrap);return wrap},
+ begin(o){S.mode=o.mode;S.names=o.names.slice();S.scores=[null,null];S.turn=0;S.hw=o.hw!==false;S.cpuR=o.cpu||[0,100];S.lvl=o.lvl||'easy';S.start=o.start;S.game=o.game||'';S.unit=o.unit||'';S.fmt=o.fmt||null;
+  api.pill();if(o.start)o.start()},
+ active(){return !!S.mode},
+ mode(){return S.mode},
+ player(){return S.names[S.turn]},
+ names(){return S.names.slice()},
+ pill(){css();if(!S.mode){if(pill){pill.remove();pill=null}return}if(!pill){pill=document.createElement('div');pill.className='duoPill';document.body.appendChild(pill)}
+  pill.textContent=S.mode==='two'?'👤 '+S.names[S.turn]+'  ('+(S.turn+1)+'/2)':'👤 '+S.names[0]+'  vs  🤖'},
+ fmt(v){return S.fmt?S.fmt(v):(Math.round(v*100)/100)+S.unit},
+ cpuScore(){const [lo,hi]=S.cpuR,mid=(lo+hi)/2,r=Math.random();let v;
+  if(S.hw)v=S.lvl==='easy'?lo+r*(mid-lo):mid+r*(hi-mid);else v=S.lvl==='easy'?mid+r*(hi-mid):lo+r*(mid-lo);return (hi-lo)>20?Math.round(v):Math.round(v*100)/100},
+ /* Call when a round ends with the player's score. Returns true if Duo took over (the game must NOT show its own game-over overlay). */
+ finish(score){if(!S.mode)return false;const sc=Number(score)||0;
+  if(S.mode==='two'){S.scores[S.turn]=sc;
+   if(S.turn===0){S.turn=1;api.pill();setTimeout(()=>{modal('<div class="big">✅</div><h2>'+esc(S.names[0])+' scored '+esc(api.fmt(sc))+'</h2><p>Now it is <b>'+esc(S.names[1])+'</b>\'s turn. Beat that!</p>',[['▶ '+esc(S.names[1])+': Go!','',true]]).then(()=>{if(S.start)S.start()})},700);return true}
+   const [a,b]=S.scores,aw=S.hw?a>b:a<b,bw=S.hw?b>a:b<a;const win=aw?0:bw?1:-1;
+   setTimeout(()=>{beep(880,.2);modal('<div class="big">'+(win<0?'🤝':'🏆')+'</div><h2>'+(win<0?'It is a tie!':esc(S.names[win])+' wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(a))+'</b></p><p>'+esc(S.names[1])+': <b>'+esc(api.fmt(b))+'</b></p>',[['🔁 Rematch','',1],['🏠 Menu','o',0]]).then(r=>{if(r){S.scores=[null,null];S.turn=0;api.pill();if(S.start)S.start()}else api.end(true)})},700);return true}
+  /* vs computer */
+  const c=api.cpuScore(),win=S.hw?(sc>c?0:sc<c?1:-1):(sc<c?0:sc>c?1:-1);
+  setTimeout(()=>{beep(win===0?880:300,.25);modal('<div class="big">'+(win===0?'🏆':win<0?'🤝':'🤖')+'</div><h2>'+(win===0?esc(S.names[0])+' wins!':win<0?'Tie!':'Computer wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(sc))+'</b></p><p>🤖 Computer: <b>'+esc(api.fmt(c))+'</b></p>',[['🔁 Play again','',1],['🏠 Menu','o',0]]).then(r=>{if(r){api.pill();if(S.start)S.start()}else api.end(true)})},700);return true},
+ /* Leave duo mode. If reload, the page reloads to the game's normal start menu. */
+ end(reload){S.mode=null;api.pill();if(reload)location.reload()}
+};
+return api})();
+/* ===== end DUO ===== */
+</script>
 <script>
 const GAME="twenty-one.html";
 const $=id=>document.getElementById(id);
@@ -110,6 +178,9 @@ function floatText(txt,x,y,color='#ffe14a'){const d=document.createElement('div'
 function floatAt(el,txt,color){const r=el.getBoundingClientRect();floatText(txt,r.left+r.width/2,r.top+r.height/2,color)}
 function overlay(o){$('em').textContent=o.em||'';$('mt').textContent=o.title||'';$('stars').textContent=o.stars?'★'.repeat(o.stars)+'☆'.repeat(3-o.stars):'';$('ms').innerHTML=o.html||'';const b=$('again');b.textContent=o.btn||'Play Again';b.onclick=()=>{beep(520);$('msg').style.display='none';o.cb()};$('msg').style.display='flex';if(o.win){jingle();bigConfetti()}else if(o.lose)sadTone()}
 
+let DUEL=false,MODE='solo',LVL='easy',PN=['You','Dealer'],SP=[],cur=0,round=1,ROUNDS=5;
+const nm=()=>DUEL?PN[cur]:'You';
+const isCpuTurn=()=>DUEL&&MODE==='cpu'&&cur===1;
 let pts,bet,streak,peak,phase='idle',P=[],D=[],dk=[],holeEl=null,busy=false,total=0;
 const val=h=>{let t=0,a=0;h.forEach(c=>{t+=c.r>10?10:c.r==1?11:c.r;if(c.r==1)a++});while(t>21&&a){t-=10;a--}return t};
 function drawC(){if(dk.length<15)dk=shuffle(deck());return dk.pop()}
@@ -117,7 +188,7 @@ function hud(){$('pts').textContent=pts;$('bt').textContent=bet;$('st').textCont
   document.querySelectorAll('.chip').forEach(c=>{const v=+c.dataset.b;c.disabled=v>pts;c.classList.toggle('sel',v==bet)});
   $('deal').disabled=pts<bet;$('cash').disabled=phase!='bet'}
 function totals(reveal){
-  $('pt').textContent='You: '+val(P);
+  $('pt').textContent=nm()+': '+val(P);
   $('dt').textContent=!D.length?'Dealer':reveal?'Dealer: '+val(D):'Dealer: '+val([D[0]])+' + ?'}
 function banner(txt,cls){const b=$('banner');b.textContent=txt;b.className=cls?'show '+cls:'show';b.style.animation='none';void b.offsetWidth;b.style.animation=''}
 function add(who,c,up=true){const h=$(who?'ph':'dh');(who?P:D).push(c);const e=cardEl(c,up);e.classList.add('dealin');h.appendChild(e);beep(who?480:380,.06);return e}
@@ -133,28 +204,28 @@ async function deal(){
   busy=false;mode('play');$('dbl').disabled=pts<total;hud()}
 async function reveal(){
   const c=D[1],e=cardEl(c,true);e.classList.add('flip');holeEl.replaceWith(e);holeEl=null;beep(600,.08);totals(true);await sleep(450)}
-function hit(){
-  if(busy||phase!='play')return;add(1,drawC());totals();const v=val(P);
+function hit(f){
+  if(busy||phase!='play'||(isCpuTurn()&&f!==true))return;add(1,drawC());totals();const v=val(P);
   $('dbl').disabled=true;
   if(v>21){busy=true;reveal().then(()=>finish('bust'))}
-  else if(v==21)stand()}
-async function stand(){
-  if(busy&&phase!='play')return;if(phase!='play')return;busy=true;phase='dealer';mode('none');
+  else if(v==21)stand(true)}
+async function stand(f){
+  if(isCpuTurn()&&f!==true)return;if(busy&&phase!='play')return;if(phase!='play')return;busy=true;phase='dealer';mode('none');
   await reveal();
   while(val(D)<17){await sleep(550);add(0,drawC());totals(true)}
   await sleep(450);const p=val(P),d=val(D);
   finish(d>21?'dbust':p>d?'win':p<d?'lose':'push')}
-function dbl(){
-  if(busy||phase!='play'||P.length!=2||pts<total)return;
+function dbl(f){
+  if(busy||phase!='play'||P.length!=2||pts<total||(isCpuTurn()&&f!==true))return;
   pts-=total;total*=2;hud();const c=drawC();add(1,c);totals();
-  if(val(P)>21){busy=true;phase='dealer';reveal().then(()=>finish('bust'))}else stand()}
+  if(val(P)>21){busy=true;phase='dealer';reveal().then(()=>finish('bust'))}else stand(true)}
 function finish(r){
   phase='end';let pay=0,msg,cls='lose',txt=null;
   if(r=='bj'){pay=Math.floor(total*2.5);msg='TWENTY-ONE! 🎉';cls='win'}
-  else if(r=='win'){pay=total*2;msg='YOU WIN!';cls='win'}
+  else if(r=='win'){pay=total*2;msg=DUEL?nm().toUpperCase()+' WINS!':'YOU WIN!';cls='win'}
   else if(r=='dbust'){pay=total*2;msg='DEALER BUSTS!';cls='win'}
   else if(r=='push'){pay=total;msg='PUSH - tie';cls=''}
-  else if(r=='bust'){msg='BUST! Over 21'}
+  else if(r=='bust'){msg=DUEL?nm()+' busts! Over 21':'BUST! Over 21'}
   else msg='Dealer wins';
   const won=cls=='win';
   if(won){streak++;const bonus=streak>=2?Math.min(25,5*(streak-1)):0;pay+=bonus;if(bonus)msg+=' +'+bonus+' streak';beep(784,.15);setTimeout(()=>beep(1047,.2),130);
@@ -163,19 +234,54 @@ function finish(r){
   pts+=pay;const net=pay-total;
   banner(msg+(net?' ('+(net>0?'+':'')+net+')':''),cls);
   if(net>0)floatText('+'+net,innerWidth/2,innerHeight*.5,'#7dff7d');
-  peak=Math.max(peak,pts);if(peak>getBest('peak',100))setBest('peak',peak);
+  if(!DUEL){peak=Math.max(peak,pts);if(peak>getBest('peak',100))setBest('peak',peak)}
   bet=[50,25,10,5].find(v=>v<=Math.min(bet,pts))||5;
+  if(DUEL){phase='wait';busy=true;mode('none');hud();setTimeout(duelNext,1700);return}
   phase='bet';busy=false;hud();
   if(pts<5){busy=true;phase='over';setTimeout(()=>over(true),1300)}else mode('bet')}
 function over(broke){
   const st=peak>=250?3:peak>=150?2:1;busy=false;hud();
   overlay({em:broke?'💸':'🏁',title:broke?'Out of points!':'Cashed out!',stars:st,lose:broke,win:!broke&&peak>100,html:'Final points <b>'+pts+'</b><br>Peak <b>'+peak+'</b> · Best <b>'+getBest('peak',100)+'</b>',cb:newGame})}
-function newGame(){pts=100;bet=10;streak=0;peak=100;phase='bet';busy=false;P=[];D=[];holeEl=null;$('dh').innerHTML='';$('ph').innerHTML='';$('banner').className='';totals();mode('bet');hud();fit()}
+function newGame(){DUEL=false;$('duelInfo').style.display='none';$('cash').textContent='💰 Cash out';pts=100;bet=10;streak=0;peak=100;phase='bet';busy=false;P=[];D=[];holeEl=null;$('dh').innerHTML='';$('ph').innerHTML='';$('banner').className='';totals();mode('bet');hud();fit()}
+
+function duelInfo(){$('duelInfo').style.display='';$('duelInfo').innerHTML='<b>'+PN[0]+'</b> '+(cur===0?pts:SP[0].pts)+' · <b>'+PN[1]+'</b> '+(cur===1?pts:SP[1].pts)+' · Round <b>'+Math.min(round,ROUNDS)+'/'+ROUNDS+'</b>'}
+function clearTable(){$('dh').innerHTML='';$('ph').innerHTML='';$('banner').className='';P=[];D=[];holeEl=null;totals()}
+function loadP(i){cur=i;({pts,bet,streak}=SP[i]);peak=pts}
+function startDuel(){DUEL=true;SP=[{pts:100,bet:10,streak:0},{pts:100,bet:10,streak:0}];round=1;loadP(0);clearTable();$('cash').textContent='🏁 End game';phase='bet';busy=false;$('menuB').style.display='none';hud();duelInfo();mode('bet')}
+async function duelNext(){
+  SP[cur]={pts,bet,streak};if(cur===1)round++;
+  if(pts<5||round>ROUNDS)return duelEnd();
+  const nx=1-cur;clearTable();mode('none');
+  if(MODE==='2p')await Duo.cover(PN[nx]);
+  loadP(nx);clearTable();phase='bet';hud();duelInfo();
+  if(isCpuTurn()){cpuPlay()}else{busy=false;mode('bet')}}
+function softHand(h){let t=0,a=0;h.forEach(c=>{t+=c.r>10?10:c.r==1?11:c.r;if(c.r==1)a++});while(t>21&&a){t-=10;a--}return a>0}
+async function cpuPlay(){
+  busy=true;mode('none');await sleep(800);
+  const hard=LVL==='hard';bet=hard?(pts>=150?25:pts>=60?10:5):10;bet=Math.min(bet,pts);if(bet<5)bet=5;hud();await sleep(500);
+  busy=false;await deal();
+  while(phase=='play'){
+    await sleep(900);const v=val(P),up=D[0].r>10?10:D[0].r==1?11:D[0].r;let act;
+    if(!hard)act=v<15||(v<17&&Math.random()<.4)?'h':'s';
+    else if(softHand(P))act=v<=17||(v==18&&up>=9)?'h':'s';
+    else if(v<=8)act='h';else if(v<=11)act=(P.length==2&&pts>=total&&(v==11||(v==10&&up<=9)||(v==9&&up>=3&&up<=6)))?'d':'h';
+    else if(v==12)act=up>=4&&up<=6?'s':'h';else if(v<=16)act=up<=6?'s':'h';else act='s';
+    if(act=='d'){dbl(true);break}
+    if(act=='s'){stand(true);break}
+    hit(true);await sleep(400);if(busy||phase!='play')break}}
+function duelEnd(){
+  busy=true;phase='over';mode('none');clearTable();const a=SP[0].pts,b=SP[1].pts,w=a>b?0:b>a?1:-1;
+  overlay({em:w<0?'🤝':'🏆',title:w<0?"It's a tie!":PN[w]+' wins!',win:w===0||(w===1&&MODE==='2p'),lose:w===1&&MODE==='cpu',html:PN[0]+' <b>'+a+'</b> pts · '+PN[1]+' <b>'+b+'</b> pts',btn:'Play again',cb:startDuel});$('menuB').style.display='inline-block'}
+async function pickMode(m,l){const n=m==='2p'?await Duo.askNames():await Duo.askNames({cpu:true});if(!n)return;MODE=m;LVL=l;PN=n.slice();$('msg').style.display='none';startDuel()}
+function mkB(txt,cls,fn){const b=document.createElement('button');b.className='btn '+cls;b.textContent=txt;b.style.margin='4px';b.onclick=fn;$('modes').appendChild(b)}
+function showMenu(){MODE='solo';newGame();$('menuB').style.display='none';
+  overlay({em:'🂡',title:'Twenty-One',btn:'Deal me in ▶',cb:()=>{},html:'Beat the dealer to <b>21</b> without going over.<br>Start with <b>100 points</b>. Hit, Stand or Double.<br>Win streaks earn bonus points!<br><small>Two-player and Computer modes: 5 rounds each, most points wins.</small><div id="modes"></div>'});
+  mkB('🤖 vs Computer: Easy','g',()=>pickMode('cpu','easy'));mkB('🧠 vs Computer: Hard','o',()=>pickMode('cpu','hard'));mkB('👥 2 Players','r',()=>pickMode('2p','easy'))}
+$('menuB').onclick=()=>{beep(520);showMenu()};
 document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{if(phase!='bet'||busy)return;bet=+c.dataset.b;beep(700,.05);hud()});
 $('deal').onclick=deal;$('hit').onclick=hit;$('stand').onclick=stand;$('dbl').onclick=dbl;
-$('cash').onclick=()=>{if(phase=='bet'&&!busy)over(false)};
+$('cash').onclick=()=>{if(phase=='bet'&&!busy){if(DUEL){SP[cur]={pts,bet,streak};duelEnd()}else over(false)}};
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(k=='h')hit();else if(k=='s')stand();else if(k=='d'&&phase=='play')dbl();else if(k==' '||k=='enter'){if(phase=='bet'&&$('msg').style.display!='flex')deal()}});
 addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,200));
-newGame();
-overlay({em:'🂡',title:'Twenty-One',btn:'Deal me in ▶',cb:()=>{},html:'Beat the dealer to <b>21</b> without going over.<br>Start with <b>100 points</b>. Hit, Stand or Double.<br>Win streaks earn bonus points!'});
+showMenu();
 </script></body></html>

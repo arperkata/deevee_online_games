@@ -57,6 +57,7 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 #ans .btn{font-size:clamp(20px,5.5vw,28px);padding:8px 6px;min-height:clamp(56px,11vh,84px)}
 #ans .btn[disabled]{background:linear-gradient(#aab8c8,#7d8da0);box-shadow:0 5px 0 #56657a;text-shadow:0 2px 0 #56657a;cursor:default}
 @media (max-height:480px){#left{width:min(50vw,420px)}#shapeBox{height:calc(100dvh - 70px)}#shape{font-size:clamp(60px,36vh,120px)}#ans{width:min(40vw,320px);grid-template-columns:1fr}#ans .btn{min-height:calc(50dvh - 50px)}#info{max-width:40vw}}
+.duoPill{top:auto!important;bottom:6px}
 </style></head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 <div id="top"><div class="pill">&#11088; <b id="sc">0</b></div><div class="pill">&#127942; <b id="bs">0</b></div><div class="pill" id="tr">1/24</div><div class="pill">&#128293; <b id="st">0</b></div></div>
@@ -64,10 +65,81 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 <div id="ans"><button class="btn" id="bSame">&#9989; Same</button><button class="btn r" id="bDiff">&#10060; Different</button></div></div>
 <div class="ov" id="ov"><div class="card"><h1 id="ovT"></h1><div class="stars" id="ovS"></div><p id="ovP"></p><div class="ovb" id="ovB"></div></div></div>
 <script>
+/* ===== DUO helper v1 (shared, pasted inline into each game as its own <script> BEFORE the game script) ===== */
+const Duo=(()=>{
+const KEY='duo_names',S={mode:null,names:['Player 1','Player 2'],scores:[null,null],turn:0,hw:true,cpuR:[0,100],lvl:'easy',start:null,game:'',unit:''};
+let pill=null,ac=null;
+function css(){if(document.getElementById('duoCss'))return;const s=document.createElement('style');s.id='duoCss';s.textContent=
+'.duoOv{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(6,30,70,.88);padding:14px;font-family:"Fredoka","Trebuchet MS","Comic Sans MS",sans-serif}'+
+'.duoCard{background:linear-gradient(#2f8cff,#0b4fb3);border:5px solid #ffe14a;border-radius:26px;padding:18px 20px;max-width:min(92vw,420px);width:100%;color:#fff;text-align:center;box-shadow:0 8px 0 #06244d;animation:duoPop .35s}'+
+'@keyframes duoPop{0%{transform:scale(.6)}70%{transform:scale(1.05)}}'+
+'.duoCard h2{margin:0 0 8px;font-size:clamp(22px,6vw,32px);text-shadow:0 3px 0 #0b3a78}.duoCard p{margin:6px 0;font-size:clamp(15px,4vw,19px);font-weight:600}'+
+'.duoCard .big{font-size:clamp(34px,10vw,52px);line-height:1.1}'+
+'.duoCard input{width:100%;box-sizing:border-box;font:600 20px inherit;font-family:inherit;padding:10px 14px;border-radius:14px;border:3px solid #fff;margin:6px 0;color:#0b3a78;text-align:center}'+
+'.duoCard label{display:block;text-align:left;font-weight:700;margin-top:6px;font-size:15px}'+
+'.duoB{font:700 clamp(18px,5vw,24px) inherit;font-family:inherit;margin:8px 4px 0;padding:.45em 1.3em;min-height:46px;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}'+
+'.duoB.o{background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9560b;text-shadow:0 2px 0 #a9560b}.duoB.g{background:linear-gradient(#8a9bb5,#5d6f8a);box-shadow:0 5px 0 #3b4a63;text-shadow:none}'+
+'.duoB:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.3)}'+
+'.duoMenu{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 0}.duoMenu .duoB{margin:0}'+
+'.duoPill{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:8000;background:#0b3a78;color:#fff;border:3px solid #ffe14a;border-radius:999px;padding:3px 14px;font:700 clamp(13px,3.6vw,17px) "Fredoka","Trebuchet MS",sans-serif;box-shadow:0 3px 0 #06244d;pointer-events:none;white-space:nowrap;max-width:62vw;overflow:hidden;text-overflow:ellipsis}';
+document.head.appendChild(s)}
+function beep(f,d){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type='triangle';g.gain.setValueAtTime(.12,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+(d||.15));o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+(d||.15))}catch(e){}}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function modal(html,buttons){css();return new Promise(res=>{const ov=document.createElement('div');ov.className='duoOv';ov.innerHTML='<div class="duoCard">'+html+'<div class="duoMenu"></div></div>';const m=ov.querySelector('.duoMenu');
+ buttons.forEach(([label,cls,val])=>{const b=document.createElement('button');b.className='duoB '+(cls||'');b.innerHTML=label;b.onclick=()=>{const out=typeof val==='function'?val(ov):val;ov.remove();res(out)};m.appendChild(b)});
+ document.body.appendChild(ov);const i=ov.querySelector('input');if(i){i.focus();i.select()}})}
+function saved(){try{const a=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(a))return a}catch(e){}return null}
+function save(a){try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}}
+function clean(v,d){v=(v||'').trim().slice(0,14);return v||d}
+const api={
+ /* Ask both player names. Resolves to [n1,n2] or null if cancelled. opts.cpu=true asks only P1 name (P2 is "Computer"). opts.t1/t2 = labels */
+ askNames(opts){opts=opts||{};const sv=saved()||['',''];
+  const html='<div class="big">'+(opts.cpu?'🤖':'👥')+'</div><h2>'+(opts.cpu?'Your name':'Who is playing?')+'</h2>'+
+   '<label>'+esc(opts.t1||'Player 1')+'</label><input id="duoN1" maxlength="14" placeholder="Player 1" value="'+esc(sv[0]||'')+'">'+
+   (opts.cpu?'':'<label>'+esc(opts.t2||'Player 2')+'</label><input id="duoN2" maxlength="14" placeholder="Player 2" value="'+esc(sv[1]||'')+'">');
+  return modal(html,[['▶ Start','',ov=>{const a=clean(ov.querySelector('#duoN1').value,'Player 1');const b=opts.cpu?'🤖 Computer':clean(ov.querySelector('#duoN2')&&ov.querySelector('#duoN2').value,'Player 2');if(!opts.cpu)save([a,b]);else save([a,sv[1]||'']);return [a,b]}],['Cancel','g',null]])},
+ /* "Pass the device" screen for hot-seat turns / hidden information. Resolves when tapped. */
+ cover(name,msg){beep(660,.12);return modal('<div class="big">🔄</div><h2>Pass to '+esc(name)+'</h2><p>'+esc(msg||'Tap when you are ready')+'</p>',[['I am '+esc(name),'',true]])},
+ /* Add "2 Players" and "vs Computer" buttons into an element (start menu/overlay).
+    o={game:'snake', start:fn(), hw:true(higher wins)|false(lower wins, e.g. time), cpu:[lo,hi] typical score range for the computer (e.g. [40,160]), unit:' pts', noTwo:false, noCpu:false} */
+ addButtons(el,o){css();const wrap=document.createElement('div');wrap.className='duoMenu';
+  if(!o.noTwo){const b=document.createElement('button');b.className='duoB o';b.innerHTML='👥 2 Players';b.onclick=async()=>{const n=await api.askNames();if(n)api.begin(Object.assign({},o,{mode:'two',names:n}))};wrap.appendChild(b)}
+  if(!o.noCpu&&o.cpu){const b=document.createElement('button');b.className='duoB o';b.innerHTML='🤖 vs Computer';b.onclick=async()=>{const lv=await modal('<div class="big">🤖</div><h2>Computer level</h2>',[['😊 Easy','',  'easy'],['🧠 Hard','o','hard'],['Cancel','g',null]]);if(!lv)return;const n=await api.askNames({cpu:true});if(n)api.begin(Object.assign({},o,{mode:'cpu',names:n,lvl:lv}))};wrap.appendChild(b)}
+  el.appendChild(wrap);return wrap},
+ begin(o){S.mode=o.mode;S.names=o.names.slice();S.scores=[null,null];S.turn=0;S.hw=o.hw!==false;S.cpuR=o.cpu||[0,100];S.lvl=o.lvl||'easy';S.start=o.start;S.game=o.game||'';S.unit=o.unit||'';S.fmt=o.fmt||null;
+  api.pill();if(o.start)o.start()},
+ active(){return !!S.mode},
+ mode(){return S.mode},
+ player(){return S.names[S.turn]},
+ names(){return S.names.slice()},
+ pill(){css();if(!S.mode){if(pill){pill.remove();pill=null}return}if(!pill){pill=document.createElement('div');pill.className='duoPill';document.body.appendChild(pill)}
+  pill.textContent=S.mode==='two'?'👤 '+S.names[S.turn]+'  ('+(S.turn+1)+'/2)':'👤 '+S.names[0]+'  vs  🤖'},
+ fmt(v){return S.fmt?S.fmt(v):(Math.round(v*100)/100)+S.unit},
+ cpuScore(){const [lo,hi]=S.cpuR,mid=(lo+hi)/2,r=Math.random();let v;
+  if(S.hw)v=S.lvl==='easy'?lo+r*(mid-lo):mid+r*(hi-mid);else v=S.lvl==='easy'?mid+r*(hi-mid):lo+r*(mid-lo);return (hi-lo)>20?Math.round(v):Math.round(v*100)/100},
+ /* Call when a round ends with the player's score. Returns true if Duo took over (the game must NOT show its own game-over overlay). */
+ finish(score){if(!S.mode)return false;const sc=Number(score)||0;
+  if(S.mode==='two'){S.scores[S.turn]=sc;
+   if(S.turn===0){S.turn=1;api.pill();setTimeout(()=>{modal('<div class="big">✅</div><h2>'+esc(S.names[0])+' scored '+esc(api.fmt(sc))+'</h2><p>Now it is <b>'+esc(S.names[1])+'</b>\'s turn. Beat that!</p>',[['▶ '+esc(S.names[1])+': Go!','',true]]).then(()=>{if(S.start)S.start()})},700);return true}
+   const [a,b]=S.scores,aw=S.hw?a>b:a<b,bw=S.hw?b>a:b<a;const win=aw?0:bw?1:-1;
+   setTimeout(()=>{beep(880,.2);modal('<div class="big">'+(win<0?'🤝':'🏆')+'</div><h2>'+(win<0?'It is a tie!':esc(S.names[win])+' wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(a))+'</b></p><p>'+esc(S.names[1])+': <b>'+esc(api.fmt(b))+'</b></p>',[['🔁 Rematch','',1],['🏠 Menu','o',0]]).then(r=>{if(r){S.scores=[null,null];S.turn=0;api.pill();if(S.start)S.start()}else api.end(true)})},700);return true}
+  /* vs computer */
+  const c=api.cpuScore(),win=S.hw?(sc>c?0:sc<c?1:-1):(sc<c?0:sc>c?1:-1);
+  setTimeout(()=>{beep(win===0?880:300,.25);modal('<div class="big">'+(win===0?'🏆':win<0?'🤝':'🤖')+'</div><h2>'+(win===0?esc(S.names[0])+' wins!':win<0?'Tie!':'Computer wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(sc))+'</b></p><p>🤖 Computer: <b>'+esc(api.fmt(c))+'</b></p>',[['🔁 Play again','',1],['🏠 Menu','o',0]]).then(r=>{if(r){api.pill();if(S.start)S.start()}else api.end(true)})},700);return true},
+ /* Leave duo mode. If reload, the page reloads to the game's normal start menu. */
+ end(reload){S.mode=null;api.pill();if(reload)location.reload()}
+};
+return api})();
+/* ===== end DUO ===== */
+</script>
+<script>
 const $=s=>document.querySelector(s);
 const P='n-back';
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+let rng=Math.random,dN=0,dSeed=1;function mkRng(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function duoSeed(){if(Duo.mode()==='two'){if(dN%2===0)dSeed=(Math.random()*1e9)|0;dN++;rng=mkRng(dSeed)}else rng=mkRng((Math.random()*1e9)|0)}
+{const oc=Duo.cpuScore;Duo.cpuScore=()=>Math.round(oc())}
+const R=(a,b)=>a+Math.floor(rng()*(b-a+1));
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=R(0,i);[a[i],a[j]]=[a[j],a[i]]}return a};
 let muted=false;try{muted=localStorage.getItem(P+'_mute')==='1'}catch(e){}
 let AC;
@@ -87,14 +159,16 @@ function overlay(t,s,h,btns){$('#ovT').textContent=t;$('#ovS').textContent=s;$('
 function hideOv(){$('#ov').classList.add('hide')}
 function finish(key,score,stars,html,title,again){const b=load(key),nb=score>b;if(nb)save(key,score);const best=nb?score:b;jingle(stars>0?[523,659,784,1047]:[392,330,262]);if(nb||stars>=3)burst(innerWidth/2,innerHeight/3,['⭐','🎉','✨','🏆'],26);overlay(nb?'🏆 New Best!':title,starStr(stars),html+'<br>Score: <b>'+score+'</b> &nbsp; Best: <b>'+best+'</b>',again);return best}
 function watch(el){const f=()=>el.style.setProperty('--u',el.clientWidth+'px');if(window.ResizeObserver)new ResizeObserver(f).observe(el);addEventListener('resize',f);addEventListener('orientationchange',()=>setTimeout(f,150));f()}
-document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;if(!$('#ov').classList.contains('hide')&&(e.key==='Enter'||e.key===' ')){const b=$('#ovB .btn');if(b){e.preventDefault();b.click()}return}if(typeof onKey==='function')onKey(e)});
+document.addEventListener('keydown',e=>{if(document.querySelector('.duoOv'))return;if(e.ctrlKey||e.metaKey||e.altKey)return;if(!$('#ov').classList.contains('hide')&&(e.key==='Enter'||e.key===' ')){const b=$('#ovB .btn');if(b){e.preventDefault();b.click()}return}if(typeof onKey==='function')onKey(e)});
 
 const SH=['🔶','🟩','🔺','⭐','🔵','💗'],TOTAL=24,TIME=3000;
 let N,seq,idx,score,streak,correct,asked,run=false,sid=0,best,phase,deadline,bestStreak;
 function hud(){$('#sc').textContent=score;$('#bs').textContent=best;$('#tr').textContent=Math.min(idx+1,TOTAL)+'/'+TOTAL;$('#st').textContent=streak}
 function setBtns(on){$('#bSame').disabled=!on;$('#bDiff').disabled=!on}
-function pick(){const q=[];for(let i=0;i<TOTAL;i++){let v;if(i>=N&&Math.random()<.4)v=q[i-N];else{do{v=R(0,SH.length-1)}while(i>=N&&v===q[i-N])}q.push(v)}return q}
-function start(n){sid++;N=n;seq=pick();idx=0;score=0;streak=0;correct=0;asked=0;bestStreak=0;best=load('best'+N);run=true;hideOv();hud();next()}
+function pick(){const q=[];for(let i=0;i<TOTAL;i++){let v;if(i>=N&&rng()<.4)v=q[i-N];else{do{v=R(0,SH.length-1)}while(i>=N&&v===q[i-N])}q.push(v)}return q}
+function duoStart(n){duoSeed();start(n)}
+function duoBtns(){[[1,[70,95]],[2,[50,85]]].forEach(([n,c])=>{const l=document.createElement('div');l.style.cssText='flex:1 1 100%;font-weight:bold;margin-top:4px';l.textContent=n+'-Back duel:';$('#ovB').appendChild(l);Duo.addButtons($('#ovB'),{game:P+n,start:()=>duoStart(n),hw:true,cpu:c,unit:'%',fmt:v=>Math.round(v)+'%'})})}
+function start(n){if(!Duo.active())rng=Math.random;sid++;N=n;seq=pick();idx=0;score=0;streak=0;correct=0;asked=0;bestStreak=0;best=load('best'+N);run=true;hideOv();hud();next()}
 async function next(){const my=sid;if(idx>=TOTAL)return end();phase='gap';setBtns(false);$('#shape').textContent='';$('#shapeBox').className='';hud();$('#fill').style.transition='none';$('#fill').style.width='100%';
 await sleep(280);if(my!==sid)return;
 const s=$('#shape');s.textContent=SH[seq[idx]];s.classList.remove('in');void s.offsetWidth;s.classList.add('in');beep(500,.07,'triangle');
@@ -107,10 +181,10 @@ const ok=a!==null&&a===isSame;
 if(ok){correct++;streak++;bestStreak=Math.max(bestStreak,streak);const pts=10+Math.min(streak,10)*2;score+=pts;box.className='good';$('#info').textContent=(isSame?'Yes, a match! ':'Right, different! ')+'+'+pts;beep(660+Math.min(streak,8)*40,.12,'triangle');const[x,y]=centerOf(box);floatText(x,y,'+'+pts);if(streak%5===0){burst(x,y,['🔥','⭐','✨'],14);jingle([523,659,784,1047])}}
 else{streak=0;box.className='bad';addClass(box,'shake');$('#info').textContent=a===null?'Too slow! It was '+(isSame?'the same.':'different.'):(isSame?'Oops, it WAS the same!':'Oops, it was different!');beep(150,.3,'sawtooth')}
 hud();setTimeout(()=>{if(my!==sid)return;idx++;next()},ok?550:1100)}
-function end(){run=false;phase='end';const tot=TOTAL-N,acc=Math.round(correct/tot*100),st=acc>=85?3:acc>=65?2:acc>=40?1:0;
+function end(){run=false;phase='end';const tot=TOTAL-N,acc=Math.round(correct/tot*100);if(Duo.active()&&Duo.finish(acc))return;const st=acc>=85?3:acc>=65?2:acc>=40?1:0;
 best=finish('best'+N,score,st,'Accuracy: <b>'+acc+'%</b> ('+correct+' of '+tot+')<br>Best streak: '+bestStreak,'🧠 Round Done',[['▶ Play Again ('+N+'-back)',()=>start(N)],['🔄 Change Level',intro,'o']])}
 function onKey(e){if(e.key==='ArrowLeft'||e.key==='s'||e.key==='y')answer(true);else if(e.key==='ArrowRight'||e.key==='d'||e.key==='n')answer(false)}
 $('#bSame').onpointerdown=e=>{e.preventDefault();answer(true)};$('#bDiff').onpointerdown=e=>{e.preventDefault();answer(false)};
-function intro(){sid++;run=false;overlay('🧠 N-Back Shapes','','Shapes appear one at a time.<br>Is the shape the <i>same</i> as the one before?<br><b>1-Back:</b> compare with the last shape.<br>🔺 → 🔺 = Same! &nbsp; 🔺 → ⭐ = Different.<br><b>2-Back:</b> compare with 2 shapes ago.<br>🔺 ⭐ 🔺 = Same!<br>Tap fast, you get 3 seconds each.',[['🟢 1-Back (easy)',()=>start(1)],['🟣 2-Back (hard)',()=>start(2),'p']])}
+function intro(){sid++;run=false;overlay('🧠 N-Back Shapes','','Shapes appear one at a time.<br>Is the shape the <i>same</i> as the one before?<br><b>1-Back:</b> compare with the last shape.<br>🔺 → 🔺 = Same! &nbsp; 🔺 → ⭐ = Different.<br><b>2-Back:</b> compare with 2 shapes ago.<br>🔺 ⭐ 🔺 = Same!<br>Tap fast, you get 3 seconds each.',[['🟢 1-Back (easy)',()=>start(1)],['🟣 2-Back (hard)',()=>start(2),'p']]);duoBtns()}
 best=0;score=0;streak=0;idx=0;setBtns(false);intro();
 </script></body></html>

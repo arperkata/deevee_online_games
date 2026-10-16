@@ -76,6 +76,74 @@ body{background:radial-gradient(ellipse at 50% 30%,#1fa05f,#0b4a2c 80%) fixed}
 <div id="cardw"><div class="blk" id="b1"></div><div class="blk" id="b2"></div></div></div>
 <div class="ov" id="ov"><div class="card"><h1 id="ovT">🎲 Lucky Five Dice</h1><div class="stars" id="ovS"></div><p id="ovP">Roll five dice up to 3 times, hold the keepers, then fill a box on your scorecard. 13 turns - highest total wins!</p><div id="ovB" style="display:contents"></div></div></div>
 <script>
+/* ===== DUO helper v1 (shared, pasted inline into each game as its own <script> BEFORE the game script) ===== */
+const Duo=(()=>{
+const KEY='duo_names',S={mode:null,names:['Player 1','Player 2'],scores:[null,null],turn:0,hw:true,cpuR:[0,100],lvl:'easy',start:null,game:'',unit:''};
+let pill=null,ac=null;
+function css(){if(document.getElementById('duoCss'))return;const s=document.createElement('style');s.id='duoCss';s.textContent=
+'.duoOv{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(6,30,70,.88);padding:14px;font-family:"Fredoka","Trebuchet MS","Comic Sans MS",sans-serif}'+
+'.duoCard{background:linear-gradient(#2f8cff,#0b4fb3);border:5px solid #ffe14a;border-radius:26px;padding:18px 20px;max-width:min(92vw,420px);width:100%;color:#fff;text-align:center;box-shadow:0 8px 0 #06244d;animation:duoPop .35s}'+
+'@keyframes duoPop{0%{transform:scale(.6)}70%{transform:scale(1.05)}}'+
+'.duoCard h2{margin:0 0 8px;font-size:clamp(22px,6vw,32px);text-shadow:0 3px 0 #0b3a78}.duoCard p{margin:6px 0;font-size:clamp(15px,4vw,19px);font-weight:600}'+
+'.duoCard .big{font-size:clamp(34px,10vw,52px);line-height:1.1}'+
+'.duoCard input{width:100%;box-sizing:border-box;font:600 20px inherit;font-family:inherit;padding:10px 14px;border-radius:14px;border:3px solid #fff;margin:6px 0;color:#0b3a78;text-align:center}'+
+'.duoCard label{display:block;text-align:left;font-weight:700;margin-top:6px;font-size:15px}'+
+'.duoB{font:700 clamp(18px,5vw,24px) inherit;font-family:inherit;margin:8px 4px 0;padding:.45em 1.3em;min-height:46px;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}'+
+'.duoB.o{background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9560b;text-shadow:0 2px 0 #a9560b}.duoB.g{background:linear-gradient(#8a9bb5,#5d6f8a);box-shadow:0 5px 0 #3b4a63;text-shadow:none}'+
+'.duoB:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.3)}'+
+'.duoMenu{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 0}.duoMenu .duoB{margin:0}'+
+'.duoPill{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:8000;background:#0b3a78;color:#fff;border:3px solid #ffe14a;border-radius:999px;padding:3px 14px;font:700 clamp(13px,3.6vw,17px) "Fredoka","Trebuchet MS",sans-serif;box-shadow:0 3px 0 #06244d;pointer-events:none;white-space:nowrap;max-width:62vw;overflow:hidden;text-overflow:ellipsis}';
+document.head.appendChild(s)}
+function beep(f,d){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type='triangle';g.gain.setValueAtTime(.12,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+(d||.15));o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+(d||.15))}catch(e){}}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function modal(html,buttons){css();return new Promise(res=>{const ov=document.createElement('div');ov.className='duoOv';ov.innerHTML='<div class="duoCard">'+html+'<div class="duoMenu"></div></div>';const m=ov.querySelector('.duoMenu');
+ buttons.forEach(([label,cls,val])=>{const b=document.createElement('button');b.className='duoB '+(cls||'');b.innerHTML=label;b.onclick=()=>{const out=typeof val==='function'?val(ov):val;ov.remove();res(out)};m.appendChild(b)});
+ document.body.appendChild(ov);const i=ov.querySelector('input');if(i){i.focus();i.select()}})}
+function saved(){try{const a=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(a))return a}catch(e){}return null}
+function save(a){try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}}
+function clean(v,d){v=(v||'').trim().slice(0,14);return v||d}
+const api={
+ /* Ask both player names. Resolves to [n1,n2] or null if cancelled. opts.cpu=true asks only P1 name (P2 is "Computer"). opts.t1/t2 = labels */
+ askNames(opts){opts=opts||{};const sv=saved()||['',''];
+  const html='<div class="big">'+(opts.cpu?'🤖':'👥')+'</div><h2>'+(opts.cpu?'Your name':'Who is playing?')+'</h2>'+
+   '<label>'+esc(opts.t1||'Player 1')+'</label><input id="duoN1" maxlength="14" placeholder="Player 1" value="'+esc(sv[0]||'')+'">'+
+   (opts.cpu?'':'<label>'+esc(opts.t2||'Player 2')+'</label><input id="duoN2" maxlength="14" placeholder="Player 2" value="'+esc(sv[1]||'')+'">');
+  return modal(html,[['▶ Start','',ov=>{const a=clean(ov.querySelector('#duoN1').value,'Player 1');const b=opts.cpu?'🤖 Computer':clean(ov.querySelector('#duoN2')&&ov.querySelector('#duoN2').value,'Player 2');if(!opts.cpu)save([a,b]);else save([a,sv[1]||'']);return [a,b]}],['Cancel','g',null]])},
+ /* "Pass the device" screen for hot-seat turns / hidden information. Resolves when tapped. */
+ cover(name,msg){beep(660,.12);return modal('<div class="big">🔄</div><h2>Pass to '+esc(name)+'</h2><p>'+esc(msg||'Tap when you are ready')+'</p>',[['I am '+esc(name),'',true]])},
+ /* Add "2 Players" and "vs Computer" buttons into an element (start menu/overlay).
+    o={game:'snake', start:fn(), hw:true(higher wins)|false(lower wins, e.g. time), cpu:[lo,hi] typical score range for the computer (e.g. [40,160]), unit:' pts', noTwo:false, noCpu:false} */
+ addButtons(el,o){css();const wrap=document.createElement('div');wrap.className='duoMenu';
+  if(!o.noTwo){const b=document.createElement('button');b.className='duoB o';b.innerHTML='👥 2 Players';b.onclick=async()=>{const n=await api.askNames();if(n)api.begin(Object.assign({},o,{mode:'two',names:n}))};wrap.appendChild(b)}
+  if(!o.noCpu&&o.cpu){const b=document.createElement('button');b.className='duoB o';b.innerHTML='🤖 vs Computer';b.onclick=async()=>{const lv=await modal('<div class="big">🤖</div><h2>Computer level</h2>',[['😊 Easy','',  'easy'],['🧠 Hard','o','hard'],['Cancel','g',null]]);if(!lv)return;const n=await api.askNames({cpu:true});if(n)api.begin(Object.assign({},o,{mode:'cpu',names:n,lvl:lv}))};wrap.appendChild(b)}
+  el.appendChild(wrap);return wrap},
+ begin(o){S.mode=o.mode;S.names=o.names.slice();S.scores=[null,null];S.turn=0;S.hw=o.hw!==false;S.cpuR=o.cpu||[0,100];S.lvl=o.lvl||'easy';S.start=o.start;S.game=o.game||'';S.unit=o.unit||'';S.fmt=o.fmt||null;
+  api.pill();if(o.start)o.start()},
+ active(){return !!S.mode},
+ mode(){return S.mode},
+ player(){return S.names[S.turn]},
+ names(){return S.names.slice()},
+ pill(){css();if(!S.mode){if(pill){pill.remove();pill=null}return}if(!pill){pill=document.createElement('div');pill.className='duoPill';document.body.appendChild(pill)}
+  pill.textContent=S.mode==='two'?'👤 '+S.names[S.turn]+'  ('+(S.turn+1)+'/2)':'👤 '+S.names[0]+'  vs  🤖'},
+ fmt(v){return S.fmt?S.fmt(v):(Math.round(v*100)/100)+S.unit},
+ cpuScore(){const [lo,hi]=S.cpuR,mid=(lo+hi)/2,r=Math.random();let v;
+  if(S.hw)v=S.lvl==='easy'?lo+r*(mid-lo):mid+r*(hi-mid);else v=S.lvl==='easy'?mid+r*(hi-mid):lo+r*(mid-lo);return (hi-lo)>20?Math.round(v):Math.round(v*100)/100},
+ /* Call when a round ends with the player's score. Returns true if Duo took over (the game must NOT show its own game-over overlay). */
+ finish(score){if(!S.mode)return false;const sc=Number(score)||0;
+  if(S.mode==='two'){S.scores[S.turn]=sc;
+   if(S.turn===0){S.turn=1;api.pill();setTimeout(()=>{modal('<div class="big">✅</div><h2>'+esc(S.names[0])+' scored '+esc(api.fmt(sc))+'</h2><p>Now it is <b>'+esc(S.names[1])+'</b>\'s turn. Beat that!</p>',[['▶ '+esc(S.names[1])+': Go!','',true]]).then(()=>{if(S.start)S.start()})},700);return true}
+   const [a,b]=S.scores,aw=S.hw?a>b:a<b,bw=S.hw?b>a:b<a;const win=aw?0:bw?1:-1;
+   setTimeout(()=>{beep(880,.2);modal('<div class="big">'+(win<0?'🤝':'🏆')+'</div><h2>'+(win<0?'It is a tie!':esc(S.names[win])+' wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(a))+'</b></p><p>'+esc(S.names[1])+': <b>'+esc(api.fmt(b))+'</b></p>',[['🔁 Rematch','',1],['🏠 Menu','o',0]]).then(r=>{if(r){S.scores=[null,null];S.turn=0;api.pill();if(S.start)S.start()}else api.end(true)})},700);return true}
+  /* vs computer */
+  const c=api.cpuScore(),win=S.hw?(sc>c?0:sc<c?1:-1):(sc<c?0:sc>c?1:-1);
+  setTimeout(()=>{beep(win===0?880:300,.25);modal('<div class="big">'+(win===0?'🏆':win<0?'🤝':'🤖')+'</div><h2>'+(win===0?esc(S.names[0])+' wins!':win<0?'Tie!':'Computer wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(sc))+'</b></p><p>🤖 Computer: <b>'+esc(api.fmt(c))+'</b></p>',[['🔁 Play again','',1],['🏠 Menu','o',0]]).then(r=>{if(r){api.pill();if(S.start)S.start()}else api.end(true)})},700);return true},
+ /* Leave duo mode. If reload, the page reloads to the game's normal start menu. */
+ end(reload){S.mode=null;api.pill();if(reload)location.reload()}
+};
+return api})();
+/* ===== end DUO ===== */
+</script>
+<script>
 const KEY='dice-yahtzee';
 const $=s=>document.querySelector(s),R=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 let muted=false;try{muted=localStorage.getItem(KEY+'_mute')==='1'}catch(e){}
@@ -107,7 +175,7 @@ switch(c){case 'k3':return mx>=3?sum:0;case 'k4':return mx>=4?sum:0;case 'fh':re
 case 'ss':return has([1,2,3,4])||has([2,3,4,5])||has([3,4,5,6])?30:0;case 'ls':return has([1,2,3,4,5])||has([2,3,4,5,6])?40:0;case 'lf':return mx===5?50:0;default:return sum}}
 function upper(p){return ['a1','a2','a3','a4','a5','a6'].reduce((s,c)=>s+(p.s[c]||0),0)}
 function total(p){const u=upper(p);return Object.values(p.s).reduce((a,b)=>a+b,0)+(u>=63?35:0)}
-let P=[],cur=0,dice=[1,1,1,1,1],held=[0,0,0,0,0],rolls=0,busy=false,mode='cpu',over=true,D=[],W=[],best=0,wins=0;
+let pn=['You','🤖 Computer'];let P=[],cur=0,dice=[1,1,1,1,1],held=[0,0,0,0,0],rolls=0,busy=false,mode='cpu',over=true,D=[],W=[],best=0,wins=0;
 const tray=$('#tray');
 for(let i=0;i<5;i++){const w=document.createElement('div');w.className='dw';tray.appendChild(w);D.push(mkDie(w,'var(--dsz)'));W.push(w);w.onclick=()=>toggle(i)}
 function msg(t){$('#msg').textContent=t}
@@ -120,7 +188,7 @@ if(!bi)h+='<div class="row bon" style="--n:'+n+'"><span>🎁 Bonus +35</span>'+P
 else h+='<div class="row tot" style="--n:'+n+'"><span>🏁 TOTAL</span>'+P.map(p=>'<span class="v">'+total(p)+'</span>').join('')+'</div>';
 el.innerHTML=h});
 $('#roll').disabled=over||busy||pl.ai||rolls>=3;$('#roll').textContent=rolls===0?'🎲 Roll!':rolls<3?'🎲 Re-roll ('+(3-rolls)+' left)':'👆 Pick a box';
-$('#pTurn').textContent=over?'🎲 Lucky Five':(pl.ai?'🤖 ':'🧑 ')+pl.n+' · Turn '+Math.min(13,Object.keys(pl.s).length+1)+'/13';
+$('#pTurn').textContent=over?'🎲 Lucky Five':(pl.ai?'':'🧑 ')+pl.n+' · Turn '+Math.min(13,Object.keys(pl.s).length+1)+'/13';
 $('#bs').textContent=best;$('#bw').textContent=wins}
 function drawDice(){D.forEach((d,i)=>W[i].classList.toggle('held',!!held[i]))}
 async function doRoll(){const hs=held.slice();const ps=[];for(let i=0;i<5;i++)if(!hs[i]){dice[i]=R(1,6);ps.push(D[i].show(dice[i],650+i*70))}await Promise.all(ps);rolls++;
@@ -133,28 +201,28 @@ v?jingle(v>=30?[523,659,784,1047]:[523,659]):beep(180,.2,'sawtooth');await sleep
 function choose(c){const p=P[cur];if(busy||over||p.ai||rolls===0||p.s[c]!==undefined)return;commit(c)}
 $('#cardw').addEventListener('click',e=>{const r=e.target.closest('.row[data-c]');if(r)choose(r.dataset.c)});
 function next(){busy=false;if(P.every(p=>Object.keys(p.s).length>=13))return finish();cur=(cur+1)%P.length;rolls=0;held.fill(0);drawDice();render();
-if(P[cur].ai){msg('🤖 '+P[cur].n+' is rolling...');aiTurn()}else msg(P.length>1&&mode==='pp'?'📱 '+P[cur].n+' - pass the device, then Roll!':'Your turn - hit Roll!')}
+if(P[cur].ai){msg(P[cur].n+' is rolling...');aiTurn()}else msg(P.length>1&&mode==='pp'?'📱 '+P[cur].n+' - pass the device, then Roll!':(mode==='solo'?'Your turn':P[cur].n+', your turn')+' - hit Roll!')}
 function valOf(d,cats){let b=-999;cats.forEach(c=>{const v=score(c,d)-PAR[c]+(c[0]==='a'&&score(c,d)>=3*(+c[1])?(score(c,d)-3*(+c[1]))*.4:0);if(v>b)b=v});return b}
 function aiHold(cats){let curV=valOf(dice,cats),bestM=-1,bestV=curV;
 for(let m=0;m<31;m++){let s=0;for(let k=0;k<24;k++){const d=dice.map((v,i)=>m>>i&1?v:R(1,6));s+=valOf(d,cats)}s/=24;if(s>bestV+.5){bestV=s;bestM=m}}
 return bestM<0?null:[0,1,2,3,4].map(i=>bestM>>i&1)}
 async function aiTurn(){busy=true;render();await sleep(800);await doRoll();const p=P[cur],cats=openCats(p);
-while(rolls<3){const h=aiHold(cats);if(!h)break;held=h;drawDice();msg('🤖 Holding '+h.filter(x=>x).length+' dice');await sleep(900);await doRoll()}
+while(rolls<3){const h=aiHold(cats);if(!h)break;held=h;drawDice();msg(p.n+' holds '+h.filter(x=>x).length+' dice');await sleep(900);await doRoll()}
 let bc=cats[0],bv=-999;cats.forEach(c=>{const s=score(c,dice),v=s-PAR[c]+(c==='lf'&&s?30:0)+(c[0]==='a'?(s-3*(+c[1]))*.4:0);if(v>bv){bv=v;bc=c}});
-msg('🤖 Scores '+CATS.find(c=>c[0]===bc)[1]);await sleep(900);commit(bc)}
-function start(m){mode=m;over=false;cur=0;rolls=0;held.fill(0);dice=[1,1,1,1,1];D.forEach(d=>d.show(1,0));drawDice();
-P=m==='cpu'?[{n:'You',s:{}},{n:'CPU',ai:true,s:{}}]:m==='pp'?[{n:'P1',s:{}},{n:'P2',s:{}}]:[{n:'You',s:{}}];
+msg(p.n+' scores '+CATS.find(c=>c[0]===bc)[1]);await sleep(900);commit(bc)}
+function start(m,nm){if(nm)pn=nm;mode=m;over=false;cur=0;rolls=0;held.fill(0);dice=[1,1,1,1,1];D.forEach(d=>d.show(1,0));drawDice();
+P=m==='cpu'?[{n:pn[0],s:{}},{n:'🤖 Computer',ai:true,s:{}}]:m==='pp'?[{n:pn[0],s:{}},{n:pn[1],s:{}}]:[{n:'You',s:{}}];
 best=load('best');wins=load('wins');busy=false;ovHide();render();msg('Roll the dice to begin! 🎲')}
 function finish(){over=true;busy=false;render();const t=P.map(total),me=t[0];let title,html,stars;
 if(mode==='solo'){title=me>=200?'🏆 Superb!':'🎲 Game over';stars=me>=200?'⭐⭐⭐':me>=150?'⭐⭐':'⭐';html='Final score <b>'+me+'</b>'}
 else{const mx=Math.max(...t),w=t.indexOf(mx),tie=t.filter(x=>x===mx).length>1;
-if(mode==='cpu'){const win=!tie&&w===0;title=tie?'🤝 Tie game!':win?'🏆 You win!':'🤖 CPU wins';stars=win?(me>=200?'⭐⭐⭐':'⭐⭐'):tie?'⭐⭐':'⭐';if(win){wins++;save('wins',wins)}}
+if(mode==='cpu'){const win=!tie&&w===0;title=tie?'🤝 Tie game!':win?'🏆 '+P[0].n+' wins!':'🤖 Computer wins';stars=win?(me>=200?'⭐⭐⭐':'⭐⭐'):tie?'⭐⭐':'⭐';if(win){wins++;save('wins',wins)}}
 else{title=tie?'🤝 Tie game!':'🏆 '+P[w].n+' wins!';stars='⭐⭐⭐'}
 html=P.map((p,i)=>p.n+': <b>'+t[i]+'</b>').join(' &nbsp;vs&nbsp; ')}
 if(mode!=='pp'&&me>best){best=me;save('best',best);html+='<br>🌟 New best!'}else if(mode!=='pp')html+='<br>Best: '+best;
 render();jingle([392,523,659,784,1047]);burst(innerWidth/2,innerHeight/3,['⭐','🎉','🎲','✨'],24);
 ov(title,stars,html,[['▶ Play Again','',()=>start(mode)],['🏠 Menu','o',menu]])}
-function menu(){ov('🎲 Lucky Five Dice','','Roll five dice up to 3 times, hold the keepers, fill a box. 13 turns - highest total wins!<br>Run (4-5 in a row), Full House, 4 Alike, and the 50-pt LUCKY 5!',[['🤖 Play vs Computer','',()=>start('cpu')],['👫 Pass &amp; Play (2 players)','b',()=>start('pp')],['🎯 Solo Score Chase','p',()=>start('solo')]])}
+function menu(){ov('🎲 Lucky Five Dice','','Roll five dice up to 3 times, hold the keepers, fill a box. 13 turns - highest total wins!<br>Run (4-5 in a row), Full House, 4 Alike, and the 50-pt LUCKY 5!',[['🤖 vs Computer','',async()=>{const n=await Duo.askNames({cpu:true});if(n)start('cpu',n)}],['👥 2 Players','b',async()=>{const n=await Duo.askNames();if(n)start('pp',n)}],['🎯 Solo Score Chase','p',()=>start('solo')]])}
 $('#roll').onclick=roll;
 addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();roll()}else if(e.key>='1'&&e.key<='5')toggle(+e.key-1)});
 best=load('best');wins=load('wins');P=[{n:'You',s:{}}];render();menu();

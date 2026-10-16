@@ -11,7 +11,7 @@ a.home{left:10px;padding:0 14px}
 .mute{right:10px;width:44px;padding:0;font-size:20px}
 #hud{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 8px;padding:8px 60px 4px 100px;min-height:52px}
 .pill{background:#0b3a78;color:#fff;border-radius:999px;padding:3px 12px;font-weight:700;font-size:clamp(14px,3.4vw,20px);box-shadow:0 3px 0 #06244d;border:2px solid #ffe14a;white-space:nowrap}
-.pill b{color:#ffe14a}
+.pill b{color:#ffe14a}.nn{display:inline-block;max-width:24vw;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
 button.go{font:700 clamp(20px,5vw,28px) 'Fredoka','Trebuchet MS',sans-serif;margin-top:12px;min-height:48px;padding:.3em 1.5em;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}
 button.go:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
 #fx{position:fixed;inset:0;pointer-events:none;z-index:1200;width:100%;height:100%}
@@ -45,11 +45,79 @@ body{background:linear-gradient(#27a2e8,#bdeafc)}
 </style></head><body>
 <a class="home" href="index.html">⌂ Home</a><button class="mute" id="mute" aria-label="Sound">🔊</button>
 
-<div id="hud"><span class="pill">Lv <b id="lv">1</b></span><span class="pill">🔵 <b id="pc">0</b></span><span class="pill">🔴 <b id="ac">0</b></span><span class="pill">Best <b id="bs">0</b></span></div>
+<div id="hud"><span class="pill">Lv <b id="lv">1</b></span><span class="pill" id="lvp">Lv <b id="lv">1</b></span><span class="pill">🔵 <span id="n1" class="nn">You</span> <b id="pc">0</b></span><span class="pill">🔴 <span id="n2" class="nn">Bot</span> <b id="ac">0</b></span><span class="pill" id="bsp">Best <b id="bs">0</b></span></div>
 <div id="main"><div id="stage"><div id="bd"></div></div><div id="st">Your turn</div></div>
 
 <canvas id="fx"></canvas>
-<div id="msg"><div id="box"><div id="mt"></div><button class="go" id="go">Play</button></div></div>
+<div id="msg"><div id="box"><div id="mt"></div><button class="go" id="go">Play</button><div><button class="go" id="go2" style="display:none;background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9560b;text-shadow:0 2px 0 #a9560b"></button></div></div></div>
+<script>
+/* ===== DUO helper v1 (shared, pasted inline into each game as its own <script> BEFORE the game script) ===== */
+const Duo=(()=>{
+const KEY='duo_names',S={mode:null,names:['Player 1','Player 2'],scores:[null,null],turn:0,hw:true,cpuR:[0,100],lvl:'easy',start:null,game:'',unit:''};
+let pill=null,ac=null;
+function css(){if(document.getElementById('duoCss'))return;const s=document.createElement('style');s.id='duoCss';s.textContent=
+'.duoOv{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(6,30,70,.88);padding:14px;font-family:"Fredoka","Trebuchet MS","Comic Sans MS",sans-serif}'+
+'.duoCard{background:linear-gradient(#2f8cff,#0b4fb3);border:5px solid #ffe14a;border-radius:26px;padding:18px 20px;max-width:min(92vw,420px);width:100%;color:#fff;text-align:center;box-shadow:0 8px 0 #06244d;animation:duoPop .35s}'+
+'@keyframes duoPop{0%{transform:scale(.6)}70%{transform:scale(1.05)}}'+
+'.duoCard h2{margin:0 0 8px;font-size:clamp(22px,6vw,32px);text-shadow:0 3px 0 #0b3a78}.duoCard p{margin:6px 0;font-size:clamp(15px,4vw,19px);font-weight:600}'+
+'.duoCard .big{font-size:clamp(34px,10vw,52px);line-height:1.1}'+
+'.duoCard input{width:100%;box-sizing:border-box;font:600 20px inherit;font-family:inherit;padding:10px 14px;border-radius:14px;border:3px solid #fff;margin:6px 0;color:#0b3a78;text-align:center}'+
+'.duoCard label{display:block;text-align:left;font-weight:700;margin-top:6px;font-size:15px}'+
+'.duoB{font:700 clamp(18px,5vw,24px) inherit;font-family:inherit;margin:8px 4px 0;padding:.45em 1.3em;min-height:46px;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}'+
+'.duoB.o{background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9560b;text-shadow:0 2px 0 #a9560b}.duoB.g{background:linear-gradient(#8a9bb5,#5d6f8a);box-shadow:0 5px 0 #3b4a63;text-shadow:none}'+
+'.duoB:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.3)}'+
+'.duoMenu{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 0}.duoMenu .duoB{margin:0}'+
+'.duoPill{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:8000;background:#0b3a78;color:#fff;border:3px solid #ffe14a;border-radius:999px;padding:3px 14px;font:700 clamp(13px,3.6vw,17px) "Fredoka","Trebuchet MS",sans-serif;box-shadow:0 3px 0 #06244d;pointer-events:none;white-space:nowrap;max-width:62vw;overflow:hidden;text-overflow:ellipsis}';
+document.head.appendChild(s)}
+function beep(f,d){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type='triangle';g.gain.setValueAtTime(.12,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+(d||.15));o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+(d||.15))}catch(e){}}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function modal(html,buttons){css();return new Promise(res=>{const ov=document.createElement('div');ov.className='duoOv';ov.innerHTML='<div class="duoCard">'+html+'<div class="duoMenu"></div></div>';const m=ov.querySelector('.duoMenu');
+ buttons.forEach(([label,cls,val])=>{const b=document.createElement('button');b.className='duoB '+(cls||'');b.innerHTML=label;b.onclick=()=>{const out=typeof val==='function'?val(ov):val;ov.remove();res(out)};m.appendChild(b)});
+ document.body.appendChild(ov);const i=ov.querySelector('input');if(i){i.focus();i.select()}})}
+function saved(){try{const a=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(a))return a}catch(e){}return null}
+function save(a){try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}}
+function clean(v,d){v=(v||'').trim().slice(0,14);return v||d}
+const api={
+ /* Ask both player names. Resolves to [n1,n2] or null if cancelled. opts.cpu=true asks only P1 name (P2 is "Computer"). opts.t1/t2 = labels */
+ askNames(opts){opts=opts||{};const sv=saved()||['',''];
+  const html='<div class="big">'+(opts.cpu?'🤖':'👥')+'</div><h2>'+(opts.cpu?'Your name':'Who is playing?')+'</h2>'+
+   '<label>'+esc(opts.t1||'Player 1')+'</label><input id="duoN1" maxlength="14" placeholder="Player 1" value="'+esc(sv[0]||'')+'">'+
+   (opts.cpu?'':'<label>'+esc(opts.t2||'Player 2')+'</label><input id="duoN2" maxlength="14" placeholder="Player 2" value="'+esc(sv[1]||'')+'">');
+  return modal(html,[['▶ Start','',ov=>{const a=clean(ov.querySelector('#duoN1').value,'Player 1');const b=opts.cpu?'🤖 Computer':clean(ov.querySelector('#duoN2')&&ov.querySelector('#duoN2').value,'Player 2');if(!opts.cpu)save([a,b]);else save([a,sv[1]||'']);return [a,b]}],['Cancel','g',null]])},
+ /* "Pass the device" screen for hot-seat turns / hidden information. Resolves when tapped. */
+ cover(name,msg){beep(660,.12);return modal('<div class="big">🔄</div><h2>Pass to '+esc(name)+'</h2><p>'+esc(msg||'Tap when you are ready')+'</p>',[['I am '+esc(name),'',true]])},
+ /* Add "2 Players" and "vs Computer" buttons into an element (start menu/overlay).
+    o={game:'snake', start:fn(), hw:true(higher wins)|false(lower wins, e.g. time), cpu:[lo,hi] typical score range for the computer (e.g. [40,160]), unit:' pts', noTwo:false, noCpu:false} */
+ addButtons(el,o){css();const wrap=document.createElement('div');wrap.className='duoMenu';
+  if(!o.noTwo){const b=document.createElement('button');b.className='duoB o';b.innerHTML='👥 2 Players';b.onclick=async()=>{const n=await api.askNames();if(n)api.begin(Object.assign({},o,{mode:'two',names:n}))};wrap.appendChild(b)}
+  if(!o.noCpu&&o.cpu){const b=document.createElement('button');b.className='duoB o';b.innerHTML='🤖 vs Computer';b.onclick=async()=>{const lv=await modal('<div class="big">🤖</div><h2>Computer level</h2>',[['😊 Easy','',  'easy'],['🧠 Hard','o','hard'],['Cancel','g',null]]);if(!lv)return;const n=await api.askNames({cpu:true});if(n)api.begin(Object.assign({},o,{mode:'cpu',names:n,lvl:lv}))};wrap.appendChild(b)}
+  el.appendChild(wrap);return wrap},
+ begin(o){S.mode=o.mode;S.names=o.names.slice();S.scores=[null,null];S.turn=0;S.hw=o.hw!==false;S.cpuR=o.cpu||[0,100];S.lvl=o.lvl||'easy';S.start=o.start;S.game=o.game||'';S.unit=o.unit||'';S.fmt=o.fmt||null;
+  api.pill();if(o.start)o.start()},
+ active(){return !!S.mode},
+ mode(){return S.mode},
+ player(){return S.names[S.turn]},
+ names(){return S.names.slice()},
+ pill(){css();if(!S.mode){if(pill){pill.remove();pill=null}return}if(!pill){pill=document.createElement('div');pill.className='duoPill';document.body.appendChild(pill)}
+  pill.textContent=S.mode==='two'?'👤 '+S.names[S.turn]+'  ('+(S.turn+1)+'/2)':'👤 '+S.names[0]+'  vs  🤖'},
+ fmt(v){return S.fmt?S.fmt(v):(Math.round(v*100)/100)+S.unit},
+ cpuScore(){const [lo,hi]=S.cpuR,mid=(lo+hi)/2,r=Math.random();let v;
+  if(S.hw)v=S.lvl==='easy'?lo+r*(mid-lo):mid+r*(hi-mid);else v=S.lvl==='easy'?mid+r*(hi-mid):lo+r*(mid-lo);return (hi-lo)>20?Math.round(v):Math.round(v*100)/100},
+ /* Call when a round ends with the player's score. Returns true if Duo took over (the game must NOT show its own game-over overlay). */
+ finish(score){if(!S.mode)return false;const sc=Number(score)||0;
+  if(S.mode==='two'){S.scores[S.turn]=sc;
+   if(S.turn===0){S.turn=1;api.pill();setTimeout(()=>{modal('<div class="big">✅</div><h2>'+esc(S.names[0])+' scored '+esc(api.fmt(sc))+'</h2><p>Now it is <b>'+esc(S.names[1])+'</b>\'s turn. Beat that!</p>',[['▶ '+esc(S.names[1])+': Go!','',true]]).then(()=>{if(S.start)S.start()})},700);return true}
+   const [a,b]=S.scores,aw=S.hw?a>b:a<b,bw=S.hw?b>a:b<a;const win=aw?0:bw?1:-1;
+   setTimeout(()=>{beep(880,.2);modal('<div class="big">'+(win<0?'🤝':'🏆')+'</div><h2>'+(win<0?'It is a tie!':esc(S.names[win])+' wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(a))+'</b></p><p>'+esc(S.names[1])+': <b>'+esc(api.fmt(b))+'</b></p>',[['🔁 Rematch','',1],['🏠 Menu','o',0]]).then(r=>{if(r){S.scores=[null,null];S.turn=0;api.pill();if(S.start)S.start()}else api.end(true)})},700);return true}
+  /* vs computer */
+  const c=api.cpuScore(),win=S.hw?(sc>c?0:sc<c?1:-1):(sc<c?0:sc>c?1:-1);
+  setTimeout(()=>{beep(win===0?880:300,.25);modal('<div class="big">'+(win===0?'🏆':win<0?'🤝':'🤖')+'</div><h2>'+(win===0?esc(S.names[0])+' wins!':win<0?'Tie!':'Computer wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(sc))+'</b></p><p>🤖 Computer: <b>'+esc(api.fmt(c))+'</b></p>',[['🔁 Play again','',1],['🏠 Menu','o',0]]).then(r=>{if(r){api.pill();if(S.start)S.start()}else api.end(true)})},700);return true},
+ /* Leave duo mode. If reload, the page reloads to the game's normal start menu. */
+ end(reload){S.mode=null;api.pill();if(reload)location.reload()}
+};
+return api})();
+/* ===== end DUO ===== */
+</script>
 <script>
 const GAME='territory-grab.html';
 const $=id=>document.getElementById(id);
@@ -68,18 +136,18 @@ function ptick(t){const dt=Math.min(.05,(t-lt)/1000||0);lt=t;fc.clearRect(0,0,fx
 function floatText(x,y,txt,col){const d=document.createElement('div');d.className='flt';d.textContent=txt;d.style.left=x+'px';d.style.top=y+'px';if(col)d.style.color=col;document.body.appendChild(d);setTimeout(()=>d.remove(),950)}
 function floatAt(el,txt,col){const r=el.getBoundingClientRect();floatText(r.left+r.width/2,r.top+r.height/3,txt,col)}
 function shake(el){el.classList.remove('shk');void el.offsetWidth;el.classList.add('shk')}
-function showBox(html,btn,fn){$('mt').innerHTML=html;const g=$('go');if(btn){g.style.display='';g.textContent=btn;boxFn=fn}else{g.style.display='none';boxFn=null}$('msg').style.display='flex'}
+function showBox(html,btn,fn){$('go2').style.display='none';$('mt').innerHTML=html;const g=$('go');if(btn){g.style.display='';g.textContent=btn;boxFn=fn}else{g.style.display='none';boxFn=null}$('msg').style.display='flex'}
 function hideBox(){$('msg').style.display='none'}
 $('go').onclick=()=>{hideBox();beep(520,.1);const f=boxFn;if(f)f()};
 function stars(n){let s='';for(let i=0;i<3;i++)s+='<i'+(i<n?' class="on"':'')+'>★</i>';return '<span class="st">'+s+'</span>'}
-function endBox(emoji,title,n,score,extra,btn,fn){const nb=saveBest(score);showBox('<span class="em">'+emoji+'</span><h2>'+title+'</h2>'+stars(n)+'Score <b style="color:#ffe14a">'+score+'</b>'+(nb?' 🏆 New best!':'')+'<small>Best '+best+(extra?' · '+extra:'')+'</small>',btn||'Play Again ▶',fn||startGame);if(n>=2)confetti(innerWidth/2,innerHeight/3,70);jingle(n>=2?[523,659,784,1047]:[392,330,262])}
+function endBox(emoji,title,n,score,extra,btn,fn){const nb=saveBest(score);showBox('<span class="em">'+emoji+'</span><h2>'+title+'</h2>'+stars(n)+'Score <b style="color:#ffe14a">'+score+'</b>'+(nb?' 🏆 New best!':'')+'<small>Best '+best+(extra?' · '+extra:'')+'</small>',btn||'Play Again ▶',fn||startGame);{const g2=$('go2');g2.style.display='';g2.textContent='☰ Menu';g2.onclick=()=>{hideBox();menu()}}if(n>=2)confetti(innerWidth/2,innerHeight/3,70);jingle(n>=2?[523,659,784,1047]:[392,330,262])}
 function lsGet(k,d){try{const v=localStorage.getItem(GAME+':'+k);return v===null?d:+v}catch(e){return d}}
 function lsSet(k,v){try{localStorage.setItem(GAME+':'+k,v)}catch(e){}}
 const rnd=n=>Math.floor(Math.random()*n),pick=a=>a[rnd(a.length)];
 updBest();
 
 
-const bd=$('bd');let N=7,lvl=1,B,turn,busy,over,cells=[];
+const bd=$('bd');let mode='cpu',nm=['You','🤖 Computer'],N=7,lvl=1,B,turn,busy,over,cells=[];
 function fit(){const s=$('stage'),m=Math.max(120,Math.min(s.clientWidth,s.clientHeight)-14);bd.style.setProperty('--bs',m+'px');bd.style.setProperty('--n',N);bd.style.width=bd.style.height=m+'px'}
 addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,200));
 const D8=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]],D4=[[-1,0],[1,0],[0,-1],[0,1]];
@@ -98,17 +166,18 @@ function claim(Bd){const seen=Array.from({length:N},()=>new Array(N).fill(false)
   if(own.size===1){const o=[...own][0];reg.forEach(([y,x])=>out.push([y,x,o]))}}
  out.forEach(([y,x,o])=>Bd[y][x]=o);return out}
 function count(Bd,w){let n=0;for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(Bd[r][c]===w)n++;return n}
-function render(newc){const L=!over&&turn===1&&!busy?new Set(legal(B,1).map(([r,c])=>r*N+c)):new Set();
+function render(newc){const L=!over&&(turn===1||mode==='two')&&!busy?new Set(legal(B,turn).map(([r,c])=>r*N+c)):new Set();
  for(let r=0;r<N;r++)for(let c=0;c<N;c++){const e=cells[r*N+c],v=B[r][c];e.className='c'+(v===1?' p':v===2?' a':L.has(r*N+c)?' ok':'')}
  (newc||[]).forEach(([r,c])=>{const e=cells[r*N+c];e.classList.add('pop')});
- $('lv').textContent=lvl;$('pc').textContent=count(B,1);$('ac').textContent=count(B,2)}
+ $('lv').textContent=lvl;$('n1').textContent=nm[0];$('n2').textContent=nm[1];$('lvp').style.display=$('bsp').style.display=mode==='two'?'none':'';$('pc').textContent=count(B,1);$('ac').textContent=count(B,2)}
 function place(r,c,who){B[r][c]=who;const cl=claim(B);const own=cl.filter(x=>x[2]===who);render([[r,c],...cl]);
  if(own.length){const e=cells[r*N+c];const rc=e.getBoundingClientRect();floatText(rc.left+rc.width/2,rc.top,'+'+own.length+' '+(who===1?'🔵':'🔴'));confetti(rc.left+rc.width/2,rc.top+rc.height/2,who===1?30:10,who===1?['#5db4ff','#fff','#ffe14a']:['#ff7a7a','#ffb0b0']);beep(who===1?700:300,.18);beep(who===1?900:240,.18,'triangle',.15,.1)}else beep(who===1?500:380,.07)}
-function tap(r,c){if(over||turn!==1||busy||B[r][c])return;if(!legal(B,1).some(m=>m[0]===r&&m[1]===c)){beep(150,.1,'square',.1);return}
- place(r,c,1);next(2)}
+function tap(r,c){if(over||busy||B[r][c]||!(turn===1||mode==='two'))return;if(!legal(B,turn).some(m=>m[0]===r&&m[1]===c)){beep(150,.1,'square',.1);return}
+ const w=turn;place(r,c,w);next(3-w)}
+const tag=w=>(w===1?'🔵 ':'🔴 ')+nm[w-1];
 function next(who){if(!count(B,0)&&!B.some(row=>row.includes(0))){return finish()}turn=who;
- if(who===1){const l=legal(B,1);if(!l.length)return finish();busy=false;$('st').textContent='🔵 Your turn — tap a glowing cell';render()}
- else{busy=true;$('st').textContent='🔴 Bot is thinking...';render();setTimeout(aiMove,450)}}
+ if(who===1||mode==='two'){const l=legal(B,who);if(!l.length)return finish();busy=false;$('st').textContent=tag(who)+"'s turn — tap a glowing cell";render()}
+ else{busy=true;$('st').textContent=tag(2)+' is thinking...';render();setTimeout(aiMove,450)}}
 function aiMove(){if(over)return;const L=legal(B,2);if(!L.length)return finish();
  const noise=Math.max(0,7-lvl*2);let bestS=-1e9,bm=L[0];
  for(const[r,c]of L){const T=B.map(x=>x.slice());T[r][c]=2;const cl=claim(T);let g=cl.filter(x=>x[2]===2).length,gl=cl.filter(x=>x[2]===1).length;
@@ -119,11 +188,15 @@ function aiMove(){if(over)return;const L=legal(B,2);if(!L.length)return finish()
   s+=Math.random()*noise;if(s>bestS){bestS=s;bm=[r,c]}}
  busy=false;place(bm[0],bm[1],2);next(1)}
 function finish(){over=true;busy=true;const p=count(B,1),a=count(B,2),tot=N*N,won=p>a,tie=p===a;
- const score=p*10+(won?100*lvl:0);const st=won?(p>=tot*.65?3:p>=tot*.55?3:2):1;render();
- $('st').textContent=won?'You win!':'Game over';
- if(won){endBox('🏆','You win '+p+' - '+a+'!',p>=tot*.6?3:2,score,'Level '+lvl+' cleared','Next Level ▶',()=>{lvl++;startGame()})}
- else endBox(tie?'🤝':'🤖',tie?'Tie '+p+' - '+a:'Bot wins '+a+' - '+p,1,score,'Try again','Try Again ▶',startGame)}
-function startGame(){mk();over=false;busy=false;turn=1;render();$('st').textContent='🔵 Your turn — tap a glowing cell'}
-showBox('<span class="em">🔵🔴</span><h2>Territory Grab</h2>Paint cells next to yours.<br><b>Enclose empty areas</b> with only your color to claim them all!<br>Most cells wins.','Start ▶',()=>{lvl=1;startGame()});
+ const score=p*10+(won?100*lvl:0);
+ if(mode==='two'){render();const w=won?0:tie?-1:1;$('st').textContent=w<0?'Tie!':nm[w]+' wins!';showBox('<span class="em">'+(w<0?'🤝':'🏆')+'</span><h2>'+(w<0?'Tie '+p+' - '+a:esc(nm[w])+' wins '+Math.max(p,a)+' - '+Math.min(p,a)+'!')+'</h2>🔵 '+esc(nm[0])+': <b style="color:#ffe14a">'+p+'</b><br>🔴 '+esc(nm[1])+': <b style="color:#ffe14a">'+a+'</b>','Rematch ▶',startGame);const g2=$('go2');g2.style.display='';g2.textContent='☰ Menu';g2.onclick=()=>{hideBox();menu()};confetti(innerWidth/2,innerHeight/3,70);jingle([523,659,784,1047]);return}const st=won?(p>=tot*.65?3:p>=tot*.55?3:2):1;render();
+ $('st').textContent=won?nm[0]+' wins!':'Game over';
+ if(won){endBox('🏆',esc(nm[0])+' wins '+p+' - '+a+'!',p>=tot*.6?3:2,score,'Level '+lvl+' cleared','Next Level ▶',()=>{lvl++;startGame()})}
+ else endBox(tie?'🤝':'🤖',tie?'Tie '+p+' - '+a:esc(nm[1])+' wins '+a+' - '+p,1,score,'Try again','Try Again ▶',startGame)}
+function startGame(){mk();over=false;busy=false;turn=1;render();$('st').textContent=tag(1)+"'s turn — tap a glowing cell"}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function menu(){over=true;showBox('<span class="em">🔵🔴</span><h2>Territory Grab</h2>Paint cells next to yours.<br><b>Enclose empty areas</b> with only your color to claim them all!<br>Most cells wins.','🤖 vs Computer',async()=>{const n=await Duo.askNames({cpu:true});if(!n){menu();return}nm=n;mode='cpu';lvl=1;startGame()});
+ const g2=$('go2');g2.style.display='';g2.textContent='👥 2 Players';g2.onclick=async()=>{hideBox();const n=await Duo.askNames();if(!n){menu();return}nm=n;mode='two';lvl=2;startGame()}}
+menu();
 mk();render();
 </script></body></html>

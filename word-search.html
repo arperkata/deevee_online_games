@@ -54,6 +54,74 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 <div id="top"><div class="pill" id="pL">Lv 1/4</div><div class="pill" id="pF">0/0</div><div class="pill" id="pS">⭐ 0</div><div class="pill" id="pT">⏱ 0:00</div></div>
 <div id="game"><canvas id="cv" width="720" height="720"></canvas><div id="side"><div id="theme"></div><div id="list"></div><button class="btn o" id="hint">💡 Hint (-50)</button></div></div>
 <script>
+/* ===== DUO helper v1 (shared, pasted inline into each game as its own <script> BEFORE the game script) ===== */
+const Duo=(()=>{
+const KEY='duo_names',S={mode:null,names:['Player 1','Player 2'],scores:[null,null],turn:0,hw:true,cpuR:[0,100],lvl:'easy',start:null,game:'',unit:''};
+let pill=null,ac=null;
+function css(){if(document.getElementById('duoCss'))return;const s=document.createElement('style');s.id='duoCss';s.textContent=
+'.duoOv{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(6,30,70,.88);padding:14px;font-family:"Fredoka","Trebuchet MS","Comic Sans MS",sans-serif}'+
+'.duoCard{background:linear-gradient(#2f8cff,#0b4fb3);border:5px solid #ffe14a;border-radius:26px;padding:18px 20px;max-width:min(92vw,420px);width:100%;color:#fff;text-align:center;box-shadow:0 8px 0 #06244d;animation:duoPop .35s}'+
+'@keyframes duoPop{0%{transform:scale(.6)}70%{transform:scale(1.05)}}'+
+'.duoCard h2{margin:0 0 8px;font-size:clamp(22px,6vw,32px);text-shadow:0 3px 0 #0b3a78}.duoCard p{margin:6px 0;font-size:clamp(15px,4vw,19px);font-weight:600}'+
+'.duoCard .big{font-size:clamp(34px,10vw,52px);line-height:1.1}'+
+'.duoCard input{width:100%;box-sizing:border-box;font:600 20px inherit;font-family:inherit;padding:10px 14px;border-radius:14px;border:3px solid #fff;margin:6px 0;color:#0b3a78;text-align:center}'+
+'.duoCard label{display:block;text-align:left;font-weight:700;margin-top:6px;font-size:15px}'+
+'.duoB{font:700 clamp(18px,5vw,24px) inherit;font-family:inherit;margin:8px 4px 0;padding:.45em 1.3em;min-height:46px;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}'+
+'.duoB.o{background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9560b;text-shadow:0 2px 0 #a9560b}.duoB.g{background:linear-gradient(#8a9bb5,#5d6f8a);box-shadow:0 5px 0 #3b4a63;text-shadow:none}'+
+'.duoB:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.3)}'+
+'.duoMenu{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 0}.duoMenu .duoB{margin:0}'+
+'.duoPill{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:8000;background:#0b3a78;color:#fff;border:3px solid #ffe14a;border-radius:999px;padding:3px 14px;font:700 clamp(13px,3.6vw,17px) "Fredoka","Trebuchet MS",sans-serif;box-shadow:0 3px 0 #06244d;pointer-events:none;white-space:nowrap;max-width:62vw;overflow:hidden;text-overflow:ellipsis}';
+document.head.appendChild(s)}
+function beep(f,d){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type='triangle';g.gain.setValueAtTime(.12,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+(d||.15));o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+(d||.15))}catch(e){}}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function modal(html,buttons){css();return new Promise(res=>{const ov=document.createElement('div');ov.className='duoOv';ov.innerHTML='<div class="duoCard">'+html+'<div class="duoMenu"></div></div>';const m=ov.querySelector('.duoMenu');
+ buttons.forEach(([label,cls,val])=>{const b=document.createElement('button');b.className='duoB '+(cls||'');b.innerHTML=label;b.onclick=()=>{const out=typeof val==='function'?val(ov):val;ov.remove();res(out)};m.appendChild(b)});
+ document.body.appendChild(ov);const i=ov.querySelector('input');if(i){i.focus();i.select()}})}
+function saved(){try{const a=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(a))return a}catch(e){}return null}
+function save(a){try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}}
+function clean(v,d){v=(v||'').trim().slice(0,14);return v||d}
+const api={
+ /* Ask both player names. Resolves to [n1,n2] or null if cancelled. opts.cpu=true asks only P1 name (P2 is "Computer"). opts.t1/t2 = labels */
+ askNames(opts){opts=opts||{};const sv=saved()||['',''];
+  const html='<div class="big">'+(opts.cpu?'🤖':'👥')+'</div><h2>'+(opts.cpu?'Your name':'Who is playing?')+'</h2>'+
+   '<label>'+esc(opts.t1||'Player 1')+'</label><input id="duoN1" maxlength="14" placeholder="Player 1" value="'+esc(sv[0]||'')+'">'+
+   (opts.cpu?'':'<label>'+esc(opts.t2||'Player 2')+'</label><input id="duoN2" maxlength="14" placeholder="Player 2" value="'+esc(sv[1]||'')+'">');
+  return modal(html,[['▶ Start','',ov=>{const a=clean(ov.querySelector('#duoN1').value,'Player 1');const b=opts.cpu?'🤖 Computer':clean(ov.querySelector('#duoN2')&&ov.querySelector('#duoN2').value,'Player 2');if(!opts.cpu)save([a,b]);else save([a,sv[1]||'']);return [a,b]}],['Cancel','g',null]])},
+ /* "Pass the device" screen for hot-seat turns / hidden information. Resolves when tapped. */
+ cover(name,msg){beep(660,.12);return modal('<div class="big">🔄</div><h2>Pass to '+esc(name)+'</h2><p>'+esc(msg||'Tap when you are ready')+'</p>',[['I am '+esc(name),'',true]])},
+ /* Add "2 Players" and "vs Computer" buttons into an element (start menu/overlay).
+    o={game:'snake', start:fn(), hw:true(higher wins)|false(lower wins, e.g. time), cpu:[lo,hi] typical score range for the computer (e.g. [40,160]), unit:' pts', noTwo:false, noCpu:false} */
+ addButtons(el,o){css();const wrap=document.createElement('div');wrap.className='duoMenu';
+  if(!o.noTwo){const b=document.createElement('button');b.className='duoB o';b.innerHTML='👥 2 Players';b.onclick=async()=>{const n=await api.askNames();if(n)api.begin(Object.assign({},o,{mode:'two',names:n}))};wrap.appendChild(b)}
+  if(!o.noCpu&&o.cpu){const b=document.createElement('button');b.className='duoB o';b.innerHTML='🤖 vs Computer';b.onclick=async()=>{const lv=await modal('<div class="big">🤖</div><h2>Computer level</h2>',[['😊 Easy','',  'easy'],['🧠 Hard','o','hard'],['Cancel','g',null]]);if(!lv)return;const n=await api.askNames({cpu:true});if(n)api.begin(Object.assign({},o,{mode:'cpu',names:n,lvl:lv}))};wrap.appendChild(b)}
+  el.appendChild(wrap);return wrap},
+ begin(o){S.mode=o.mode;S.names=o.names.slice();S.scores=[null,null];S.turn=0;S.hw=o.hw!==false;S.cpuR=o.cpu||[0,100];S.lvl=o.lvl||'easy';S.start=o.start;S.game=o.game||'';S.unit=o.unit||'';S.fmt=o.fmt||null;
+  api.pill();if(o.start)o.start()},
+ active(){return !!S.mode},
+ mode(){return S.mode},
+ player(){return S.names[S.turn]},
+ names(){return S.names.slice()},
+ pill(){css();if(!S.mode){if(pill){pill.remove();pill=null}return}if(!pill){pill=document.createElement('div');pill.className='duoPill';document.body.appendChild(pill)}
+  pill.textContent=S.mode==='two'?'👤 '+S.names[S.turn]+'  ('+(S.turn+1)+'/2)':'👤 '+S.names[0]+'  vs  🤖'},
+ fmt(v){return S.fmt?S.fmt(v):(Math.round(v*100)/100)+S.unit},
+ cpuScore(){const [lo,hi]=S.cpuR,mid=(lo+hi)/2,r=Math.random();let v;
+  if(S.hw)v=S.lvl==='easy'?lo+r*(mid-lo):mid+r*(hi-mid);else v=S.lvl==='easy'?mid+r*(hi-mid):lo+r*(mid-lo);return (hi-lo)>20?Math.round(v):Math.round(v*100)/100},
+ /* Call when a round ends with the player's score. Returns true if Duo took over (the game must NOT show its own game-over overlay). */
+ finish(score){if(!S.mode)return false;const sc=Number(score)||0;
+  if(S.mode==='two'){S.scores[S.turn]=sc;
+   if(S.turn===0){S.turn=1;api.pill();setTimeout(()=>{modal('<div class="big">✅</div><h2>'+esc(S.names[0])+' scored '+esc(api.fmt(sc))+'</h2><p>Now it is <b>'+esc(S.names[1])+'</b>\'s turn. Beat that!</p>',[['▶ '+esc(S.names[1])+': Go!','',true]]).then(()=>{if(S.start)S.start()})},700);return true}
+   const [a,b]=S.scores,aw=S.hw?a>b:a<b,bw=S.hw?b>a:b<a;const win=aw?0:bw?1:-1;
+   setTimeout(()=>{beep(880,.2);modal('<div class="big">'+(win<0?'🤝':'🏆')+'</div><h2>'+(win<0?'It is a tie!':esc(S.names[win])+' wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(a))+'</b></p><p>'+esc(S.names[1])+': <b>'+esc(api.fmt(b))+'</b></p>',[['🔁 Rematch','',1],['🏠 Menu','o',0]]).then(r=>{if(r){S.scores=[null,null];S.turn=0;api.pill();if(S.start)S.start()}else api.end(true)})},700);return true}
+  /* vs computer */
+  const c=api.cpuScore(),win=S.hw?(sc>c?0:sc<c?1:-1):(sc<c?0:sc>c?1:-1);
+  setTimeout(()=>{beep(win===0?880:300,.25);modal('<div class="big">'+(win===0?'🏆':win<0?'🤝':'🤖')+'</div><h2>'+(win===0?esc(S.names[0])+' wins!':win<0?'Tie!':'Computer wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(sc))+'</b></p><p>🤖 Computer: <b>'+esc(api.fmt(c))+'</b></p>',[['🔁 Play again','',1],['🏠 Menu','o',0]]).then(r=>{if(r){api.pill();if(S.start)S.start()}else api.end(true)})},700);return true},
+ /* Leave duo mode. If reload, the page reloads to the game's normal start menu. */
+ end(reload){S.mode=null;api.pill();if(reload)location.reload()}
+};
+return api})();
+/* ===== end DUO ===== */
+</script>
+<script>
 const $=id=>document.getElementById(id);
 const GK='word-search.html:';
 function lsGet(k,d){try{const v=localStorage.getItem(GK+k);return v==null?d:JSON.parse(v)}catch(e){return d}}
@@ -114,7 +182,13 @@ function gen(L){const cfg=LV[L],dirs=cfg.d===2?D2:cfg.d===4?D4:D8;
 function hud(){$('pL').textContent='Lv '+(lv+1)+'/'+LV.length;$('pF').textContent='🔎 '+words.filter(w=>w.found).length+'/'+words.length;$('pS').textContent='⭐ '+(total+score);
  const t=Math.floor(lvTime);$('pT').textContent='⏱ '+Math.floor(t/60)+':'+String(t%60).padStart(2,'0')}
 function buildList(){$('theme').textContent=ICON[curTheme]+' '+curTheme;$('list').innerHTML=words.map((w,i)=>'<div class="w" id="w'+i+'">'+w.w+'</div>').join('');fit()}
-function startLevel(L){lv=L;curTheme=pickTheme();gen(L);cs=SZ/N;score=0;combo=0;lastT=-99;lvTime=0;t0=performance.now();sel=null;pending=null;hintCell=null;busy=false;buildList();hud()}
+let duoReplay=false,duoCache=[];
+function duoStart(){if(!duoReplay)duoCache=[];$('ov').classList.add('hide');newGame()}
+function duoBtns(){Duo.addButtons($('oextra'),{game:'word-search',start:duoStart,cpu:[3500,7000],hw:true,unit:' pts'})}
+function startLevel(L){lv=L;curTheme=pickTheme();
+if(Duo.active()&&duoReplay&&duoCache[L]){const c=duoCache[L];curTheme=c.th;N=c.N;grid=c.grid;words=c.words.map(w=>({w:w.w,cells:w.cells.map(x=>x.slice()),found:false,color:w.color}))}
+else{gen(L);if(Duo.active())duoCache[L]={th:curTheme,N,grid,words:words.map(w=>({w:w.w,cells:w.cells.map(x=>x.slice()),color:w.color}))}}
+cs=SZ/N;score=0;combo=0;lastT=-99;lvTime=0;t0=performance.now();sel=null;pending=null;hintCell=null;busy=false;buildList();hud()}
 function newGame(){total=0;starSum=0;running=true;startLevel(0)}
 function pill(a,b,col){ctx.save();ctx.lineCap='round';ctx.lineWidth=cs*.78;ctx.strokeStyle=col;ctx.beginPath();ctx.moveTo((a[1]+.5)*cs,(a[0]+.5)*cs);ctx.lineTo((b[1]+.5)*cs,(b[0]+.5)*cs);ctx.stroke();ctx.restore()}
 function draw(){ctx.clearRect(0,0,SZ,SZ);ctx.fillStyle='#fff';ctx.fillRect(0,0,SZ,SZ);if(!grid)return;const cov=new Set();
@@ -148,8 +222,8 @@ function submit(s,e){const cl=cells(s),str=cl.map(c=>grid[c[0]][c[1]]).join(''),
 function levelDone(){busy=true;const par=words.length*11,bonus=Math.max(0,Math.round((par-lvTime)*5));score+=bonus;total+=score;const st=lvTime<par*.6?3:lvTime<par?2:1;starSum+=st;hud();sfx.win();confetti(50);
  const R=cv.getBoundingClientRect();floatText(R.left+R.width/2,R.top+R.height/2-30,'Cleared! Time bonus +'+bonus,'#fff');
  if(lv<LV.length-1)setTimeout(()=>{if(running)startLevel(lv+1)},1900);else setTimeout(finish,1900)}
-function finish(){running=false;const st=Math.max(1,Math.min(3,Math.round(starSum/LV.length))),nb=total>best;if(nb){best=total;lsSet('best',best)}
- overlay({e:st===3?'🏆':'🎉',t:'Puzzle Master!',p:'Score <b>'+total+'</b><br>'+(nb?'🌟 New best!':'Best: '+best),s:st,extra:chips(),btn:'Play Again',go:newGame})}
+function finish(){running=false;if(Duo.active()){duoReplay=Duo.mode()==='two'?!duoReplay:false;if(Duo.finish(total))return}const st=Math.max(1,Math.min(3,Math.round(starSum/LV.length))),nb=total>best;if(nb){best=total;lsSet('best',best)}
+ overlay({e:st===3?'🏆':'🎉',t:'Puzzle Master!',p:'Score <b>'+total+'</b><br>'+(nb?'🌟 New best!':'Best: '+best),s:st,extra:chips(),btn:'Play Again',go:newGame});duoBtns()}
 function chips(){return'<div class="chips">'+['Random',...Object.keys(TH)].map(t=>'<button class="chip'+(t===theme?' on':'')+'" data-t="'+t+'">'+ICON[t]+' '+t+'</button>').join('')+'</div>'}
 $('oextra').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;theme=b.dataset.t;lsSet('theme',theme);sfx.tap();[...document.querySelectorAll('.chip')].forEach(x=>x.classList.toggle('on',x===b))});
 $('hint').onclick=()=>{if(busy||!running)return;const w=shuffle(words.filter(x=>!x.found))[0];if(!w)return;hintCell=w.cells[0];hintT=performance.now();score=Math.max(-total,score-50);combo=0;sfx.tap();hud()};
@@ -160,6 +234,6 @@ function fit(){const g=$('game'),W=g.clientWidth-16,H=g.clientHeight-14,land=g.c
 addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,150));
 function loop(){if(running&&!busy){lvTime=(performance.now()-t0)/1000;if(Math.floor(lvTime)!==lastShown){lastShown=Math.floor(lvTime);hud()}}draw();requestAnimationFrame(loop)}
 words=[];lv=0;total=0;score=0;N=7;cs=SZ/N;busy=false;running=false;lvTime=0;hud();fit();loop();
-overlay({e:'🔎',t:'Word Search',p:'Drag across letters (any direction) or tap the first and last letter. Find every word fast for combos and stars!<br>Best: '+best,extra:chips(),btn:'Play!',go:newGame});
+overlay({e:'🔎',t:'Word Search',p:'Drag across letters (any direction) or tap the first and last letter. Find every word fast for combos and stars!<br>Best: '+best,extra:chips(),btn:'Play!',go:newGame});duoBtns();
 
 </script></body></html>

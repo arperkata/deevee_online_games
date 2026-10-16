@@ -73,16 +73,84 @@ body{background:radial-gradient(ellipse at 50% 40%,#1f9fd6,#0b4f86 80%)}
 @media(max-height:520px){:root{--cw:clamp(34px,min(11vw,16dvh),64px)}#log{min-height:2.4em;padding:4px 10px}}
 </style></head><body>
 <a class="home" href="index.html">⌂ Home</a>
-<div id="top"><h1>Go Fish</h1><span class="pill">Your books <b id="mb">0</b></span><span class="pill">AI books <b id="ab">0</b></span><span class="pill">Best <b id="bs">0</b></span><button class="mute" id="mute">🔊</button></div>
+<div id="top"><h1>Go Fish</h1><span class="pill"><span id="l1">Your books</span> <b id="mb">0</b></span><span class="pill"><span id="l2">AI books</span> <b id="ab">0</b></span><span class="pill">Best <b id="bs">0</b></span><button class="mute" id="mute">🔊</button></div>
 <div id="stage">
-<div class="zone"><span class="lbl">🤖 AI <b id="ac">7</b> cards</span><div id="ai" class="zone"></div><div class="books" id="abk"></div></div>
+<div class="zone"><span class="lbl"><span id="l2b">🤖 AI</span> <b id="ac">7</b> cards</span><div id="ai" class="zone"></div><div class="books" id="abk"></div></div>
 <div id="mid"><div id="pond"><div id="pondc"></div><small>🐟 <span id="pc">0</span></small></div><div id="log">Tap one of your cards to ask for that rank!</div></div>
 <div class="zone"><div class="books" id="mbk"></div></div>
 <div id="hint">Your hand - tap a card to ask the AI for that rank</div>
 <div id="hand"></div>
 </div>
 <canvas id="fx"></canvas>
-<div id="msg"><div id="box"><div id="em"></div><div id="mt"></div><div id="stars"></div><div id="ms"></div><button class="go" id="again">Play</button></div></div>
+<div id="msg"><div id="box"><div id="em"></div><div id="mt"></div><div id="stars"></div><div id="ms"></div><button class="go" id="again">Play</button><button class="go" id="menuB" style="display:none;background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9560b;text-shadow:0 2px 0 #a9560b;margin-left:8px">Menu</button></div></div>
+<script>
+/* ===== DUO helper v1 (shared, pasted inline into each game as its own <script> BEFORE the game script) ===== */
+const Duo=(()=>{
+const KEY='duo_names',S={mode:null,names:['Player 1','Player 2'],scores:[null,null],turn:0,hw:true,cpuR:[0,100],lvl:'easy',start:null,game:'',unit:''};
+let pill=null,ac=null;
+function css(){if(document.getElementById('duoCss'))return;const s=document.createElement('style');s.id='duoCss';s.textContent=
+'.duoOv{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(6,30,70,.88);padding:14px;font-family:"Fredoka","Trebuchet MS","Comic Sans MS",sans-serif}'+
+'.duoCard{background:linear-gradient(#2f8cff,#0b4fb3);border:5px solid #ffe14a;border-radius:26px;padding:18px 20px;max-width:min(92vw,420px);width:100%;color:#fff;text-align:center;box-shadow:0 8px 0 #06244d;animation:duoPop .35s}'+
+'@keyframes duoPop{0%{transform:scale(.6)}70%{transform:scale(1.05)}}'+
+'.duoCard h2{margin:0 0 8px;font-size:clamp(22px,6vw,32px);text-shadow:0 3px 0 #0b3a78}.duoCard p{margin:6px 0;font-size:clamp(15px,4vw,19px);font-weight:600}'+
+'.duoCard .big{font-size:clamp(34px,10vw,52px);line-height:1.1}'+
+'.duoCard input{width:100%;box-sizing:border-box;font:600 20px inherit;font-family:inherit;padding:10px 14px;border-radius:14px;border:3px solid #fff;margin:6px 0;color:#0b3a78;text-align:center}'+
+'.duoCard label{display:block;text-align:left;font-weight:700;margin-top:6px;font-size:15px}'+
+'.duoB{font:700 clamp(18px,5vw,24px) inherit;font-family:inherit;margin:8px 4px 0;padding:.45em 1.3em;min-height:46px;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}'+
+'.duoB.o{background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9560b;text-shadow:0 2px 0 #a9560b}.duoB.g{background:linear-gradient(#8a9bb5,#5d6f8a);box-shadow:0 5px 0 #3b4a63;text-shadow:none}'+
+'.duoB:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.3)}'+
+'.duoMenu{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 0}.duoMenu .duoB{margin:0}'+
+'.duoPill{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:8000;background:#0b3a78;color:#fff;border:3px solid #ffe14a;border-radius:999px;padding:3px 14px;font:700 clamp(13px,3.6vw,17px) "Fredoka","Trebuchet MS",sans-serif;box-shadow:0 3px 0 #06244d;pointer-events:none;white-space:nowrap;max-width:62vw;overflow:hidden;text-overflow:ellipsis}';
+document.head.appendChild(s)}
+function beep(f,d){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type='triangle';g.gain.setValueAtTime(.12,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+(d||.15));o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+(d||.15))}catch(e){}}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function modal(html,buttons){css();return new Promise(res=>{const ov=document.createElement('div');ov.className='duoOv';ov.innerHTML='<div class="duoCard">'+html+'<div class="duoMenu"></div></div>';const m=ov.querySelector('.duoMenu');
+ buttons.forEach(([label,cls,val])=>{const b=document.createElement('button');b.className='duoB '+(cls||'');b.innerHTML=label;b.onclick=()=>{const out=typeof val==='function'?val(ov):val;ov.remove();res(out)};m.appendChild(b)});
+ document.body.appendChild(ov);const i=ov.querySelector('input');if(i){i.focus();i.select()}})}
+function saved(){try{const a=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(a))return a}catch(e){}return null}
+function save(a){try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}}
+function clean(v,d){v=(v||'').trim().slice(0,14);return v||d}
+const api={
+ /* Ask both player names. Resolves to [n1,n2] or null if cancelled. opts.cpu=true asks only P1 name (P2 is "Computer"). opts.t1/t2 = labels */
+ askNames(opts){opts=opts||{};const sv=saved()||['',''];
+  const html='<div class="big">'+(opts.cpu?'🤖':'👥')+'</div><h2>'+(opts.cpu?'Your name':'Who is playing?')+'</h2>'+
+   '<label>'+esc(opts.t1||'Player 1')+'</label><input id="duoN1" maxlength="14" placeholder="Player 1" value="'+esc(sv[0]||'')+'">'+
+   (opts.cpu?'':'<label>'+esc(opts.t2||'Player 2')+'</label><input id="duoN2" maxlength="14" placeholder="Player 2" value="'+esc(sv[1]||'')+'">');
+  return modal(html,[['▶ Start','',ov=>{const a=clean(ov.querySelector('#duoN1').value,'Player 1');const b=opts.cpu?'🤖 Computer':clean(ov.querySelector('#duoN2')&&ov.querySelector('#duoN2').value,'Player 2');if(!opts.cpu)save([a,b]);else save([a,sv[1]||'']);return [a,b]}],['Cancel','g',null]])},
+ /* "Pass the device" screen for hot-seat turns / hidden information. Resolves when tapped. */
+ cover(name,msg){beep(660,.12);return modal('<div class="big">🔄</div><h2>Pass to '+esc(name)+'</h2><p>'+esc(msg||'Tap when you are ready')+'</p>',[['I am '+esc(name),'',true]])},
+ /* Add "2 Players" and "vs Computer" buttons into an element (start menu/overlay).
+    o={game:'snake', start:fn(), hw:true(higher wins)|false(lower wins, e.g. time), cpu:[lo,hi] typical score range for the computer (e.g. [40,160]), unit:' pts', noTwo:false, noCpu:false} */
+ addButtons(el,o){css();const wrap=document.createElement('div');wrap.className='duoMenu';
+  if(!o.noTwo){const b=document.createElement('button');b.className='duoB o';b.innerHTML='👥 2 Players';b.onclick=async()=>{const n=await api.askNames();if(n)api.begin(Object.assign({},o,{mode:'two',names:n}))};wrap.appendChild(b)}
+  if(!o.noCpu&&o.cpu){const b=document.createElement('button');b.className='duoB o';b.innerHTML='🤖 vs Computer';b.onclick=async()=>{const lv=await modal('<div class="big">🤖</div><h2>Computer level</h2>',[['😊 Easy','',  'easy'],['🧠 Hard','o','hard'],['Cancel','g',null]]);if(!lv)return;const n=await api.askNames({cpu:true});if(n)api.begin(Object.assign({},o,{mode:'cpu',names:n,lvl:lv}))};wrap.appendChild(b)}
+  el.appendChild(wrap);return wrap},
+ begin(o){S.mode=o.mode;S.names=o.names.slice();S.scores=[null,null];S.turn=0;S.hw=o.hw!==false;S.cpuR=o.cpu||[0,100];S.lvl=o.lvl||'easy';S.start=o.start;S.game=o.game||'';S.unit=o.unit||'';S.fmt=o.fmt||null;
+  api.pill();if(o.start)o.start()},
+ active(){return !!S.mode},
+ mode(){return S.mode},
+ player(){return S.names[S.turn]},
+ names(){return S.names.slice()},
+ pill(){css();if(!S.mode){if(pill){pill.remove();pill=null}return}if(!pill){pill=document.createElement('div');pill.className='duoPill';document.body.appendChild(pill)}
+  pill.textContent=S.mode==='two'?'👤 '+S.names[S.turn]+'  ('+(S.turn+1)+'/2)':'👤 '+S.names[0]+'  vs  🤖'},
+ fmt(v){return S.fmt?S.fmt(v):(Math.round(v*100)/100)+S.unit},
+ cpuScore(){const [lo,hi]=S.cpuR,mid=(lo+hi)/2,r=Math.random();let v;
+  if(S.hw)v=S.lvl==='easy'?lo+r*(mid-lo):mid+r*(hi-mid);else v=S.lvl==='easy'?mid+r*(hi-mid):lo+r*(mid-lo);return (hi-lo)>20?Math.round(v):Math.round(v*100)/100},
+ /* Call when a round ends with the player's score. Returns true if Duo took over (the game must NOT show its own game-over overlay). */
+ finish(score){if(!S.mode)return false;const sc=Number(score)||0;
+  if(S.mode==='two'){S.scores[S.turn]=sc;
+   if(S.turn===0){S.turn=1;api.pill();setTimeout(()=>{modal('<div class="big">✅</div><h2>'+esc(S.names[0])+' scored '+esc(api.fmt(sc))+'</h2><p>Now it is <b>'+esc(S.names[1])+'</b>\'s turn. Beat that!</p>',[['▶ '+esc(S.names[1])+': Go!','',true]]).then(()=>{if(S.start)S.start()})},700);return true}
+   const [a,b]=S.scores,aw=S.hw?a>b:a<b,bw=S.hw?b>a:b<a;const win=aw?0:bw?1:-1;
+   setTimeout(()=>{beep(880,.2);modal('<div class="big">'+(win<0?'🤝':'🏆')+'</div><h2>'+(win<0?'It is a tie!':esc(S.names[win])+' wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(a))+'</b></p><p>'+esc(S.names[1])+': <b>'+esc(api.fmt(b))+'</b></p>',[['🔁 Rematch','',1],['🏠 Menu','o',0]]).then(r=>{if(r){S.scores=[null,null];S.turn=0;api.pill();if(S.start)S.start()}else api.end(true)})},700);return true}
+  /* vs computer */
+  const c=api.cpuScore(),win=S.hw?(sc>c?0:sc<c?1:-1):(sc<c?0:sc>c?1:-1);
+  setTimeout(()=>{beep(win===0?880:300,.25);modal('<div class="big">'+(win===0?'🏆':win<0?'🤝':'🤖')+'</div><h2>'+(win===0?esc(S.names[0])+' wins!':win<0?'Tie!':'Computer wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(sc))+'</b></p><p>🤖 Computer: <b>'+esc(api.fmt(c))+'</b></p>',[['🔁 Play again','',1],['🏠 Menu','o',0]]).then(r=>{if(r){api.pill();if(S.start)S.start()}else api.end(true)})},700);return true},
+ /* Leave duo mode. If reload, the page reloads to the game's normal start menu. */
+ end(reload){S.mode=null;api.pill();if(reload)location.reload()}
+};
+return api})();
+/* ===== end DUO ===== */
+</script>
 <script>
 const GAME="go-fish.html";
 const $=id=>document.getElementById(id);
@@ -110,59 +178,79 @@ function floatAt(el,txt,color){const r=el.getBoundingClientRect();floatText(txt,
 function overlay(o){$('em').textContent=o.em||'';$('mt').textContent=o.title||'';$('stars').textContent=o.stars?'★'.repeat(o.stars)+'☆'.repeat(3-o.stars):'';$('ms').innerHTML=o.html||'';const b=$('again');b.textContent=o.btn||'Play Again';b.onclick=()=>{beep(520);$('msg').style.display='none';o.cb()};$('msg').style.display='flex';if(o.win){jingle();bigConfetti()}else if(o.lose)sadTone()}
 
 let dk,H,AH,mb,ab,turn,busy,over,mem;
+let MODE="classic",LVL="normal",NMB=["You","🤖 AI"],NM=["You","🤖 AI"],hideH=false;
+const named=()=>MODE!=="classic";
+const vb=(a,b)=>named()?b:a;
 const RN=r=>({1:'Aces',11:'Jacks',12:'Queens',13:'Kings'}[r]||r+'s');
 function log(t){$('log').textContent=t}
 function sortH(h){h.sort((a,b)=>a.r-b.r||a.s-b.s)}
 function render(newId){
+  $('l1').textContent=named()?NM[0]+' books':'Your books';$('l2').textContent=NM[1]+' books';$('l2b').textContent=NM[1];$('hint').textContent=named()?NM[0]+"'s hand - tap a card to ask "+NM[1]+' for that rank':'Your hand - tap a card to ask the AI for that rank';
   $('mb').textContent=mb.length;$('ab').textContent=ab.length;$('ac').textContent=AH.length;$('pc').textContent=dk.length;
   $('ai').innerHTML='';const cn=Math.min(AH.length,10);for(let i=0;i<cn;i++)$('ai').appendChild(cardEl(null,false));
   $('pondc').innerHTML='';if(dk.length)$('pondc').appendChild(cardEl(null,false));
   const hd=$('hand');hd.innerHTML='';sortH(H);const W=$('stage').clientWidth-12,w=cwpx()||60;
   const step=H.length>1?Math.min(w*.8,(W-w)/(H.length-1)):0;
-  H.forEach((c,i)=>{const e=cardEl(c);if(i)e.style.marginLeft=(step-w)+'px';if(c.id===newId)e.classList.add('new');e.onclick=()=>ask(c.r);hd.appendChild(e)});
+  H.forEach((c,i)=>{const e=cardEl(c,!hideH);if(i)e.style.marginLeft=(step-w)+'px';if(c.id===newId)e.classList.add('new');e.onclick=()=>{if(!hideH)ask(c.r)};hd.appendChild(e)});
   const bk=(a)=>a.map(r=>'<span>'+RK[r]+'</span>').join('');
-  $('mbk').innerHTML=mb.length?'<span class="lbl">Your books</span>'+bk(mb):'';$('abk').innerHTML=ab.length?bk(ab)+'<span class="lbl">AI books</span>':'';
+  $('mbk').innerHTML=mb.length?'<span class="lbl">'+(named()?NM[0]+' books':'Your books')+'</span>'+bk(mb):'';$('abk').innerHTML=ab.length?bk(ab)+'<span class="lbl">'+NM[1]+' books</span>':'';
 }
 function cwpx(){const e=document.createElement('div');e.className='card';e.style.visibility='hidden';document.body.appendChild(e);const v=e.offsetWidth;e.remove();return v}
 function checkBooks(hand,isMe){
   const cnt={};hand.forEach(c=>cnt[c.r]=(cnt[c.r]||0)+1);let got=false;
   for(const r in cnt)if(cnt[r]==4){const rr=+r;(isMe?mb:ab).push(rr);for(let i=hand.length-1;i>=0;i--)if(hand[i].r==rr)hand.splice(i,1);got=true;
-    if(isMe){confetti(innerWidth/2,innerHeight*.7,40);floatText('BOOK of '+RN(rr)+'!',innerWidth/2,innerHeight*.6)}else floatText('AI booked '+RN(rr),innerWidth/2,innerHeight*.25,'#fff');beep(880,.15);setTimeout(()=>beep(1175,.2),130)}
+    if(isMe){confetti(innerWidth/2,innerHeight*.7,40);floatText((named()?NM[0]+': ':'')+'BOOK of '+RN(rr)+'!',innerWidth/2,innerHeight*.6)}else floatText(NM[1]+' booked '+RN(rr),innerWidth/2,innerHeight*.25,'#fff');beep(880,.15);setTimeout(()=>beep(1175,.2),130)}
   return got}
 function refill(hand){while(hand.length<1&&dk.length)hand.push(dk.pop())}
 function finished(){return mb.length+ab.length>=13||(!dk.length&&(!H.length||!AH.length))}
 async function ask(r){
   if(busy||over||turn!=0||!H.some(c=>c.r==r))return;busy=true;mem[r]=1;
   const got=AH.filter(c=>c.r==r);
-  log('You: "Got any '+RN(r)+'?"');beep(500,.08);await sleep(800);
-  if(got.length){AH=AH.filter(c=>c.r!=r);H.push(...got);beep(700,.1);log('Yes! You take '+got.length+' '+RN(r)+'. Go again!');checkBooks(H,true);refill(H);render();$('ac').classList.add('pulse');
-    if(finished())return end();await sleep(900);busy=false;if(!H.length&&!dk.length){return aiTurn()}return}
+  log(NM[0]+': "Got any '+RN(r)+'?"');beep(500,.08);await sleep(800);
+  if(got.length){AH=AH.filter(c=>c.r!=r);H.push(...got);beep(700,.1);log('Yes! '+vb('You take',NM[0]+' takes')+' '+got.length+' '+RN(r)+'. Go again!');checkBooks(H,true);refill(H);render();$('ac').classList.add('pulse');
+    if(finished())return end();await sleep(900);busy=false;if(!H.length&&!dk.length){return nextTurn()}return}
   log('"Go Fish!" 🐟');await sleep(700);
-  if(dk.length){const c=dk.pop();H.push(c);beep(350,.1);checkBooks(H,true);if(c.r==r){log('You fished a '+RN(r).slice(0,-1)+'! Lucky - go again!');render(c.id);if(finished())return end();await sleep(900);busy=false;return}render(c.id)}
+  if(dk.length){const c=dk.pop();H.push(c);beep(350,.1);checkBooks(H,true);if(c.r==r){refill(H);log(vb('You fished',NM[0]+' fished')+' a '+RN(r).slice(0,-1)+'! Lucky - go again!');render(c.id);if(finished())return end();await sleep(900);busy=false;return}render(c.id)}
   if(finished())return end();
-  await sleep(500);aiTurn()}
+  await sleep(500);nextTurn()}
+function nextTurn(){return MODE==='2p'?passTurn():aiTurn()}
+async function passTurn(){
+  busy=true;turn=1;hideH=true;render();log('Pass the device...');await sleep(500);
+  [H,AH]=[AH,H];[mb,ab]=[ab,mb];[NM[0],NM[1]]=[NM[1],NM[0]];
+  if(finished()){hideH=false;return end()}
+  await Duo.cover(NM[0]);hideH=false;refill(H);turn=0;busy=false;render();
+  if(finished())return end();
+  if(!H.length){log(NM[0]+' has no cards!');return passTurn()}
+  log(NM[0]+"'s turn - tap a card to ask "+NM[1]+'!')}
 async function aiTurn(){
   turn=1;busy=true;
   while(true){
     if(finished())return end();
-    refill(AH);if(!AH.length){log('AI has no cards');await sleep(700);break}
-    render();log('🤖 AI is thinking...');await sleep(1100);
-    const known=AH.filter(c=>mem[c.r]);const pool=known.length&&Math.random()<.6?known:AH;const r=pool[rnd(pool.length)].r;
-    log('AI: "Got any '+RN(r)+'?"');beep(420,.08);await sleep(900);
+    refill(AH);if(!AH.length){log(NM[1]+' has no cards');await sleep(700);break}
+    render();log(NM[1]+' is thinking...');await sleep(1100);
+    const known=AH.filter(c=>mem[c.r]);const pr=LVL==='easy'?0:LVL==='hard'?.95:.6;const pool=known.length&&Math.random()<pr?known:AH;const r=pool[rnd(pool.length)].r;
+    log(NM[1]+': "Got any '+RN(r)+'?"');beep(420,.08);await sleep(900);
     const got=H.filter(c=>c.r==r);
-    if(got.length){H=H.filter(c=>c.r!=r);AH.push(...got);delete mem[r];log('AI takes your '+got.length+' '+RN(r)+'!');beep(250,.15,'square',.08);checkBooks(AH,false);refill(H);render();await sleep(1100);continue}
-    log('AI goes fishing...');await sleep(700);
-    if(dk.length){const c=AH.length?dk.pop():null;if(c){AH.push(c);checkBooks(AH,false);render();if(c.r==r){log('AI got lucky and goes again!');await sleep(1000);continue}}}
+    if(got.length){H=H.filter(c=>c.r!=r);AH.push(...got);delete mem[r];log(NM[1]+' takes '+vb('your ',NM[0]+"'s ")+got.length+' '+RN(r)+'!');beep(250,.15,'square',.08);checkBooks(AH,false);refill(H);render();await sleep(1100);continue}
+    log(NM[1]+' goes fishing...');await sleep(700);
+    if(dk.length){const c=AH.length?dk.pop():null;if(c){AH.push(c);checkBooks(AH,false);render();if(c.r==r){log(NM[1]+' got lucky and goes again!');await sleep(1000);continue}}}
     break}
   turn=0;busy=false;if(!H.length&&dk.length){refill(H)}render();
-  if(finished())return end();log(H.length?'Your turn - tap a card to ask!':'You have no cards!');
+  if(finished())return end();log(H.length?vb('Your turn',NM[0]+"'s turn")+' - tap a card to ask!':vb('You have',NM[0]+' has')+' no cards!');
   if(!H.length)aiTurn()}
 function end(){
-  over=true;busy=true;render();const m=mb.length,a=ab.length,win=m>a,best=Math.max(getBest('best'),m);setBest('best',best);$('bs').textContent=best;
+  over=true;busy=true;render();const m=mb.length,a=ab.length,win=m>a;
+  if(MODE!=='classic'){const w=m>a?NM[0]:a>m?NM[1]:null;overlay({em:w?'🏆':'🤝',title:w?w+' wins!':"It's a tie!",win:!!w&&(MODE==='2p'||m>a),lose:MODE==='cpu'&&a>m,html:NM[0]+' books <b>'+m+'</b> · '+NM[1]+' books <b>'+a+'</b>',btn:'Play again',cb:newGame});$('menuB').style.display='inline-block';return}
+  const best=Math.max(getBest('best'),m);setBest('best',best);$('bs').textContent=best;
   overlay({em:win?'🏆':m==a?'🤝':'🐟',title:win?'You win!':m==a?'It\'s a tie!':'AI wins!',stars:win?(m>=9?3:m>=7?2:1):1,win,lose:!win&&m!=a,html:'Your books <b>'+m+'</b> · AI books <b>'+a+'</b><br>Best <b>'+best+'</b>',cb:newGame})}
-function newGame(){dk=shuffle(deck());H=[];AH=[];for(let i=0;i<7;i++){H.push(dk.pop());AH.push(dk.pop())}mb=[];ab=[];mem={};turn=0;busy=false;over=false;
+function newGame(){NM=NMB.slice();hideH=false;dk=shuffle(deck());H=[];AH=[];for(let i=0;i<7;i++){H.push(dk.pop());AH.push(dk.pop())}mb=[];ab=[];mem={};turn=0;busy=false;over=false;
   checkBooks(H,true);checkBooks(AH,false);$('bs').textContent=getBest('best');log('Tap one of your cards to ask for that rank!');render()}
 addEventListener('resize',()=>render());
-newGame();
-overlay({em:'🐟',title:'Go Fish',btn:'Play ▶',cb:()=>{},html:'Tap a card in your hand to ask the AI for that rank.<br>Collect <b>4 of a kind</b> to make a book.<br>Most books wins!'});
+$('menuB').onclick=()=>{beep(520);showMenu()};
+function mkB(txt,cls,fn){const b=document.createElement('button');b.className='btn '+cls;b.textContent=txt;b.style.margin='4px';b.onclick=fn;$('modes').appendChild(b)}
+async function pick(mode,lvl){let n;if(mode==='2p'){n=await Duo.askNames();}else{n=await Duo.askNames({cpu:true})}if(!n)return;MODE=mode;LVL=lvl;NMB=n.slice();$('msg').style.display='none';newGame()}
+function showMenu(){MODE='classic';LVL='normal';NMB=['You','🤖 AI'];newGame();$('menuB').style.display='none';
+  overlay({em:'🐟',title:'Go Fish',btn:'Play ▶',cb:()=>{MODE='classic';NMB=['You','🤖 AI'];newGame()},html:'Tap a card in your hand to ask for that rank.<br>Collect <b>4 of a kind</b> to make a book.<br>Most books wins!<div id="modes"></div>'});
+  $('modes').innerHTML='';mkB('🤖 Computer: Easy','g',()=>pick('cpu','easy'));mkB('🧠 Computer: Hard','o',()=>pick('cpu','hard'));mkB('👥 2 Players','r',()=>pick('2p','normal'))}
+showMenu();
 </script></body></html>

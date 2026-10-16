@@ -7,6 +7,7 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 canvas{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:16px;box-shadow:0 0 0 4px #5cc8ff,0 8px 0 4px #0b2a5c;touch-action:none;max-width:100vw}
 #ov{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:500;text-align:center;padding:20px;overflow:auto;background:radial-gradient(circle at 50% 35%,#2a6fcf 0,#123a7c 55%,#0a1f4d 100%)}
 #ov.hide{display:none}
+#mm{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:min(94vw,460px)}#mm .btn{font-size:clamp(16px,4.5vw,20px);padding:8px 16px;min-height:44px;background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9560b;text-shadow:0 2px 0 #a9560b}#mm .btn.g{background:linear-gradient(#8a9bb5,#5d6f8a);box-shadow:0 5px 0 #3b4a63;text-shadow:none}
 #ov h1{margin:0;color:#ffe14d;text-shadow:0 4px 0 #1b4f86,0 0 18px #ff9a3d;font-size:clamp(34px,10vw,64px);line-height:1.05}
 #ov p{margin:0;font-size:clamp(16px,4.5vw,22px);line-height:1.4;background:#14367a;border:3px solid #5cc8ff;border-radius:20px;padding:12px 22px;max-width:min(92vw,440px);color:#fff;font-weight:600;text-shadow:0 2px 0 #0b2a5c}
 #ov p b{color:#ffe14d}
@@ -39,7 +40,75 @@ canvas{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);border-rad
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Mute">🔊</button>
 <canvas id="c"></canvas>
 <div id="pad"><div id="pl"></div><div id="pr"></div></div>
-<div id="ov"><h1 id="t"></h1><p id="m"></p><button class="btn" id="go">Play</button></div>
+<div id="ov"><h1 id="t"></h1><p id="m"></p><button class="btn" id="go">Play</button><div id="mm"></div></div>
+<script>
+/* ===== DUO helper v1 (shared, pasted inline into each game as its own <script> BEFORE the game script) ===== */
+const Duo=(()=>{
+const KEY='duo_names',S={mode:null,names:['Player 1','Player 2'],scores:[null,null],turn:0,hw:true,cpuR:[0,100],lvl:'easy',start:null,game:'',unit:''};
+let pill=null,ac=null;
+function css(){if(document.getElementById('duoCss'))return;const s=document.createElement('style');s.id='duoCss';s.textContent=
+'.duoOv{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(6,30,70,.88);padding:14px;font-family:"Fredoka","Trebuchet MS","Comic Sans MS",sans-serif}'+
+'.duoCard{background:linear-gradient(#2f8cff,#0b4fb3);border:5px solid #ffe14a;border-radius:26px;padding:18px 20px;max-width:min(92vw,420px);width:100%;color:#fff;text-align:center;box-shadow:0 8px 0 #06244d;animation:duoPop .35s}'+
+'@keyframes duoPop{0%{transform:scale(.6)}70%{transform:scale(1.05)}}'+
+'.duoCard h2{margin:0 0 8px;font-size:clamp(22px,6vw,32px);text-shadow:0 3px 0 #0b3a78}.duoCard p{margin:6px 0;font-size:clamp(15px,4vw,19px);font-weight:600}'+
+'.duoCard .big{font-size:clamp(34px,10vw,52px);line-height:1.1}'+
+'.duoCard input{width:100%;box-sizing:border-box;font:600 20px inherit;font-family:inherit;padding:10px 14px;border-radius:14px;border:3px solid #fff;margin:6px 0;color:#0b3a78;text-align:center}'+
+'.duoCard label{display:block;text-align:left;font-weight:700;margin-top:6px;font-size:15px}'+
+'.duoB{font:700 clamp(18px,5vw,24px) inherit;font-family:inherit;margin:8px 4px 0;padding:.45em 1.3em;min-height:46px;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}'+
+'.duoB.o{background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9560b;text-shadow:0 2px 0 #a9560b}.duoB.g{background:linear-gradient(#8a9bb5,#5d6f8a);box-shadow:0 5px 0 #3b4a63;text-shadow:none}'+
+'.duoB:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.3)}'+
+'.duoMenu{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 0}.duoMenu .duoB{margin:0}'+
+'.duoPill{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:8000;background:#0b3a78;color:#fff;border:3px solid #ffe14a;border-radius:999px;padding:3px 14px;font:700 clamp(13px,3.6vw,17px) "Fredoka","Trebuchet MS",sans-serif;box-shadow:0 3px 0 #06244d;pointer-events:none;white-space:nowrap;max-width:62vw;overflow:hidden;text-overflow:ellipsis}';
+document.head.appendChild(s)}
+function beep(f,d){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type='triangle';g.gain.setValueAtTime(.12,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+(d||.15));o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+(d||.15))}catch(e){}}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function modal(html,buttons){css();return new Promise(res=>{const ov=document.createElement('div');ov.className='duoOv';ov.innerHTML='<div class="duoCard">'+html+'<div class="duoMenu"></div></div>';const m=ov.querySelector('.duoMenu');
+ buttons.forEach(([label,cls,val])=>{const b=document.createElement('button');b.className='duoB '+(cls||'');b.innerHTML=label;b.onclick=()=>{const out=typeof val==='function'?val(ov):val;ov.remove();res(out)};m.appendChild(b)});
+ document.body.appendChild(ov);const i=ov.querySelector('input');if(i){i.focus();i.select()}})}
+function saved(){try{const a=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(a))return a}catch(e){}return null}
+function save(a){try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}}
+function clean(v,d){v=(v||'').trim().slice(0,14);return v||d}
+const api={
+ /* Ask both player names. Resolves to [n1,n2] or null if cancelled. opts.cpu=true asks only P1 name (P2 is "Computer"). opts.t1/t2 = labels */
+ askNames(opts){opts=opts||{};const sv=saved()||['',''];
+  const html='<div class="big">'+(opts.cpu?'🤖':'👥')+'</div><h2>'+(opts.cpu?'Your name':'Who is playing?')+'</h2>'+
+   '<label>'+esc(opts.t1||'Player 1')+'</label><input id="duoN1" maxlength="14" placeholder="Player 1" value="'+esc(sv[0]||'')+'">'+
+   (opts.cpu?'':'<label>'+esc(opts.t2||'Player 2')+'</label><input id="duoN2" maxlength="14" placeholder="Player 2" value="'+esc(sv[1]||'')+'">');
+  return modal(html,[['▶ Start','',ov=>{const a=clean(ov.querySelector('#duoN1').value,'Player 1');const b=opts.cpu?'🤖 Computer':clean(ov.querySelector('#duoN2')&&ov.querySelector('#duoN2').value,'Player 2');if(!opts.cpu)save([a,b]);else save([a,sv[1]||'']);return [a,b]}],['Cancel','g',null]])},
+ /* "Pass the device" screen for hot-seat turns / hidden information. Resolves when tapped. */
+ cover(name,msg){beep(660,.12);return modal('<div class="big">🔄</div><h2>Pass to '+esc(name)+'</h2><p>'+esc(msg||'Tap when you are ready')+'</p>',[['I am '+esc(name),'',true]])},
+ /* Add "2 Players" and "vs Computer" buttons into an element (start menu/overlay).
+    o={game:'snake', start:fn(), hw:true(higher wins)|false(lower wins, e.g. time), cpu:[lo,hi] typical score range for the computer (e.g. [40,160]), unit:' pts', noTwo:false, noCpu:false} */
+ addButtons(el,o){css();const wrap=document.createElement('div');wrap.className='duoMenu';
+  if(!o.noTwo){const b=document.createElement('button');b.className='duoB o';b.innerHTML='👥 2 Players';b.onclick=async()=>{const n=await api.askNames();if(n)api.begin(Object.assign({},o,{mode:'two',names:n}))};wrap.appendChild(b)}
+  if(!o.noCpu&&o.cpu){const b=document.createElement('button');b.className='duoB o';b.innerHTML='🤖 vs Computer';b.onclick=async()=>{const lv=await modal('<div class="big">🤖</div><h2>Computer level</h2>',[['😊 Easy','',  'easy'],['🧠 Hard','o','hard'],['Cancel','g',null]]);if(!lv)return;const n=await api.askNames({cpu:true});if(n)api.begin(Object.assign({},o,{mode:'cpu',names:n,lvl:lv}))};wrap.appendChild(b)}
+  el.appendChild(wrap);return wrap},
+ begin(o){S.mode=o.mode;S.names=o.names.slice();S.scores=[null,null];S.turn=0;S.hw=o.hw!==false;S.cpuR=o.cpu||[0,100];S.lvl=o.lvl||'easy';S.start=o.start;S.game=o.game||'';S.unit=o.unit||'';S.fmt=o.fmt||null;
+  api.pill();if(o.start)o.start()},
+ active(){return !!S.mode},
+ mode(){return S.mode},
+ player(){return S.names[S.turn]},
+ names(){return S.names.slice()},
+ pill(){css();if(!S.mode){if(pill){pill.remove();pill=null}return}if(!pill){pill=document.createElement('div');pill.className='duoPill';document.body.appendChild(pill)}
+  pill.textContent=S.mode==='two'?'👤 '+S.names[S.turn]+'  ('+(S.turn+1)+'/2)':'👤 '+S.names[0]+'  vs  🤖'},
+ fmt(v){return S.fmt?S.fmt(v):(Math.round(v*100)/100)+S.unit},
+ cpuScore(){const [lo,hi]=S.cpuR,mid=(lo+hi)/2,r=Math.random();let v;
+  if(S.hw)v=S.lvl==='easy'?lo+r*(mid-lo):mid+r*(hi-mid);else v=S.lvl==='easy'?mid+r*(hi-mid):lo+r*(mid-lo);return (hi-lo)>20?Math.round(v):Math.round(v*100)/100},
+ /* Call when a round ends with the player's score. Returns true if Duo took over (the game must NOT show its own game-over overlay). */
+ finish(score){if(!S.mode)return false;const sc=Number(score)||0;
+  if(S.mode==='two'){S.scores[S.turn]=sc;
+   if(S.turn===0){S.turn=1;api.pill();setTimeout(()=>{modal('<div class="big">✅</div><h2>'+esc(S.names[0])+' scored '+esc(api.fmt(sc))+'</h2><p>Now it is <b>'+esc(S.names[1])+'</b>\'s turn. Beat that!</p>',[['▶ '+esc(S.names[1])+': Go!','',true]]).then(()=>{if(S.start)S.start()})},700);return true}
+   const [a,b]=S.scores,aw=S.hw?a>b:a<b,bw=S.hw?b>a:b<a;const win=aw?0:bw?1:-1;
+   setTimeout(()=>{beep(880,.2);modal('<div class="big">'+(win<0?'🤝':'🏆')+'</div><h2>'+(win<0?'It is a tie!':esc(S.names[win])+' wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(a))+'</b></p><p>'+esc(S.names[1])+': <b>'+esc(api.fmt(b))+'</b></p>',[['🔁 Rematch','',1],['🏠 Menu','o',0]]).then(r=>{if(r){S.scores=[null,null];S.turn=0;api.pill();if(S.start)S.start()}else api.end(true)})},700);return true}
+  /* vs computer */
+  const c=api.cpuScore(),win=S.hw?(sc>c?0:sc<c?1:-1):(sc<c?0:sc>c?1:-1);
+  setTimeout(()=>{beep(win===0?880:300,.25);modal('<div class="big">'+(win===0?'🏆':win<0?'🤝':'🤖')+'</div><h2>'+(win===0?esc(S.names[0])+' wins!':win<0?'Tie!':'Computer wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(sc))+'</b></p><p>🤖 Computer: <b>'+esc(api.fmt(c))+'</b></p>',[['🔁 Play again','',1],['🏠 Menu','o',0]]).then(r=>{if(r){api.pill();if(S.start)S.start()}else api.end(true)})},700);return true},
+ /* Leave duo mode. If reload, the page reloads to the game's normal start menu. */
+ end(reload){S.mode=null;api.pill();if(reload)location.reload()}
+};
+return api})();
+/* ===== end DUO ===== */
+</script>
 <script>
 const W=400,H=560,KEY='pong.html_best',PADH=0,SIDEW=0;
 const $=id=>document.getElementById(id);
@@ -84,25 +153,30 @@ function showOv(t,m,b){$('t').textContent=t;$('m').innerHTML=m;$('go').textConte
 const keys={left:0,right:0,up:0,down:0,fire:0},hooks={press(k){}};
 const KM={arrowleft:'left',a:'left',arrowright:'right',d:'right',arrowup:'up',w:'up',arrowdown:'down',s:'down',' ':'fire',z:'fire',x:'fire'};
 function setKey(k,v){if(v&&!keys[k])hooks.press(k);keys[k]=v?1:0;document.querySelectorAll('[data-k="'+k+'"]').forEach(b=>b.classList.toggle('on',!!v))}
-addEventListener('keydown',e=>{const k=KM[e.key.toLowerCase()];if(k&&ovHidden()){e.preventDefault();if(!e.repeat)setKey(k,1)}});
-addEventListener('keyup',e=>{const k=KM[e.key.toLowerCase()];if(k)setKey(k,0)});
-addEventListener('blur',()=>{for(const k in keys)setKey(k,0)});
+const KM1={a:'left',d:'right',w:'left',s:'right'},KM2={arrowleft:'left',arrowright:'right',arrowup:'left',arrowdown:'right'},k2={left:0,right:0};
+function setK2(k,v){k2[k]=v?1:0}
+addEventListener('keydown',e=>{if(document.querySelector('.duoOv'))return;const lk=e.key.toLowerCase();if(mode=='two'&&ovHidden()){const a=KM1[lk],b=KM2[lk];if(a||b){e.preventDefault();if(a)setKey(a,1);if(b)setK2(b,1)}return}const k=KM[lk];if(k&&ovHidden()){e.preventDefault();if(!e.repeat)setKey(k,1)}});
+addEventListener('keyup',e=>{const lk=e.key.toLowerCase(),k=KM[lk];if(k)setKey(k,0);if(KM1[lk])setKey(KM1[lk],0);if(KM2[lk])setK2(KM2[lk],0)});
+addEventListener('blur',()=>{for(const k in keys)setKey(k,0);k2.left=k2.right=0});
 document.querySelectorAll('.pb').forEach(b=>{const k=b.dataset.k;
  b.addEventListener('pointerdown',e=>{e.preventDefault();try{b.setPointerCapture(e.pointerId)}catch(x){}setKey(k,1)});
  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>b.addEventListener(ev,()=>setKey(k,0)))});
 $('go').onclick=()=>{$('go').blur();startGame()};
-addEventListener('keydown',e=>{if(!ovHidden()&&(e.code=='Space'||e.code=='Enter')){e.preventDefault();startGame()}});
+addEventListener('keydown',e=>{if(document.querySelector('.duoOv'))return;if(!ovHidden()&&(e.code=='Space'||e.code=='Enter')){e.preventDefault();startGame()}});
 /* ---------- GAME ---------- */
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const WIN=7,PW=84,PH=16,R=10,PY=H-62,AY=62;
 let state='ready',ps=0,as=0,score=0,rally=0,maxRally=0,px=W/2,tx=W/2,ax=W/2,aimOff=0,serveT=0,ball,trail=[],t=0,dragging=false,lastLoser=1,hitFlash=[0,0];
-const lvl=()=>Math.min(7,1+ps);
+let mode='solo',names=['You','AI'],dif='easy',tx2=W/2,ptrs={};
+const lvl=()=>mode=='two'?3:mode=='cpu'?(dif=='easy'?Math.min(4,1+ps):Math.min(7,3+ps)):Math.min(7,1+ps);
+const nm=n=>n.length>9?n.slice(0,8)+'…':n;
 function serve(towardPlayer){
   const sp=290+lvl()*22,a=rnd(-.5,.5);
   ball={x:W/2,y:H/2,vx:Math.sin(a)*sp,vy:(towardPlayer?1:-1)*Math.cos(a)*sp,sp};
   serveT=.9;rally=0;trail=[];aimOff=rnd(-1,1)*Math.max(4,66-lvl()*8);
 }
 function startGame(){
-  if(ovHidden())return;hideOv();clearFx();ps=0;as=0;score=0;rally=0;maxRally=0;px=tx=ax=W/2;lastLoser=1;state='play';hitFlash=[0,0];serve(true);beep(520,.1,'triangle');
+  if(ovHidden())return;hideOv();clearFx();ps=0;as=0;score=0;rally=0;maxRally=0;px=tx=ax=tx2=W/2;k2.left=k2.right=0;ptrs={};lastLoser=1;state='play';hitFlash=[0,0];serve(true);beep(520,.1,'triangle');
 }
 function predict(b,ty){ // x where ball reaches y=ty (with wall folding)
   if(b.vy>=0)return W/2;const tt=(b.y-ty)/-b.vy;let x=b.x+b.vx*tt;const span=W-2*R;x=((x-R)%(2*span)+2*span)%(2*span);if(x>span)x=2*span-x;return x+R;
@@ -114,7 +188,7 @@ function hitPaddle(pxc,py,dirY,who){
   burst(ball.x,py,8,['#fff','#ffe14d'],140);
 }
 function point(playerWon){
-  if(playerWon){ps++;const pts=100*lvl()+rally*10;score+=pts;pop(W/2,H/2+30,'+'+pts,'#ffe14d',28);beep(760,.2,'triangle',.07,300);lastLoser=0}
+  if(playerWon){ps++;const pts=100*lvl()+rally*10;if(mode=='solo'){score+=pts;pop(W/2,H/2+30,'+'+pts,'#ffe14d',28)}beep(760,.2,'triangle',.07,300);lastLoser=0}
   else{as++;beep(180,.35,'sawtooth',.07,-100);shake=12;lastLoser=1}
   burst(ball.x,clamp(ball.y,10,H-10),24,playerWon?['#5fd35f','#ffe14d','#fff']:['#ff5c5c','#ffb347','#fff'],240);
   maxRally=Math.max(maxRally,rally);
@@ -122,7 +196,9 @@ function point(playerWon){
   serve(!playerWon);
 }
 function finish(){
-  state='over';const win=ps>=WIN;if(win)score+=300+(WIN-as)*50;
+  state='over';const win=ps>=WIN;
+  if(mode!='solo'){const w=win?names[0]:names[1];beep(win||mode=='two'?880:300,.3);setTimeout(()=>{showOv((win||mode=='two'?'🏆 ':'')+esc(w)+' wins!','<span class="big">'+ps+' - '+as+'</span>'+esc(names[0])+' vs '+esc(names[1])+' · Best rally '+maxRally,'🔁 Rematch');$('mn').style.display=''},700);return}
+  if(win)score+=300+(WIN-as)*50;
   const nb=saveBest(score);const n=win?(as<=1?3:as<=4?2:1):(ps>=4?1:0);
   setTimeout(()=>showOv(win?'You Win! 🏆':'AI Wins 🤖',stars(n)+'<span class="big">'+score+'</span>'+ps+' - '+as+' · Best rally '+maxRally+' · Best '+best+(nb&&score>0?'<br><span class="nb">🎉 New best!</span>':''),'Play again'),700);
 }
@@ -132,10 +208,11 @@ function update(dt){
   // player paddle
   if(keys.left||keys.right){tx=clamp(tx+(keys.right-keys.left)*560*dt,PW/2,W-PW/2)}
   px+=clamp(tx-px,-1100*dt,1100*dt);px=clamp(px,PW/2,W-PW/2);
+  if(mode=='two'){if(k2.left||k2.right)tx2=clamp(tx2+(k2.right-k2.left)*560*dt,PW/2,W-PW/2);ax+=clamp(tx2-ax,-1100*dt,1100*dt);ax=clamp(ax,PW/2,W-PW/2)}else{
   // AI paddle
   const sp=150+lvl()*32;let target=W/2+Math.sin(t*.8)*20;
   if(serveT<=0&&ball.vy<0)target=predict(ball,AY+PH/2+R)+aimOff;
-  const d=target-ax;ax+=clamp(d,-sp*dt,sp*dt);ax=clamp(ax,PW/2,W-PW/2);
+  const d=target-ax;ax+=clamp(d,-sp*dt,sp*dt);ax=clamp(ax,PW/2,W-PW/2)}
   if(serveT>0){serveT-=dt;return}
   const steps=3,h=dt/steps;
   for(let i=0;i<steps&&state=='play';i++){
@@ -143,7 +220,7 @@ function update(dt){
     if(ball.x<R){ball.x=R;ball.vx=Math.abs(ball.vx);beep(500,.04)}
     if(ball.x>W-R){ball.x=W-R;ball.vx=-Math.abs(ball.vx);beep(500,.04)}
     if(ball.vy>0&&ball.y+R>=PY-PH/2&&ball.y-R<=PY+PH/2&&Math.abs(ball.x-px)<=PW/2+R){
-      hitPaddle(px,PY-PH/2,-1,1);ball.y=PY-PH/2-R;rally++;score+=5*rally;if(rally>1)pop(px,PY-30,'Rally x'+rally,'#ffe14d',20);
+      hitPaddle(px,PY-PH/2,-1,1);ball.y=PY-PH/2-R;rally++;if(mode=='solo')score+=5*rally;if(rally>1)pop(px,PY-30,'Rally x'+rally,'#ffe14d',20);
       aimOff=rnd(-1,1)*Math.max(4,66-lvl()*8);
     }else if(ball.vy<0&&ball.y-R<=AY+PH/2&&ball.y+R>=AY-PH/2&&Math.abs(ball.x-ax)<=PW/2+R){
       hitPaddle(ax,AY+PH/2,1,0);ball.y=AY+PH/2+R;rally++;
@@ -160,9 +237,10 @@ function draw(){
   g.fillStyle='#2a62b6';for(let i=0;i<W;i+=40)g.fillRect(i,H/2-3,22,6);
   g.beginPath();g.arc(W/2,H/2,56,0,6.283);g.lineWidth=5;g.strokeStyle='#2a62b6';g.stroke();
   g.lineWidth=6;g.strokeStyle='#5cc8ff';g.strokeRect(3,3,W-6,H-6);
-  pill(10,H/2-52,116,40,'#a32121');txt('AI '+as,22,H/2-23,24);
+  if(mode=='solo'){pill(10,H/2-52,116,40,'#a32121');txt('AI '+as,22,H/2-23,24);
   pill(10,H/2+12,116,40,'#1c701c');txt('YOU '+ps,22,H/2+41,24);
-  pill(W-126,H/2-20,116,40);txt('Lv '+lvl(),W-114,H/2+9,24,'left','#ffe14d');
+  pill(W-126,H/2-20,116,40);txt('Lv '+lvl(),W-114,H/2+9,24,'left','#ffe14d')}
+  else{pill(10,H/2-52,150,40,'#a32121');txt(nm(names[1])+' '+as,22,H/2-24,20);pill(10,H/2+12,150,40,'#1c701c');txt(nm(names[0])+' '+ps,22,H/2+40,20)}
   paddle(ax,AY,'#ff7a7a','#d62b2b',hitFlash[0]);paddle(px,PY,'#7be57b','#2ea32e',hitFlash[1]);
   if(ball&&state!='ready'){
     for(let i=0;i<trail.length;i++){g.fillStyle='#ffe14d';g.beginPath();g.arc(trail[i].x,trail[i].y,R*(i/trail.length)*.8,0,6.283);g.fill()}
@@ -171,15 +249,20 @@ function draw(){
     if(serveT>0)txt(serveT>.6?'3':serveT>.3?'2':'1',W/2,H/2-80,44,'center','#ffe14d');
   }
   drawFx();g.restore();
-  txt('Score '+score,W/2,H-12,18,'center');
-  pill(W-120,8,112,34);txt('Best '+best,W-108,33,20);
+  if(mode=='solo'){txt('Score '+score,W/2,H-12,18,'center');
+  pill(W-120,8,112,34);txt('Best '+best,W-108,33,20)}
   if(rally>2)txt('Rally x'+rally,W/2,H/2-76,24,'center','#ffe14d');
 }
-function setT(e){if(state!='play')return;tx=clamp(pos(e)[0],PW/2,W-PW/2)}
-cv.addEventListener('pointerdown',e=>{dragging=true;try{cv.setPointerCapture(e.pointerId)}catch(x){}setT(e)});
-cv.addEventListener('pointermove',e=>{if(dragging||e.pointerType=='mouse')setT(e)});
-['pointerup','pointercancel'].forEach(ev=>cv.addEventListener(ev,()=>dragging=false));
-showOv('🏓 Pong Rally','First to <b>7</b> wins! The AI gets <b>smarter</b> every point.<br>Drag, move the mouse, or use ← →','Play');
+function setT(e){if(state!='play')return;const p=pos(e);if(mode=='two'){const w=ptrs[e.pointerId];if(w===undefined)return;if(w==0)tx2=clamp(p[0],PW/2,W-PW/2);else tx=clamp(p[0],PW/2,W-PW/2);return}tx=clamp(p[0],PW/2,W-PW/2)}
+cv.addEventListener('pointerdown',e=>{dragging=true;try{cv.setPointerCapture(e.pointerId)}catch(x){}if(mode=='two')ptrs[e.pointerId]=pos(e)[1]<H/2?0:1;setT(e)});
+cv.addEventListener('pointermove',e=>{if(mode=='two'){if(ptrs[e.pointerId]!==undefined)setT(e);return}if(dragging||e.pointerType=='mouse')setT(e)});
+['pointerup','pointercancel'].forEach(ev=>cv.addEventListener(ev,e=>{dragging=false;delete ptrs[e.pointerId]}));
+function mkB(label,cls,fn,id){const b=document.createElement('button');b.className='btn '+(cls||'');b.textContent=label;if(id)b.id=id;b.onclick=()=>{b.blur();fn()};$('mm').appendChild(b);return b}
+async function pickCpu(d){const n=await Duo.askNames({cpu:true});if(!n)return;mode='cpu';dif=d;names=n;startGame()}
+async function pickTwo(){const n=await Duo.askNames();if(!n)return;mode='two';names=n;startGame()}
+function menu(){mode='solo';$('mn').style.display='none';showOv('🏓 Pong Rally','First to <b>7</b> wins! <b>Play</b>: the AI gets <b>smarter</b> every point.<br>Drag, move the mouse, or use ← →<br><b>2 Players</b>: top half of the screen / ← → move the top paddle, bottom half / A D (or W S) the bottom.','Play')}
+mkB('😊 vs Computer: Easy','',()=>pickCpu('easy'));mkB('🧠 vs Computer: Hard','',()=>pickCpu('hard'));mkB('👥 2 Players','',pickTwo);mkB('🏠 Menu','g',menu,'mn');
+menu();
 
 /* ---------- LOOP ---------- */
 let last=performance.now();
