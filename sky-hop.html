@@ -22,6 +22,7 @@
   .go:active{transform:translateY(4px);box-shadow:0 2px 0 #1c701c}
   .hidden{display:none}
   #kb{position:absolute;opacity:0;left:0;top:0;width:1px;height:1px}
+  .duoPill{display:none!important}
 </style>
 </head>
 <body>
@@ -159,7 +160,7 @@ function spawnLogs(){
   while(logs.length<idx+9){
     const last=logs[logs.length-1], recent=logs.slice(-3).map(l=>l.word[0]);
     const w=newWord(recent), width=Math.max(150,60+w.length*26);
-    let x;do{x=rnd(width/2+110,W-width/2-90)}while(Math.abs(x-last.x)<150);
+    let x;do{x=rnd(width/2+110,Math.min(W-width/2-90,770-width/2))}while(Math.abs(x-last.x)<150);
     logs.push({h:last.h+GAP,x,w:width,word:w,s:Math.random()*10});
   }
 }
@@ -345,9 +346,10 @@ function hud(){
   T('Lv '+(level+1),178,72,'left',24);
   if(combo>1)T('Combo x'+combo,10,102,'left',24,'#ffe14a');
   T('Best '+best.toLocaleString(),10,combo>1?130:102,'left',18,'#bfe6ff');
+  let dy=0;if(Duo.active()){dy=30;const nm=Duo.names();const lbl=Duo.mode()==='two'?'👤 '+Duo.player()+' ('+(Duo.player()===nm[0]?1:2)+'/2)':'👤 '+nm[0]+' vs 🤖';T(lbl,10,(combo>1?160:132),'left',20,'#ffe14a')}
   // meter: distance between storm cloud and bot
   const gap=Math.max(0,Math.min(1,(logs[idx].h-mistH)/430));
-  const my=combo>1?150:122,mh=Math.max(120,Math.min(300,H-my-20));
+  const my=(combo>1?150:122)+dy,mh=Math.max(120,Math.min(300,H-my-20));
   g.fillStyle='#0b3a78';g.beginPath();g.roundRect(8,my,24,mh,8);g.fill();g.strokeStyle='#fff';g.lineWidth=3;g.stroke();
   const col=gap<.3?'#ff3a2a':gap<.6?'#ffa31a':'#4cd82a';g.fillStyle=col;g.beginPath();g.roundRect(12,my+4+(mh-8)*(1-gap),16,(mh-8)*gap,5);g.fill();
   T('☁',20,my+mh+14,'center',20);
