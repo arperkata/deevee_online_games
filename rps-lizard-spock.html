@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RPS Lizard Spock</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
+body{height:100dvh;display:flex;flex-direction:column;font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;color:#fff;text-align:center;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+button{font-family:inherit}
+a.home,.mute{position:fixed;top:10px;z-index:1000;background:linear-gradient(#ffb21f,#f08a12);color:#fff;min-height:40px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;text-decoration:none;font:700 17px 'Fredoka','Trebuchet MS',sans-serif;border:0;box-shadow:0 4px 0 #a9560b;cursor:pointer;background-color:#f08a12}
+a.home{left:10px;padding:0 14px}
+.mute{right:10px;width:44px;padding:0;font-size:20px}
+#hud{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 8px;padding:8px 60px 4px 100px;min-height:52px}
+.pill{background:#0b3a78;color:#fff;border-radius:999px;padding:3px 12px;font-weight:700;font-size:clamp(14px,3.4vw,20px);box-shadow:0 3px 0 #06244d;border:2px solid #ffe14a;white-space:nowrap}
+.pill b{color:#ffe14a}
+button.go{font:700 clamp(20px,5vw,28px) 'Fredoka','Trebuchet MS',sans-serif;margin-top:12px;min-height:48px;padding:.3em 1.5em;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}
+button.go:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:1200;width:100%;height:100%}
+#msg{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(6,30,70,.9);z-index:1100;padding:12px}
+#box{background:linear-gradient(#2f8cff,#0b4fb3);border:5px solid #ffe14a;border-radius:26px;padding:16px 22px;box-shadow:0 8px 0 #06244d;max-width:94vw;max-height:94dvh;overflow:auto;animation:pop2 .45s}
+@keyframes pop2{0%{transform:scale(.5)}70%{transform:scale(1.07)}}
+#mt{font-size:clamp(18px,4.4vw,26px);font-weight:700;text-shadow:0 2px 0 #0b3a78;line-height:1.25}
+#mt .em{font-size:clamp(46px,12vw,76px);display:block;line-height:1.1}
+#mt h2{margin:2px 0 4px;font-size:clamp(26px,7vw,42px);color:#ffe14a;text-shadow:0 3px 0 #0b3a78}
+#mt .st{font-size:clamp(34px,9vw,52px);letter-spacing:3px;display:block}
+#mt .st i{font-style:normal;color:#6d86b0}#mt .st i.on{color:#ffcf1f;text-shadow:0 3px 0 #a9560b}
+#mt small{font-size:.75em;color:#ffe14a;display:block}
+.flt{position:fixed;z-index:1300;pointer-events:none;font-weight:700;font-size:22px;color:#fff;text-shadow:0 2px 0 #1b4f86,2px 0 0 #1b4f86,-2px 0 0 #1b4f86,0 -2px 0 #1b4f86;animation:flt .9s ease-out forwards;transform:translateX(-50%)}
+@keyframes flt{from{transform:translate(-50%,0) scale(.6)}20%{transform:translate(-50%,-10px) scale(1.2)}to{transform:translate(-50%,-60px) scale(1)}}
+.shk{animation:shk .35s}
+@keyframes shk{20%{transform:translate(-6px,3px)}40%{transform:translate(6px,-3px)}60%{transform:translate(-4px,-2px)}80%{transform:translate(4px,2px)}}
+@media (max-height:500px){#hud{min-height:48px;padding-top:4px}}
+
+body{background:linear-gradient(#27a2e8,#bdeafc)}
+#main{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;padding:0 10px 8px;gap:6px}
+#arena{display:flex;align-items:center;justify-content:center;gap:clamp(6px,3vw,30px);width:100%;max-width:760px}
+.side{background:linear-gradient(#1c5fb8,#14407a);border:4px solid #3aa0ff;border-radius:22px;box-shadow:0 6px 0 #0a2a55;padding:6px 10px;flex:1;max-width:260px;min-width:0}
+.who{font-weight:700;font-size:clamp(14px,3.6vw,20px);text-shadow:0 2px 0 #0a2a55}
+.hand{font-size:clamp(46px,min(19vw,19dvh),130px);line-height:1.15}
+.hand.shaking{animation:wob .25s infinite alternate}
+@keyframes wob{from{transform:translateY(-10px) rotate(-14deg)}to{transform:translateY(8px) rotate(10deg)}}
+.hand.rev{animation:pop2 .4s}
+.side.win{border-color:#ffe14a;background:linear-gradient(#2fb84a,#157a2c)}
+.side.lose{background:linear-gradient(#c93b3b,#8a1c1c);border-color:#ff8a8a}
+#vs{font-weight:700;font-size:clamp(20px,5vw,34px);color:#ffe14a;text-shadow:0 3px 0 #0b3a78}
+#res{background:#0b3a78;border:3px solid #ffe14a;border-radius:16px;padding:6px 14px;font-weight:700;font-size:clamp(15px,3.8vw,22px);min-height:2.4em;display:flex;align-items:center;justify-content:center;width:100%;max-width:640px;box-shadow:0 4px 0 #06244d}
+#picks{display:flex;gap:clamp(5px,1.6vw,12px);width:100%;max-width:640px}
+.pk{flex:1;min-width:0;min-height:clamp(70px,13dvh,110px);border:0;border-radius:18px;background:linear-gradient(#ffd23a,#f59a0a);box-shadow:0 6px 0 #a9560b;color:#5a2d00;font-weight:700;font-size:clamp(11px,2.8vw,16px);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px}
+.pk span{font-size:clamp(30px,8vw,52px);line-height:1.1}
+.pk:active{transform:translateY(5px);box-shadow:0 1px 0 #a9560b}
+#foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+.b2{border:0;border-radius:999px;min-height:44px;padding:0 18px;background:linear-gradient(#7a5cff,#4a2fc7);color:#fff;font:700 17px 'Fredoka','Trebuchet MS',sans-serif;box-shadow:0 4px 0 #2a1a80;cursor:pointer}
+#read{font-weight:700;font-size:clamp(13px,3vw,17px);background:#0b3a78;padding:4px 12px;border-radius:999px;border:2px solid #ffe14a}
+#rt{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;text-align:left;font-size:clamp(13px,3.2vw,18px);margin-top:6px}
+#rt div{background:#0b3a78;border-radius:10px;padding:3px 8px;white-space:nowrap}
+.pbtn{display:inline-block}
+@media (max-height:500px) and (orientation:landscape){#main{flex-direction:row;flex-wrap:wrap;align-content:center;padding-bottom:4px}#arena{width:52%}#picks{width:44%;flex-wrap:wrap}.pk{flex:1 1 28%;min-height:60px}#res{width:52%;min-height:2em}#foot{width:44%}.hand{font-size:clamp(36px,22dvh,80px)}}
+</style></head><body>
+<a class="home" href="index.html">⌂ Home</a><button class="mute" id="mute" aria-label="Sound">🔊</button>
+
+<div id="hud"><span class="pill">Round <b id="rd">1</b></span><span class="pill">🧑 <b id="ps">0</b> : <b id="as">0</b> 🤖</span><span class="pill">Combo <b id="cb">0</b></span><span class="pill">Best <b id="bs">0</b></span></div>
+<div id="main">
+<div id="arena"><div class="side" id="sa"><div class="who">🤖 Brainy Bot</div><div class="hand" id="ah">❓</div></div><div id="vs">VS</div><div class="side" id="sp"><div class="who">🧑 You</div><div class="hand" id="ph">❔</div></div></div>
+<div id="res">Pick your move!</div>
+<div id="picks"></div>
+<div id="foot"><button class="b2" id="rules">📖 Rules</button><span id="read">🤖 Bot is learning you...</span></div>
+</div>
+
+<canvas id="fx"></canvas>
+<div id="msg"><div id="box"><div id="mt"></div><button class="go" id="go">Play</button></div></div>
+<script>
+const GAME='rps-lizard-spock.html';
+const $=id=>document.getElementById(id);
+const BK=GAME+':best';let best=0,muted=false,ac,boxFn=null;
+try{best=+localStorage.getItem(BK)||0}catch(e){}
+function updBest(){const b=$('bs');if(b)b.textContent=best}
+function saveBest(s){if(s>best){best=s;try{localStorage.setItem(BK,best)}catch(e){}updBest();return true}return false}
+$('mute').onclick=function(){muted=!muted;this.textContent=muted?'🔇':'🔊'};
+function beep(f,d=.12,type='triangle',v=.15,delay=0){if(muted)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();const t=ac.currentTime+delay,o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type=type;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d)}catch(e){}}
+function jingle(a){a.forEach((f,i)=>beep(f,.16,'triangle',.15,i*.11))}
+addEventListener('pointerdown',()=>{try{if(ac&&ac.state==='suspended')ac.resume()}catch(e){}},true);
+const fx=$('fx'),fc=fx.getContext('2d');let PT=[],raf=0,lt=0;
+function fxfit(){fx.width=innerWidth;fx.height=innerHeight}fxfit();addEventListener('resize',fxfit);
+function confetti(x,y,n=40,cols){const C=cols||['#ff4a5a','#ffe14a','#4ade5a','#3aa0ff','#ff8bd0','#ff9a1f'];for(let i=0;i<n;i++){const a=Math.random()*6.283,s=120+Math.random()*320;PT.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-180,l:1+Math.random()*.6,c:C[i%C.length],r:Math.random()*6,s:5+Math.random()*6})}lt=performance.now();if(!raf)raf=requestAnimationFrame(ptick)}
+function ptick(t){const dt=Math.min(.05,(t-lt)/1000||0);lt=t;fc.clearRect(0,0,fx.width,fx.height);PT.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=700*dt;p.l-=dt;p.r+=dt*8;fc.save();fc.globalAlpha=Math.max(0,Math.min(1,p.l*2));fc.fillStyle=p.c;fc.translate(p.x,p.y);fc.rotate(p.r);fc.fillRect(-p.s/2,-p.s/3,p.s,p.s*.6);fc.restore()});PT=PT.filter(p=>p.l>0&&p.y<fx.height+20);raf=PT.length?requestAnimationFrame(ptick):0;if(!raf)fc.clearRect(0,0,fx.width,fx.height)}
+function floatText(x,y,txt,col){const d=document.createElement('div');d.className='flt';d.textContent=txt;d.style.left=x+'px';d.style.top=y+'px';if(col)d.style.color=col;document.body.appendChild(d);setTimeout(()=>d.remove(),950)}
+function floatAt(el,txt,col){const r=el.getBoundingClientRect();floatText(r.left+r.width/2,r.top+r.height/3,txt,col)}
+function shake(el){el.classList.remove('shk');void el.offsetWidth;el.classList.add('shk')}
+function showBox(html,btn,fn){$('mt').innerHTML=html;const g=$('go');if(btn){g.style.display='';g.textContent=btn;boxFn=fn}else{g.style.display='none';boxFn=null}$('msg').style.display='flex'}
+function hideBox(){$('msg').style.display='none'}
+$('go').onclick=()=>{hideBox();beep(520,.1);const f=boxFn;if(f)f()};
+function stars(n){let s='';for(let i=0;i<3;i++)s+='<i'+(i<n?' class="on"':'')+'>★</i>';return '<span class="st">'+s+'</span>'}
+function endBox(emoji,title,n,score,extra,btn,fn){const nb=saveBest(score);showBox('<span class="em">'+emoji+'</span><h2>'+title+'</h2>'+stars(n)+'Score <b style="color:#ffe14a">'+score+'</b>'+(nb?' 🏆 New best!':'')+'<small>Best '+best+(extra?' · '+extra:'')+'</small>',btn||'Play Again ▶',fn||startGame);if(n>=2)confetti(innerWidth/2,innerHeight/3,70);jingle(n>=2?[523,659,784,1047]:[392,330,262])}
+function lsGet(k,d){try{const v=localStorage.getItem(GAME+':'+k);return v===null?d:+v}catch(e){return d}}
+function lsSet(k,v){try{localStorage.setItem(GAME+':'+k,v)}catch(e){}}
+const rnd=n=>Math.floor(Math.random()*n),pick=a=>a[rnd(a.length)];
+updBest();
+
+
+const N=['Rock','Paper','Scissors','Lizard','Spock'],E=['🪨','📄','✂️','🦎','🖖'];
+const W={0:{2:'crushes',3:'crushes'},1:{0:'covers',4:'disproves'},2:{1:'cuts',3:'decapitates'},3:{4:'poisons',1:'eats'},4:{2:'smashes',0:'vaporizes'}};
+let need=3,ps=0,as=0,round=1,combo=0,maxCombo=0,score=0,last=-1,last2=-1,t1,t2,freq,hist,locked=true,wins=0,gameOn=false;
+const picks=$('picks');
+N.forEach((n,i)=>{const b=document.createElement('button');b.className='pk';b.innerHTML='<span>'+E[i]+'</span>'+n+'<small style="font-size:10px">['+(i+1)+']</small>';b.onclick=()=>play(i);picks.appendChild(b)});
+function showRules(){let h='<h2>📖 Rules</h2>';h+='<div id="rt">';for(const a in W)for(const d in W[a])h+='<div>'+E[a]+' '+W[a][d]+' '+E[d]+'</div>';h+='</div><small>Win '+'the series first!</small>';showBox(h,'Got it!',()=>{})}
+$('rules').onclick=showRules;
+function startMenu(){gameOn=false;showBox('<span class="em">🖖</span><h2>Rock Paper Scissors Lizard Spock</h2>Beat the bot that <b>learns your habits</b>!<br>Pick series length:<br><button class="go pbtn" id="s3">Best of 3</button> <button class="go pbtn" id="s5">Best of 5</button> <button class="go pbtn" id="s7">Best of 7</button><br><button class="b2" id="r2" style="margin-top:10px">📖 Rules chart</button>',null);
+ $('s3').onclick=()=>begin(2);$('s5').onclick=()=>begin(3);$('s7').onclick=()=>begin(4);$('r2').onclick=()=>{showRules();const g=$('go');g.onclick=()=>{hideBox();startMenu()}};}
+function begin(n){need=n;hideBox();startGame()}
+function startGame(){ps=0;as=0;round=1;combo=0;maxCombo=0;score=0;last=-1;last2=-1;freq=[0,0,0,0,0];t1=[0,1,2,3,4].map(()=>[0,0,0,0,0]);t2={};hist=0;locked=false;gameOn=true;
+ $('ah').textContent='❓';$('ph').textContent='❔';$('res').textContent='First to '+need+' wins! Pick your move!';$('sa').className=$('sp').className='side';upd();
+ $('go').onclick=()=>{hideBox();beep(520,.1);const f=boxFn;if(f)f()}}
+function upd(){$('rd').textContent=round;$('ps').textContent=ps;$('as').textContent=as;$('cb').textContent=combo;
+ if(hist>=5){let m=0;freq.forEach((v,i)=>{if(v>freq[m])m=i});$('read').textContent='🤖 Bot thinks you love '+E[m]}else $('read').textContent='🤖 Bot is learning you...'}
+function aiPick(){
+ const sc=[0,0,0,0,0];
+ if(last>=0)for(let i=0;i<5;i++)sc[i]+=t1[last][i]*2;
+ const k=last2+','+last;if(t2[k])for(let i=0;i<5;i++)sc[i]+=t2[k][i]*3.5;
+ for(let i=0;i<5;i++)sc[i]+=freq[i]*.6;
+ let pred;
+ if(hist<2||Math.random()<.12)pred=rnd(5);
+ else{let mx=Math.max(...sc);const c=[];sc.forEach((v,i)=>{if(v>=mx-1e-9)c.push(i)});pred=pick(c)}
+ const cand=[];for(let m=0;m<5;m++)if(W[m][pred])cand.push(m);
+ return pick(cand)}
+function play(p){
+ if(locked||!gameOn)return;locked=true;
+ const a=aiPick();
+ /* learn */
+ if(last>=0)t1[last][p]++;const k=last2+','+last;if(last>=0){(t2[k]=t2[k]||[0,0,0,0,0])[p]++}
+ freq[p]++;hist++;last2=last;last=p;
+ $('ph').textContent='✊';$('ah').textContent='✊';$('ph').className=$('ah').className='hand shaking';$('res').textContent='Rock... Paper... Go!';beep(300,.08);beep(300,.08,'triangle',.15,.25);
+ setTimeout(()=>reveal(p,a),650)}
+function reveal(p,a){
+ $('ph').textContent=E[p];$('ah').textContent=E[a];$('ph').className=$('ah').className='hand rev';
+ const sp=$('sp'),sa=$('sa');let txt;
+ if(p===a){txt=E[p]+' vs '+E[a]+' — Tie! Same pick.';combo=0;beep(330,.15)}
+ else if(W[p][a]){ps++;combo++;maxCombo=Math.max(maxCombo,combo);const pts=10*combo;score+=pts;txt=E[p]+' '+W[p][a]+' '+E[a]+' — You win the round!';sp.className='side win';sa.className='side lose';beep(660,.15);beep(880,.15,'triangle',.15,.1);floatAt($('ph'),'+'+pts,'#ffe14a');confetti(sp.getBoundingClientRect().left+60,sp.getBoundingClientRect().top+50,18)}
+ else{as++;combo=0;txt=E[a]+' '+W[a][p]+' '+E[p]+' — Bot wins the round!';sa.className='side win';sp.className='side lose';beep(200,.25,'sawtooth',.1);shake($('main'))}
+ $('res').textContent=txt;round++;upd();
+ if(ps>=need||as>=need){setTimeout(finish,1100)}else setTimeout(()=>{locked=false;sp.className=sa.className='side';$('ah').textContent='❓';$('ph').textContent='❔';$('ah').className=$('ph').className='hand'},1100)}
+function finish(){
+ gameOn=false;const won=ps>=need;let total=score+(won?100+(need-as)*20:0);
+ const st=won?(as===0?3:as<=1?3:2):(ps>=need-1?1:1);
+ endBox(won?'🏆':'🤖',won?'You won '+ps+' : '+as+'!':'Bot won '+as+' : '+ps,won?(as<=1?3:2):1,total,'Best combo x'+maxCombo)}
+addEventListener('keydown',e=>{const n=+e.key;if(n>=1&&n<=5)play(n-1)});
+startMenu();
+</script></body></html>

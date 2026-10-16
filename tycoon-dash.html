@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Tycoon Dash</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
+body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;color:#fff;text-shadow:0 2px 0 #1b4f86;user-select:none;-webkit-user-select:none;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;height:100dvh}
+.home{position:fixed;left:10px;top:10px;z-index:1000;background:#f08a12;color:#fff;border-radius:999px;padding:6px 14px;text-decoration:none;font-weight:bold;box-shadow:0 3px 0 #a85d00;text-shadow:none}
+#mute{position:fixed;right:10px;top:8px;z-index:1000;font-size:22px;background:#fff;border:0;border-radius:50%;width:44px;height:44px;box-shadow:0 3px 0 #1b4f86;cursor:pointer;padding:0;text-shadow:none}
+.btn{font:inherit;font-size:20px;font-weight:bold;color:#fff;text-shadow:0 2px 0 #1c701c;background:linear-gradient(#5fd35f,#2ea32e);border:3px solid #fff;border-radius:16px;padding:8px 22px;min-height:44px;box-shadow:0 5px 0 #1c701c;cursor:pointer}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
+.btn[disabled]{background:linear-gradient(#b8c4cf,#8a98a6);box-shadow:0 5px 0 #5d6a77;text-shadow:0 2px 0 #5d6a77;cursor:default}
+.btn[disabled]:active{transform:none;box-shadow:0 5px 0 #5d6a77}
+.btn.o{background:linear-gradient(#ffb347,#f08a12);box-shadow:0 5px 0 #a85d00;text-shadow:0 2px 0 #a85d00}.btn.o:active{box-shadow:0 1px 0 #a85d00}
+.btn.r{background:linear-gradient(#ff8a8a,#d63030);box-shadow:0 5px 0 #8f1c1c;text-shadow:0 2px 0 #8f1c1c}.btn.r:active{box-shadow:0 1px 0 #8f1c1c}
+.btn.p{background:linear-gradient(#c59cff,#7b3fe0);box-shadow:0 5px 0 #4a1fa0;text-shadow:0 2px 0 #4a1fa0}.btn.p:active{box-shadow:0 1px 0 #4a1fa0}
+.btn.b{background:linear-gradient(#5fb8ff,#2a7fe0);box-shadow:0 5px 0 #174f95;text-shadow:0 2px 0 #174f95}.btn.b:active{box-shadow:0 1px 0 #174f95}
+#top{padding:52px 8px 0;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;flex:none}
+.pill{background:linear-gradient(#3b86e0,#1b4f86);border:2px solid #fff;border-radius:999px;padding:2px clamp(8px,2.6vw,14px);font-weight:bold;font-size:clamp(13px,3.8vw,19px);box-shadow:0 3px 0 #0f2f57;text-shadow:0 2px 0 #0f2f57;white-space:nowrap}
+.ov{position:fixed;inset:0;background:rgba(15,47,87,.88);display:flex;align-items:center;justify-content:center;z-index:100;padding:48px 12px 12px}
+.card{background:linear-gradient(#fff,#e3f3ff);color:#1b4f86;text-shadow:none;border:5px solid #ffd84a;border-radius:28px;box-shadow:0 10px 0 #0f2f57,0 20px 40px rgba(0,0,0,.35);padding:clamp(14px,4vmin,28px);display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2vmin,12px);text-align:center;width:min(94vw,520px);max-height:calc(100dvh - 60px);overflow-y:auto;animation:cardin .4s cubic-bezier(.2,1.6,.4,1)}
+.card h1{margin:0;font-size:clamp(26px,7.5vmin,42px);color:#e8590c;text-shadow:0 3px 0 #ffd84a}
+.card p{margin:0;font-size:clamp(15px,3.6vmin,19px);line-height:1.35;font-weight:bold}
+.card .btn{width:100%}
+.stars{font-size:clamp(28px,8vmin,44px);letter-spacing:4px}.stars:empty{display:none}
+@keyframes cardin{0%{transform:scale(.6)}100%{transform:scale(1)}}
+.hide{display:none!important}
+@media (max-height:480px){#top{padding-top:6px}.ov{padding:8px 12px}.card{flex-direction:row;flex-wrap:wrap;justify-content:center;max-height:calc(100dvh - 16px);width:min(94vw,640px)}.card h1,.card p,.stars{flex:1 1 100%}.card .btn{width:auto;flex:1 1 auto;padding:6px 14px;font-size:16px}}
+.shake{animation:shk .4s}@keyframes shk{20%{transform:translateX(-9px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+.flt{position:fixed;pointer-events:none;z-index:150;font-weight:bold;font-size:26px;text-shadow:0 2px 0 #0f2f57,0 0 6px #0f2f57;white-space:nowrap}
+/* 3D dice */
+.die{--ds:64px;width:var(--ds);height:var(--ds);perspective:calc(var(--ds)*5);position:relative;flex:none;cursor:pointer;text-shadow:none}
+.tilt{width:100%;height:100%;transform-style:preserve-3d;transform:rotateX(-20deg) rotateY(24deg)}
+.cube{width:100%;height:100%;position:relative;transform-style:preserve-3d}
+.face{position:absolute;inset:0;background:linear-gradient(145deg,#fff,#d9e4f3);border:2px solid #8aa4cc;border-radius:16%;display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);padding:13%;box-shadow:inset 0 0 8px rgba(40,70,120,.35)}
+.f1{transform:translateZ(calc(var(--ds)/2))}.f6{transform:rotateY(180deg) translateZ(calc(var(--ds)/2))}
+.f2{transform:rotateY(90deg) translateZ(calc(var(--ds)/2))}.f5{transform:rotateY(-90deg) translateZ(calc(var(--ds)/2))}
+.f3{transform:rotateX(90deg) translateZ(calc(var(--ds)/2))}.f4{transform:rotateX(-90deg) translateZ(calc(var(--ds)/2))}
+.pip{border-radius:50%;margin:14%;background:radial-gradient(circle at 35% 30%,#4a4a4a,#0b0b0b)}
+.f1 .pip{background:radial-gradient(circle at 35% 30%,#ff7b7b,#c41414)}
+.die.red .face{background:linear-gradient(145deg,#ff7a7a,#c91c1c);border-color:#7a0f0f}.die.red .pip{background:radial-gradient(circle at 35% 30%,#fff,#e8e8e8)}
+.die.gold .face{background:linear-gradient(145deg,#ffe58a,#f0a810);border-color:#a56d00}
+.die.hop{animation:hop .9s}
+@keyframes hop{0%{transform:translateY(0)}30%{transform:translateY(-34%) scale(1.08)}60%{transform:translateY(0)}78%{transform:translateY(-9%)}100%{transform:translateY(0)}}
+.die::after{content:'';position:absolute;left:12%;right:12%;bottom:-9%;height:12%;border-radius:50%;background:rgba(10,30,60,.35);z-index:-1}
+
+body{background:linear-gradient(#27a2e8,#bdeafc) fixed}
+#main{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;padding:4px}
+#board{--bs:340px;width:var(--bs);height:var(--bs);display:grid;grid-template:repeat(7,1fr)/repeat(7,1fr);gap:2px;background:#0f2f57;border:4px solid #0f2f57;border-radius:14px;box-shadow:0 8px 0 #0a1f3c;flex:none;--dsz:calc(var(--bs)/10)}
+.tl{position:relative;background:#fff;color:#1b4f86;text-shadow:none;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;font-weight:bold;line-height:1.05}
+.tl .band{position:absolute;left:0;right:0;top:0;height:22%}
+.tl .em{font-size:calc(var(--bs)/22);margin-top:18%}
+.tl .pr{font-size:calc(var(--bs)/40)}
+.tl.own{box-shadow:inset 0 0 0 3px var(--oc)}
+.tl .ob{position:absolute;right:1px;bottom:0;font-size:calc(var(--bs)/42)}
+.tl .tk{position:absolute;inset:0;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;align-content:center;font-size:calc(var(--bs)/20);pointer-events:none}
+.tk span{animation:pp .25s;filter:drop-shadow(0 2px 0 #0f2f57)}
+@keyframes pp{0%{transform:translateY(-8px) scale(1.4)}100%{transform:none}}
+.tl.corner{background:linear-gradient(#ffe58a,#f5b800)}
+#ctr{grid-area:2/2/7/7;background:linear-gradient(#fff,#dff0ff);color:#1b4f86;text-shadow:none;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;padding:4px;font-size:clamp(11px,calc(var(--bs)/26),17px);min-height:0}
+#chips{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
+.chip{border:3px solid;border-radius:999px;padding:0 7px;font-weight:bold;background:#fff;white-space:nowrap}
+.chip.on{background:#ffe58a;transform:scale(1.08)}.chip.out{text-decoration:line-through;background:#ddd}
+#dice{display:flex;gap:calc(var(--bs)/22)}
+#msg{font-weight:bold;text-align:center;line-height:1.15;min-height:2.3em;display:flex;align-items:center;max-width:100%}
+#roll{font-size:clamp(15px,calc(var(--bs)/18),22px);padding:4px 18px;min-height:44px}
+@media (max-height:480px){#roll{min-height:38px}}
+</style></head><body>
+<a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
+<div id="top"><div class="pill" id="pRound">🏙 Tycoon Dash</div><div class="pill" id="pPool">🅿️ Pool 0</div><div class="pill">🏆 Wins <b id="bw">0</b></div></div>
+<div id="main"><div id="board"><div id="ctr"><div id="chips"></div><div id="dice"></div><div id="msg"></div><button class="btn" id="roll">🎲 Roll</button></div></div></div>
+<div class="ov" id="ov"><div class="card"><h1 id="ovT">🏙 Tycoon Dash</h1><div class="stars" id="ovS"></div><p id="ovP"></p><div id="ovB" style="display:contents"></div></div></div>
+<script>
+const KEY='tycoon-dash';
+const $=s=>document.querySelector(s),R=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let muted=false;try{muted=localStorage.getItem(KEY+'_mute')==='1'}catch(e){}
+let AC;function beep(f,d=.1,t='sine',v=.12){if(muted)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
+function jingle(a,t='triangle'){a.forEach((f,i)=>setTimeout(()=>beep(f,.14,t),i*90))}
+function load(k){try{return +localStorage.getItem(KEY+'_'+k)||0}catch(e){return 0}}
+function save(k,v){try{localStorage.setItem(KEY+'_'+k,v)}catch(e){}}
+function burst(x,y,list,n=12){for(let i=0;i<n;i++){const s=document.createElement('div');s.textContent=list[i%list.length];s.style.cssText=`position:fixed;left:${x}px;top:${y}px;font-size:${14+Math.random()*16}px;pointer-events:none;z-index:150;text-shadow:none`;document.body.appendChild(s);const a=Math.random()*6.28,d=40+Math.random()*90;s.animate([{transform:'translate(-50%,-50%) scale(1)',opacity:1},{transform:`translate(calc(-50% + ${Math.cos(a)*d}px),calc(-50% + ${Math.sin(a)*d+30}px)) scale(.3)`,opacity:0}],{duration:600+Math.random()*400,easing:'ease-out'}).onfinish=()=>s.remove()}}
+function burstEl(el,list,n){const r=el.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,list,n)}
+function floatText(x,y,txt,col='#ffd84a'){const s=document.createElement('div');s.className='flt';s.textContent=txt;s.style.cssText+=`left:${x}px;top:${y}px;color:${col}`;document.body.appendChild(s);s.animate([{transform:'translate(-50%,0) scale(.6)',opacity:1},{transform:'translate(-50%,-60px) scale(1.15)',opacity:1,offset:.7},{transform:'translate(-50%,-80px) scale(1)',opacity:0}],{duration:1000,easing:'ease-out'}).onfinish=()=>s.remove()}
+function floatEl(el,txt,col){const r=el.getBoundingClientRect();floatText(r.left+r.width/2,r.top+r.height/3,txt,col)}
+function shake(el){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake')}
+(function(){const m=$('#mute');m.textContent=muted?'🔇':'🔊';m.onclick=()=>{muted=!muted;save('mute',muted?1:0);try{localStorage.setItem(KEY+'_mute',muted?'1':'0')}catch(e){}m.textContent=muted?'🔇':'🔊';beep(600,.08)}})();
+document.addEventListener('pointerdown',()=>{try{if(AC&&AC.state==='suspended')AC.resume()}catch(e){}});
+function ov(title,stars,html,btns){$('#ovT').textContent=title;$('#ovS').textContent=stars||'';$('#ovP').innerHTML=html||'';const b=$('#ovB');b.innerHTML='';btns.forEach(([l,c,f])=>{const e=document.createElement('button');e.className='btn '+(c||'');e.innerHTML=l;e.onclick=()=>{beep(520,.06);f()};b.appendChild(e)});$('#ov').classList.remove('hide')}
+function ovHide(){$('#ov').classList.add('hide')}
+const PIPS=[null,[4],[0,8],[0,4,8],[0,2,6,8],[0,2,4,6,8],[0,2,3,5,6,8]];
+const ROT=[null,[0,0],[0,-90],[-90,0],[90,0],[0,90],[0,180]];
+function mkDie(parent,size,cls){const el=document.createElement('div');el.className='die'+(cls?' '+cls:'');el.style.setProperty('--ds',size);let h='<div class="tilt"><div class="cube">';for(let f=1;f<=6;f++){h+='<div class="face f'+f+'">';for(let i=0;i<9;i++)h+=PIPS[f].includes(i)?'<span class="pip" style="grid-area:'+(Math.floor(i/3)+1)+'/'+(i%3+1)+'"></span>':'';h+='</div>'}el.innerHTML=h+'</div></div>';parent.appendChild(el);const cube=el.querySelector('.cube');
+const d={el,v:1,kx:0,ky:0,show(v,dur=900){d.v=v;const r=ROT[v];if(dur){d.kx+=R(1,2);d.ky+=R(1,3)}cube.style.transition=dur?'transform '+dur+'ms cubic-bezier(.2,.75,.3,1)':'none';cube.style.transform='rotateX('+(r[0]+d.kx*360)+'deg) rotateY('+(r[1]+d.ky*360)+'deg)';if(dur){el.classList.remove('hop');void el.offsetWidth;el.classList.add('hop');for(let i=1;i<5;i++)setTimeout(()=>beep(220+R(0,200),.04,'square',.05),i*dur/6)}return dur?sleep(dur):Promise.resolve()}};d.show(1,0);return d}
+function fitBoard(cv,main,sideLand,sideBot){const W=innerWidth,H=innerHeight,tp=$('#top').offsetHeight,land=W/H>1.15;let s=land?Math.min(H-tp-14,W-sideLand-24):Math.min(W-14,H-tp-sideBot-14);s=Math.max(160,Math.floor(s||0));cv.style.width=cv.style.height=s+'px';main.style.flexDirection=land?'row':'column';return s}
+const CANCEL='cancel';
+
+const ROUNDS=15,GC=['#8d5a2b','#4cc3ff','#e056c0','#ff9f1a','#e53935','#f5d300','#2eaa3a'],TOK=['🚗','🚀','🐶','🎩'],PCOL=['#e53935','#2a7fe0','#2eaa3a','#8e44d6'];
+const pr=(g,e,n,p)=>({t:'prop',g,e,n,pr:p,o:null});
+const TL=[{t:'start',e:'🏁',n:'START',c:1},pr(0,'🥐','Bakery Row',60),{t:'card',e:'❓',n:'Surprise'},pr(0,'🍦','Ice-Cream Lane',60),{t:'fee',e:'💸',n:'Fee'},pr(1,'🧁','Cupcake Court',100),{t:'rest',e:'⏸️',n:'Time-Out',c:1},pr(1,'🎡','Fairground',100),{t:'card',e:'❓',n:'Surprise'},pr(2,'🎳','Bowling Alley',140),pr(2,'🎬','Cinema Circle',140),{t:'bonus',e:'🎁',n:'Bonus'},{t:'free',e:'🅿️',n:'Free Spot',c:1},pr(3,'🏖️','Beach Walk',180),pr(3,'🏄','Surf Street',180),{t:'card',e:'❓',n:'Surprise'},pr(4,'🏔️','Mountain Pass',220),pr(4,'⛷️','Ski Slope',220),{t:'jail',e:'🚔',n:'Go to Time-Out',c:1},pr(5,'🏰','Castle Hill',260),{t:'fee',e:'💸',n:'Fee'},pr(5,'🛸','Saucer Square',260),pr(6,'🚀','Rocket Plaza',320),pr(6,'👑','Crown Avenue',320)];
+const rentOf=t=>{const own=t.o,full=TL.filter(x=>x.g===t.g).every(x=>x.o===own);return Math.round(t.pr*.15)*(full?2:1)};
+const CARDS=[['🎂 Birthday! Collect 30 from every player','bday'],['🍀 Lucky find! +80','g80'],['🔧 Repair bill! Pay 60','p60'],['🚀 Zoom to START! Collect 200','start'],['👟 Hop forward 3 squares','f3'],['🔙 Slide back 2 squares','b2'],['🚔 Straight to Time-Out! Skip your next turn','jail'],['🎟️ Raffle win! +150','g150'],['🍕 Pizza party! Pay each player 20','pizza'],['📉 Tax audit! Pay 10% of your points','tax']];
+let pls=[],cur=0,round=1,gen=0,over=true,pool=0,mode=1,wins=0,bestW=0,rollRes=null,die=[];
+const board=$('#board');
+for(let i=0;i<24;i++){const [r,c]=i<7?[7,7-i]:i<13?[7-(i-6),1]:i<19?[1,i-12+1]:[i-18+1,7];const t=TL[i],d=document.createElement('div');d.className='tl'+(t.c?' corner':'');d.style.gridArea=r+'/'+c;
+d.innerHTML=(t.t==='prop'?'<i class="band" style="background:'+GC[t.g]+'"></i>':'')+'<span class="em">'+t.e+'</span>'+(t.pr?'<span class="pr">'+t.pr+'</span>':t.n.length<9?'<span class="pr">'+t.n+'</span>':'')+'<span class="ob"></span><div class="tk"></div>';d.onclick=()=>info(i);board.appendChild(d);t.el=d}
+die=[mkDie($('#dice'),'var(--dsz)'),mkDie($('#dice'),'var(--dsz)','gold')];
+function msg(t){$('#msg').textContent=t}
+function info(i){const t=TL[i];if(over)return;msg(t.e+' '+t.n+(t.pr?' - cost '+t.pr+', rent '+Math.round(t.pr*.15)+(t.o!=null?' (owner '+TOK[t.o]+')':''):''))}
+function ui(){$('#chips').innerHTML=pls.map((p,i)=>'<div class="chip'+(i===cur&&!over?' on':'')+(p.out?' out':'')+'" style="border-color:'+PCOL[i]+'">'+TOK[i]+' '+p.cash+'</div>').join('');
+TL.forEach((t,i)=>{if(t.pr){t.el.classList.toggle('own',t.o!=null);if(t.o!=null)t.el.style.setProperty('--oc',PCOL[t.o]);t.el.querySelector('.ob').textContent=t.o!=null?TOK[t.o]:''}t.el.querySelector('.tk').innerHTML=pls.map(p=>!p.out&&p.pos===i?'<span>'+TOK[pls.indexOf(p)]+'</span>':'').join('')});
+$('#pRound').textContent='🏙 Round '+Math.min(round,ROUNDS)+'/'+ROUNDS;$('#pPool').textContent='🅿️ Pool '+pool;$('#bw').textContent=wins;const p=pls[cur];$('#roll').disabled=!(rollRes&&p&&!p.ai)}
+const worth=p=>p.cash+TL.filter(t=>t.o===pls.indexOf(p)).reduce((s,t)=>s+t.pr,0);
+const ask=(title,html,btns)=>new Promise(res=>ov(title,'',html,btns.map(([l,c],i)=>[l,c,()=>{ovHide();res(i)}])));
+async function run(){const g=++gen,chk=()=>{if(g!==gen)throw CANCEL};
+const chipEl=p=>$('#chips').children[pls.indexOf(p)]||$('#chips');
+const bankrupt=async(p,cr)=>{p.out=true;p.cash=0;TL.forEach(t=>{if(t.o===pls.indexOf(p))t.o=cr?pls.indexOf(cr):null});beep(120,.5,'sawtooth');msg('💥 '+TOK[pls.indexOf(p)]+' is bankrupt!');ui();await sleep(1500);chk()};
+const pay=async(p,a,to)=>{p.cash-=a;if(to)to.cash+=a;floatEl(chipEl(p),'-'+a,'#ff8a8a');beep(220,.15,'square');ui();if(p.cash<0)await bankrupt(p,to)};
+const gain=(p,a)=>{p.cash+=a;floatEl(chipEl(p),'+'+a,'#7dff7d');beep(700,.1,'triangle');ui()};
+const step=async(p,k)=>{const d=k>0?1:-1;for(let i=0;i<Math.abs(k);i++){p.pos=(p.pos+d+24)%24;if(d>0&&p.pos===0){gain(p,200);msg('🏁 Passed START: +200!')}beep(400+i*30,.05);ui();await sleep(190);chk()}};
+const note=async(p,title,text)=>{if(!p.ai)await ask(title,text,[['👍 OK','']]);else{msg(title+' '+text);await sleep(1800)}chk()};
+const land=async(p,depth)=>{const t=TL[p.pos],pi=pls.indexOf(p);
+if(t.t==='prop'){if(t.o==null){const can=p.cash>=t.pr;if(!can){msg(t.e+' '+t.n+': not enough points');await sleep(1000)}else{let buy;const full=TL.filter(x=>x.g===t.g&&x.o===pi).length===TL.filter(x=>x.g===t.g).length-1;
+if(!p.ai)buy=(await ask(t.e+' '+t.n,'Cost <b>'+t.pr+'</b> pts - rent <b>'+Math.round(t.pr*.15)+'</b> (double with both of its colour)<br>You have <b>'+p.cash+'</b>',[['💰 Buy it!',''],['⏭ Skip','o']]))===0;else{buy=p.cash-t.pr>=120||(full&&p.cash-t.pr>=30);msg(TOK[pi]+' '+(buy?'buys ':'passes on ')+t.n);await sleep(1000)}chk();
+if(buy){p.cash-=t.pr;t.o=pi;jingle([523,659,784]);burstEl(t.el,['⭐','✨','💰'],8);msg(TOK[pi]+' now owns '+t.n+'!');ui();await sleep(700)}}}
+else if(t.o!==pi){const o=pls[t.o],a=rentOf(t);msg(TOK[pi]+' pays '+a+' rent to '+TOK[t.o]);await sleep(500);chk();await pay(p,a,o);if(!p.out)await sleep(500)}else{msg('🏡 Your own place!');await sleep(600)}}
+else if(t.t==='card'){const c=CARDS[R(0,CARDS.length-1)];await note(p,'❓ Surprise!',c[0]);const k=c[1],others=pls.filter(x=>x!==p&&!x.out);
+if(k==='bday'){for(const o of others){await pay(o,30,p)}}else if(k==='g80')gain(p,80);else if(k==='g150')gain(p,150);else if(k==='p60')await pay(p,60,null);else if(k==='tax')await pay(p,Math.round(p.cash/10),null);
+else if(k==='pizza'){for(const o of others){if(!p.out)await pay(p,20,o)}}else if(k==='start'){const f=(24-p.pos)%24;await step(p,f||24)}
+else if(k==='f3'||k==='b2'){await step(p,k==='f3'?3:-2);if(depth<2&&!p.out)await land(p,depth+1)}else if(k==='jail'){p.pos=6;p.skip=true;ui()}}
+else if(t.t==='fee'){msg('💸 Fee! Pay 100 into the Free Spot pool');pool+=100;await pay(p,100,null);await sleep(500)}
+else if(t.t==='bonus'){msg('🎁 Bonus! +100');gain(p,100);await sleep(800)}
+else if(t.t==='free'){if(pool>0){msg('🅿️ Free Spot! You scoop the pool: +'+pool);gain(p,pool);pool=0;jingle([523,659,784,1047])}else msg('🅿️ Free Spot - pool is empty, relax!');ui();await sleep(900)}
+else if(t.t==='jail'){msg('🚔 Go to Time-Out! Skip next turn');beep(200,.3,'sawtooth');p.pos=6;p.skip=true;ui();await sleep(1000)}
+else{msg(t.e+' '+t.n);await sleep(500)}chk()};
+try{while(!over){const p=pls[cur];ui();
+if(p.skip){p.skip=false;msg(TOK[cur]+' is in Time-Out - skips this turn');await sleep(1200);chk()}
+else{if(!p.ai){msg((mode===0?'P'+(cur+1)+' ':'')+TOK[cur]+' Your turn - roll!');await new Promise(r=>{rollRes=r;ui()});rollRes=null}else{msg(TOK[cur]+' CPU is rolling...');await sleep(800)}chk();$('#roll').disabled=true;
+const a=R(1,6),b=R(1,6);await Promise.all([die[0].show(a,800),die[1].show(b,950)]);chk();msg(TOK[cur]+' rolled '+(a+b)+(a===b?' (doubles!)':''));await sleep(300);chk();await step(p,a+b);await land(p,0)}
+if(pls.filter(x=>!x.out).length<2)return finish();
+const prev=cur;do{cur=(cur+1)%pls.length}while(pls[cur].out);if(cur<=prev){round++;if(round>ROUNDS)return finish()}}}catch(e){if(e!==CANCEL)throw e}}
+function finish(){over=true;ui();const rk=pls.map((p,i)=>({p,i,w:p.out?-1:worth(p)})).sort((a,b)=>b.w-a.w),top=rk[0].i;
+const me=rk.findIndex(r=>r.i===0),human=mode!==0;let title,stars;if(!human){title='🏆 '+TOK[top]+' P'+(top+1)+' wins!';stars='⭐⭐⭐'}else if(top===0){title='🏆 You win!';stars='⭐⭐⭐';wins++;save('wins',wins)}else{title=TOK[top]+' CPU wins';stars=me===1?'⭐⭐':'⭐'}
+const mw=pls[0].out?0:worth(pls[0]);if(human&&mw>bestW){bestW=mw;save('bestW',bestW)}
+jingle([392,523,659,784,1047]);if(top===0||!human)burst(innerWidth/2,innerHeight/3,['💰','⭐','🎉','🏙️'],26);
+setTimeout(()=>ov(title,stars,'Net worth (cash + property):<br>'+rk.map(r=>TOK[r.i]+(r.i===0?' You':' P'+(r.i+1))+': <b>'+(r.w<0?'bankrupt':r.w)+'</b>').join('<br>')+(human?'<br>🌟 Best: <b>'+bestW+'</b>':''),[['▶ Play Again','',()=>start(mode)],['🏠 Menu','o',menu]]),900)}
+function start(m){mode=m;const n=m===0?2:m+1;pls=[];for(let i=0;i<n;i++)pls.push({pos:0,cash:800,ai:m===0?false:i>0,out:false,skip:false});TL.forEach(t=>t.o=null);cur=0;round=1;pool=0;over=false;rollRes=null;wins=load('wins');bestW=load('bestW');die.forEach(d=>d.show(1,0));ovHide();ui();run()}
+function menu(){gen++;over=true;rollRes=null;ui();ov('🏙 Tycoon Dash','','Lap the 24-square city! Buy places, collect rent, draw Surprise cards. Pass START for +200. Play-points only - after '+ROUNDS+' rounds the richest player wins!',[['🤖 vs 1 CPU','',()=>start(1)],['🤖 vs 2 CPU','b',()=>start(2)],['🤖 vs 3 CPU','p',()=>start(3)],['👫 Pass &amp; Play (2 players)','o',()=>start(0)]])}
+$('#roll').onclick=()=>{if(rollRes&&!$('#roll').disabled){const f=rollRes;rollRes=null;beep(500,.05);f()}};
+addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();$('#roll').onclick()}});
+function fit(){const s=Math.max(260,Math.floor(Math.min(innerWidth-12,innerHeight-$('#top').offsetHeight-16)));board.style.setProperty('--bs',s+'px')}addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,200));
+fit();wins=load('wins');menu();
+</script></body></html>

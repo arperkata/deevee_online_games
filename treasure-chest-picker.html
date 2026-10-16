@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Treasure Chest Picker</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
+body{height:100dvh;display:flex;flex-direction:column;font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;color:#fff;text-align:center;user-select:none;-webkit-user-select:none;touch-action:manipulation;background:var(--bg,linear-gradient(#27a2e8,#bdeafc))}
+a.home{position:fixed;left:10px;top:10px;z-index:1000;background:#f08a12;color:#fff;border-radius:999px;padding:0 14px;min-height:40px;display:inline-flex;align-items:center;text-decoration:none;font-weight:700;font-size:17px;box-shadow:0 4px 0 #a9560b}
+#top{display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 10px 4px 96px;min-height:54px}
+.pill{background:#0b3a78;color:#fff;border-radius:999px;padding:4px 12px;font-weight:700;font-size:clamp(15px,3vw,22px);box-shadow:0 3px 0 #06244d;border:2px solid #ffe14a;white-space:nowrap}
+.pill b{color:#ffe14a}
+.mute{width:44px;height:40px;border:0;border-radius:999px;background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 4px 0 #a9560b;font-size:20px;cursor:pointer;padding:0}
+#main{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:0 10px 8px}
+#ctl{display:flex;flex-direction:column;align-items:center;gap:8px;max-width:100%}
+#status{background:#0b3a78;border:3px solid #ffe14a;border-radius:14px;padding:4px 14px;font-weight:700;font-size:clamp(15px,3.6vw,22px);min-height:38px;display:flex;align-items:center;justify-content:center;max-width:94vw;text-shadow:0 2px 0 #06244d}
+#bets,.row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
+.chip{min-width:52px;min-height:44px;padding:0 12px;border:3px solid #fff;border-radius:14px;background:linear-gradient(#4aa3ff,#1f6fe0);color:#fff;font-weight:700;font-size:18px;font-family:inherit;box-shadow:0 4px 0 #0b3a78;cursor:pointer}
+.chip.on{background:linear-gradient(#ffe14a,#ffb21f);color:#5a3200;transform:translateY(-2px);box-shadow:0 6px 0 #a9560b}
+.chip:disabled{background:#56657a;color:#fff;box-shadow:0 4px 0 #2e3a4a;cursor:default}
+button.go{font-weight:700;font-size:clamp(20px,5vw,28px);font-family:inherit;padding:0 1.4em;min-height:52px;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}
+button.go:active:not(:disabled){transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
+button.go:disabled{background:#56657a;box-shadow:0 5px 0 #2e3a4a;text-shadow:none;cursor:default}
+button.go.alt{background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9560b;text-shadow:0 2px 0 #a9560b}
+.note{background:#0b3a78;color:#ffe14a;font-weight:700;font-size:13px;padding:4px 12px;border-radius:999px;border:2px solid #ffe14a}
+.ov{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(6,30,70,.9);z-index:50;padding:12px}
+.ov.show{display:flex}
+.box{background:linear-gradient(#2f8cff,#0b4fb3);border:5px solid #ffe14a;border-radius:28px;padding:16px 22px;box-shadow:0 8px 0 #06244d;max-width:94vw;max-height:96dvh;overflow:auto;animation:pop2 .5s}
+.box h2{margin:4px 0;font-size:clamp(26px,6vw,38px);text-shadow:0 3px 0 #0b3a78}
+.box p{margin:6px 0;font-size:clamp(15px,3.6vw,19px);font-weight:600}
+.box .note{display:inline-block;margin:6px 0 10px}
+.big{font-size:clamp(46px,12vw,72px);line-height:1.1}
+@keyframes pop2{0%{transform:scale(.5)}70%{transform:scale(1.08)}}
+.fl{position:fixed;z-index:70;pointer-events:none;font-weight:700;font-size:clamp(24px,5vw,34px);color:#ffe14a;text-shadow:0 3px 0 #0b3a78,2px 2px 0 #0b3a78,-2px -2px 0 #0b3a78,2px -2px 0 #0b3a78,-2px 2px 0 #0b3a78;transform:translate(-50%,-50%);animation:rise 1.2s ease-out forwards;white-space:nowrap}
+@keyframes rise{0%{transform:translate(-50%,-30%) scale(.5)}20%{transform:translate(-50%,-80%) scale(1.3)}85%{opacity:1}100%{transform:translate(-50%,-260%) scale(1);opacity:0}}
+.shk{animation:shk .4s}
+@keyframes shk{20%{transform:translate(-6px,3px)}40%{transform:translate(6px,-3px)}60%{transform:translate(-4px,2px)}80%{transform:translate(4px,-2px)}}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:60}
+@media (orientation:landscape) and (max-height:520px){#main{flex-direction:row;gap:14px}#ctl{width:min(300px,40vw)}#top{padding-top:6px;min-height:48px}.big{font-size:44px}.box{padding:8px 16px}.box h2{font-size:24px}}
+
+:root{--bg:linear-gradient(#27a2e8,#bdeafc 70%,#f6d98a);--bw:min(94vw,calc((100dvh - 300px)*4/3),520px)}
+#board{width:var(--bw);aspect-ratio:4/3;padding:8px;border-radius:22px;background:linear-gradient(#103d86,#0a2a63);border:4px solid #3aa0ff;box-shadow:0 8px 0 #06204a,0 14px 24px rgba(0,0,0,.35)}
+#grid{width:100%;height:100%;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr);gap:8px;font-size:var(--fs,40px)}
+.ch{position:relative;border:3px solid #ffd23a;border-radius:16px;background:linear-gradient(#d98a2b,#8a4b12);box-shadow:0 5px 0 #4a2606;color:#fff;font-family:inherit;font-size:inherit;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05;padding:0;min-width:0;min-height:0}
+.ch::before{content:"";position:absolute;left:0;right:0;top:34%;height:14%;background:#ffd23a;border-top:2px solid #a9760b;border-bottom:2px solid #a9760b}
+.ch span{position:relative;z-index:1}
+.ch:active:not(.open):not(:disabled){transform:translateY(4px);box-shadow:0 1px 0 #4a2606}
+.ch.open{cursor:default;background:linear-gradient(#fff6c8,#ffe27a);color:#5a3200;animation:pop2 .45s;box-shadow:0 5px 0 #a9760b}
+.ch.open::before,.ch.skull::before,.ch.rev::before{display:none}
+.ch.skull{background:linear-gradient(#ff6a5a,#c4161c);color:#fff;box-shadow:0 5px 0 #6a0a0e;animation:shk .5s}
+.ch.rev{background:#5c3a1a;color:#fff;border-color:#8a6a3a;box-shadow:0 3px 0 #2a1608;transform:scale(.92)}
+.ch.rev.skull{background:#8a1218}
+.ch small{font-size:.32em;font-weight:700}
+.ch .lk{font-size:.7em}
+#hud{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+#hud .pill{font-size:clamp(14px,3.4vw,19px)}
+#res h2{margin:2px 0}.st{font-size:clamp(34px,9vw,52px);letter-spacing:4px;display:block}
+@media (orientation:landscape) and (max-height:520px){:root{--bw:min(calc(100vw - 340px),calc((100dvh - 66px)*2.6))}#board{aspect-ratio:3/1.15}#grid{grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(2,1fr)}}
+</style></head><body>
+<a class="home" href="index.html">⌂ Home</a>
+<div id="top"><div class="pill">🪙 <b id="coins">1000</b></div><div class="pill">🏆 <b id="best">1000</b></div><button class="mute" id="mute" aria-label="Mute">🔊</button></div>
+<div id="main">
+<div id="board"><div id="grid"></div></div>
+<div id="ctl"><div id="hud"><div class="pill">Round <b id="rd">-</b>/4</div><div class="pill">💰 Pot <b id="pot">0</b></div><div class="pill">Picks <b id="pk">-</b></div></div>
+<div id="status">Pick a bet, then open chests - avoid the 💀!</div><div id="bets"></div>
+<div class="row"><button class="go" id="go">▶ START</button><button class="go alt" id="cash" disabled>💰 CASH OUT</button></div><div class="note">Just for fun - no real money, no purchases</div></div>
+</div>
+<div id="msg" class="ov show"><div class="box"><div class="big">🧰</div><h2>Treasure Chest Picker</h2><p>Open 3 chests each round to build your pot. Skulls 💀 wipe the pot! Cash out any time, or risk the next round for bigger prizes.</p><div class="note">Just for fun - no real money, no purchases</div><br><button class="go" id="startBtn">▶ Play!</button></div></div>
+<div id="res" class="ov"><div class="box"><div class="big" id="re">🎉</div><h2 id="rt">Treasure!</h2><span class="st" id="rs">⭐⭐⭐</span><p id="rp"></p><p>Best balance: <b id="rb"></b></p><button class="go" id="again">▶ Play Again</button></div></div>
+<div id="refill" class="ov"><div class="box"><div class="big">😅</div><h2>Out of coins!</h2><p>No worries - here are 1000 free coins.</p><button class="go" id="refillBtn">🪙 Free refill</button><br><div class="note">Just for fun - no real money, no purchases</div></div></div>
+<canvas id="fx"></canvas>
+<script>
+const FILE='treasure-chest-picker.html',BETS=[10,25,50,100],MINBET=10;
+const $=id=>document.getElementById(id);
+function ld(k,d){try{const v=localStorage.getItem(FILE+':'+k);return v===null?d:JSON.parse(v)}catch(e){return d}}
+function sv(k,v){try{localStorage.setItem(FILE+':'+k,JSON.stringify(v))}catch(e){}}
+let coins=1000,best=ld('best',1000),bet=BETS[0],muted=false,AC=null,busy=false;
+function snd(f,d,t,v,w){if(muted)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain(),s=AC.currentTime+(w||0);o.type=t||'square';o.frequency.value=f;g.gain.setValueAtTime(v||.06,s);g.gain.exponentialRampToValueAtTime(.001,s+(d||.1));o.connect(g);g.connect(AC.destination);o.start(s);o.stop(s+(d||.1)+.02)}catch(e){}}
+function jingle(n){for(let i=0;i<n;i++)snd(520+i*110,.14,'triangle',.07,i*.08)}
+function showCoins(){$('coins').textContent=coins;$('best').textContent=best}
+function setCoins(n){coins=Math.max(0,Math.round(n));if(coins>best){best=coins;sv('best',best)}showCoins();refreshBets()}
+function buildBets(){const w=$('bets');w.innerHTML='';BETS.forEach(b=>{const e=document.createElement('button');e.className='chip';e.textContent=typeof BETLABEL==='function'?BETLABEL(b):b;e.dataset.b=b;e.onclick=()=>{if(busy||b>coins)return;bet=b;refreshBets();snd(600,.05,'square',.05);if(typeof onBet==='function')onBet()};w.appendChild(e)});refreshBets()}
+function refreshBets(){const af=BETS.filter(b=>b<=coins);if(bet>coins&&af.length){bet=af[af.length-1];if(typeof onBet==='function')onBet()}document.querySelectorAll('#bets .chip').forEach(e=>{const b=+e.dataset.b;e.classList.toggle('on',b===bet);e.disabled=b>coins||(busy&&b!==bet)})}
+function checkBroke(){if(coins<MINBET)$('refill').classList.add('show')}
+$('refillBtn').onclick=()=>{setCoins(1000);$('refill').classList.remove('show');jingle(4);if(typeof onRefill==='function')onRefill()};
+$('startBtn').onclick=()=>{$('msg').classList.remove('show');jingle(3);if(typeof onStart==='function')onStart()};
+$('mute').onclick=()=>{muted=!muted;$('mute').textContent=muted?'🔇':'🔊';if(!muted)snd(600,.08)};
+function setStatus(t){$('status').textContent=t}
+function centerOf(el){const r=el.getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2]}
+function shake(el){el.classList.remove('shk');void el.offsetWidth;el.classList.add('shk')}
+function pop(t,x,y){const d=document.createElement('div');d.className='fl';d.textContent=t;d.style.left=x+'px';d.style.top=y+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),1250)}
+const fx=$('fx'),fc=fx.getContext('2d'),CONF=['#ff3b3b','#ffe14a','#3bd23b','#2f8cff','#ff7ad9','#ff9a1f'];
+let P=[],fxOn=false,lastT=0;
+function fxSize(){fx.width=innerWidth;fx.height=innerHeight}
+addEventListener('resize',fxSize);addEventListener('orientationchange',fxSize);fxSize();
+function startFx(){if(!fxOn){fxOn=true;lastT=0;requestAnimationFrame(fxLoop)}}
+function burst(x,y,n,em){n=n||22;for(let i=0;i<n;i++){const a=Math.random()*6.283,s=3+Math.random()*8;P.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-6,e:em||'🪙',sz:20+Math.random()*14,life:80+Math.random()*40,r:0,vr:(Math.random()-.5)*.3,bn:0,g:.4})}startFx()}
+function burstEl(el,n,em){const c=centerOf(el);burst(c[0],c[1],n,em)}
+function confetti(n){n=n||70;for(let i=0;i<n;i++)P.push({x:Math.random()*innerWidth,y:-10-Math.random()*80,vx:(Math.random()-.5)*4,vy:2+Math.random()*4,c:CONF[i%CONF.length],sz:6+Math.random()*7,life:170,r:Math.random()*6,vr:(Math.random()-.5)*.4,g:.1});startFx()}
+function fxLoop(t){fc.clearRect(0,0,fx.width,fx.height);const k=lastT?Math.min(2,(t-lastT)/16.67):1;lastT=t;
+for(const p of P){p.vy+=p.g*k;p.x+=p.vx*k;p.y+=p.vy*k;p.r+=p.vr*k;p.life-=k;
+if(p.e&&p.y>fx.height-14&&p.vy>0&&p.bn<3){p.y=fx.height-14;p.vy*=-.55;p.vx*=.8;p.bn++}
+fc.save();fc.globalAlpha=1;fc.translate(p.x,p.y);fc.rotate(p.r);
+if(p.e){const s=p.sz*Math.min(1,p.life/20);fc.font=s+'px serif';fc.textAlign='center';fc.textBaseline='middle';fc.fillStyle='#000';fc.fillText(p.e,0,0)}
+else{fc.fillStyle=p.c;fc.fillRect(-p.sz/2,-p.sz/4,p.sz,p.sz/2)}
+fc.restore()}
+P=P.filter(p=>p.life>0&&p.y<fx.height+40);
+if(P.length)requestAnimationFrame(fxLoop);else{fxOn=false;fc.clearRect(0,0,fx.width,fx.height)}}
+
+const PR=[['🪙',.1,45],['💰',.25,30],['💎',.5,17],['👑',1.5,8]],RM=[1,1.5,2.2,3],grid=$('grid');
+let phase='idle',round=1,pot=0,picks=0,chests=[],btns=[],opened=0,maxRound=1;
+function fit(){const w=grid.clientWidth,cols=getComputedStyle(grid).gridTemplateColumns.split(' ').length||4;grid.style.setProperty('--fs',Math.max(18,Math.min(w/cols*.5,64))+'px')}
+addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,150));
+function rp(){let r=Math.random()*100;for(const p of PR){r-=p[2];if(r<0)return p}return PR[0]}
+function val(m){return Math.max(1,Math.round(bet*m*RM[round-1]))}
+function hud(){$('rd').textContent=phase==='idle'?'-':round;$('pot').textContent=pot;$('pk').textContent=phase==='pick'?picks:phase==='decide'?'done':'-';
+$('cash').disabled=!((phase==='pick'||phase==='decide')&&pot>0);$('cash').textContent='💰 CASH OUT'+(pot>0?' ('+pot+')':'');
+$('go').disabled=phase==='pick';$('go').textContent=phase==='decide'?'➡️ NEXT ROUND':phase==='pick'?'Pick a chest...':'▶ START ('+bet+')'}
+function build(){
+const sk=round,items=[];for(let i=0;i<sk;i++)items.push({skull:true});while(items.length<12){const p=rp();items.push({e:p[0],v:val(p[1])})}
+for(let i=11;i>0;i--){const j=Math.floor(Math.random()*(i+1));[items[i],items[j]]=[items[j],items[i]]}
+chests=items;grid.innerHTML='';btns=items.map((it,i)=>{const b=document.createElement('button');b.className='ch';b.innerHTML='<span class="lk">🔒</span>';b.onclick=()=>choose(i);grid.appendChild(b);return b});fit()}
+function startGame(){
+if(phase==='pick')return;
+if(phase==='decide'){round++;maxRound=Math.max(maxRound,round);beginRound();return}
+if(coins<bet)return;
+setCoins(coins-bet);busy=true;refreshBets();round=1;maxRound=1;pot=0;beginRound()}
+function beginRound(){phase='pick';picks=3;build();setStatus('Round '+round+': '+round+' skull'+(round>1?'s':'')+' hiding! Pick 3 chests.');snd(500,.1,'triangle');hud()}
+function show(i,rev){const b=btns[i],it=chests[i];b.classList.add(rev?'rev':'open');
+if(it.skull){b.classList.add('skull');b.innerHTML='<span>💀</span>'}else{b.innerHTML='<span>'+it.e+'</span><small>+'+it.v+'</small>'}}
+function choose(i){
+if(phase!=='pick'||btns[i].classList.contains('open'))return;
+const it=chests[i],b=btns[i];show(i,false);
+if(it.skull){phase='over';shake($('board'));snd(110,.6,'sawtooth',.09);revealRest();
+const lost=pot;pot=0;hud();setStatus('💀 SKULL! You lost the pot ('+lost+')');setTimeout(()=>end(false,0),1300);return}
+pot+=it.v;picks--;const p=centerOf(b);pop('+'+it.v,p[0],p[1]);burst(p[0],p[1],it.v>=bet?18:8);snd(600+it.v%7*50,.12,'triangle',.06);
+if(picks<=0){if(round>=4){bank(true);return}phase='decide';setStatus('Round clear! 💰 Cash out or risk Round '+(round+1)+'?')}
+else setStatus('Safe! '+picks+' pick'+(picks>1?'s':'')+' left');
+hud()}
+function revealRest(soft){chests.forEach((it,i)=>{if(!btns[i].classList.contains('open')&&!btns[i].classList.contains('rev')){if(soft){if(!it.skull)return}setTimeout(()=>{show(i,true)},soft?0:60*i)}})}
+function bank(auto){
+if(phase!=='pick'&&phase!=='decide')return;
+const amt=pot;phase='over';setCoins(coins+amt);pot=0;hud();revealRest();jingle(6);confetti(100);const p=centerOf($('board'));pop('+'+amt,p[0],p[1]);
+setStatus((auto?'🏆 All 4 rounds cleared! ':'💰 Banked ')+amt+' coins');setTimeout(()=>end(true,amt),1100)}
+function end(ok,amt){
+busy=false;refreshBets();hud();
+const x=amt/bet,stars=!ok?0:x>=3?3:x>=1?2:1,sh=Math.max(1,stars);
+$('re').textContent=!ok?'💀':stars===3?'🏆':'💰';$('rt').textContent=!ok?'Skull! Pot lost':stars===3?'Huge haul!':stars===2?'Nice treasure!':'Small haul';
+$('rs').textContent='⭐'.repeat(sh)+'☆'.repeat(3-sh);$('rp').textContent=(ok?'Banked '+amt+' coins':'You lost the pot')+' - reached round '+maxRound;$('rb').textContent=best;
+phase='idle';hud();$('res').classList.add('show')}
+$('go').onclick=startGame;$('cash').onclick=()=>bank(false);
+$('again').onclick=()=>{$('res').classList.remove('show');grid.innerHTML='';btns=[];hud();if(coins<MINBET){checkBroke();return}startGame()};
+function onBet(){hud()}
+addEventListener('keydown',e=>{if(e.code==='Enter'&&!document.querySelector('.ov.show')&&phase!=='pick')startGame()});
+function mkEmpty(){grid.innerHTML='';btns=[];for(let i=0;i<12;i++){const b=document.createElement('button');b.className='ch';b.innerHTML='<span class="lk">🔒</span>';b.disabled=true;grid.appendChild(b)}fit()}
+buildBets();showCoins();mkEmpty();hud();
+</script></body></html>

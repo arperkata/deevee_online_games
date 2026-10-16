@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Twenty-One</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--cw:64px}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
+body{height:100dvh;display:flex;flex-direction:column;font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:radial-gradient(ellipse at 50% 35%,#22a65c,#0d5a30 75%);color:#fff;text-align:center;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+a.home{position:fixed;left:10px;top:10px;z-index:1000;background:#f08a12;color:#fff;border-radius:999px;padding:0 14px;min-height:40px;display:inline-flex;align-items:center;font-weight:700;font-size:17px;text-decoration:none;box-shadow:0 4px 0 #a9560b}
+#top{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 8px;padding:8px 8px 4px 96px;min-height:56px}
+@media(min-width:700px){#top{padding:8px 96px 4px}}
+h1{margin:0;font-size:clamp(20px,3.6vw,34px);text-shadow:0 3px 0 #0b3a78,2px 2px 0 #0b3a78,-2px -2px 0 #0b3a78,2px -2px 0 #0b3a78,-2px 2px 0 #0b3a78}
+@media(max-height:520px){h1{display:none}#top{padding-top:4px;min-height:48px}}
+.pill{background:#0b3a78;color:#fff;border-radius:999px;padding:3px 12px;font-weight:700;font-size:clamp(15px,2.6vw,20px);box-shadow:0 3px 0 #06244d;border:2px solid #ffe14a;white-space:nowrap}
+.pill b{color:#ffe14a}
+.btn,.mute{font:700 16px 'Fredoka','Trebuchet MS',sans-serif;min-height:44px;min-width:44px;padding:0 14px;border:0;border-radius:999px;color:#fff;background:linear-gradient(#4aa8ff,#1670d8);box-shadow:0 4px 0 #0b3a78;cursor:pointer;text-shadow:0 2px 0 #0b3a78}
+.btn:active,.mute:active{transform:translateY(3px);box-shadow:0 1px 0 #0b3a78}
+.btn.g{background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 4px 0 #1c701c;text-shadow:0 2px 0 #1c701c}
+.btn.r{background:linear-gradient(#ff6a5a,#d62a1c);box-shadow:0 4px 0 #8a1209;text-shadow:0 2px 0 #8a1209}
+.btn.o{background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 4px 0 #a9560b;text-shadow:0 2px 0 #a9560b}
+.btn[disabled]{background:#7d8aa0;box-shadow:0 4px 0 #4a5568;text-shadow:none;cursor:default}
+.mute{padding:0 10px;background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 4px 0 #a9560b}
+#stage{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;padding:4px 6px 8px}
+.card{width:var(--cw);height:calc(var(--cw)*1.4);font-size:calc(var(--cw)*.3);position:relative;border-radius:calc(var(--cw)*.1);background:#fff;border:2px solid #1b2a41;box-shadow:0 3px 6px rgba(0,0,0,.45);color:#14161c;font-weight:700;line-height:1;flex:none;font-family:Georgia,'Trebuchet MS',serif;overflow:hidden}
+.card.red{color:#d4101f}
+.card i{font-style:normal}
+.card .c1,.card .c2{position:absolute;text-align:center;line-height:.95;font-size:.9em}
+.card .c1{left:.14em;top:.1em}
+.card .c2{right:.14em;bottom:.1em;transform:rotate(180deg)}
+.card .mid{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.1em;padding-top:.05em}
+.card .mid.f{font-size:1.5em}
+.card.back{background:repeating-linear-gradient(45deg,#d4202f 0 .3em,#9c0f1c .3em .6em);border:calc(var(--cw)*.07) solid #fff;outline:2px solid #1b2a41;outline-offset:calc(var(--cw)*-.07)}
+.card.back *{display:none}
+.card.sel{box-shadow:0 0 0 4px #ffe14a,0 6px 10px rgba(0,0,0,.5);transform:translateY(-8px)}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:60}
+#msg{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(5,25,15,.85);z-index:50;padding:12px}
+#box{background:linear-gradient(#2f8cff,#0b4fb3);border:5px solid #ffe14a;border-radius:28px;padding:16px 26px 20px;box-shadow:0 8px 0 #06244d;max-width:94vw;max-height:96dvh;overflow:auto;animation:pop2 .5s}
+@keyframes pop2{0%{transform:scale(.5)}70%{transform:scale(1.08)}}
+#em{font-size:clamp(46px,12vmin,80px);line-height:1.1}
+#mt{font-size:clamp(26px,6vw,40px);font-weight:700;text-shadow:0 3px 0 #0b3a78}
+#stars{font-size:clamp(34px,9vmin,54px);color:#ffe14a;letter-spacing:4px;text-shadow:0 3px 0 #7a4a00}
+#ms{font-size:clamp(17px,3.4vw,24px);font-weight:700;margin:4px 0;line-height:1.5}
+#ms b{color:#ffe14a}
+#ms .btn{margin:4px}
+#ms .btn.on{background:linear-gradient(#ffd23a,#f0a000);color:#3a2500;text-shadow:none;box-shadow:0 4px 0 #8a5a00}
+button.go{font:700 clamp(20px,5vw,28px) 'Fredoka','Trebuchet MS',sans-serif;margin-top:10px;padding:.4em 1.5em;min-height:48px;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}
+button.go:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
+.fl{position:fixed;font-weight:700;font-size:clamp(22px,4vw,34px);pointer-events:none;z-index:70;text-shadow:0 2px 0 #0b3a78,1px 1px 0 #0b3a78,-1px -1px 0 #0b3a78;animation:fl 1s forwards;white-space:nowrap}
+@keyframes fl{to{transform:translateY(-70px);opacity:0}}
+@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.shake{animation:shake .35s}
+
+#stage{flex-direction:column;align-items:stretch;gap:4px}
+#table{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:space-around;align-items:center}
+.zone{display:flex;flex-direction:column;align-items:center;gap:4px}
+.hand{display:flex;justify-content:center;min-height:calc(var(--cw)*1.4 + 6px);padding-top:4px}
+.hand .card+.card{margin-left:calc(var(--cw)*-.5)}
+.dealin{animation:dealin .28s ease-out}
+@keyframes dealin{from{transform:translateY(-90px) rotate(-12deg) scale(.6)}to{transform:none}}
+.flip{animation:flip .35s}
+@keyframes flip{from{transform:scaleX(.05)}to{transform:none}}
+#banner{min-height:46px;display:flex;align-items:center;justify-content:center;padding:0 22px;border-radius:14px;font-size:clamp(20px,5vw,30px);font-weight:700;background:#0b3a78;border:3px solid #ffe14a;box-shadow:0 4px 0 #06244d;visibility:hidden;text-shadow:0 2px 0 #06244d}
+#banner.show{visibility:visible;animation:pop2 .4s}
+#banner.win{background:linear-gradient(#34c759,#1a8f3a);border-color:#fff}
+#banner.lose{background:linear-gradient(#e8423a,#a5120b);border-color:#fff}
+#ctl{display:flex;flex-direction:column;align-items:center;gap:8px;padding:2px 4px}
+#bets,#acts{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px}
+#acts{display:none}
+.chip{width:52px;height:52px;border-radius:50%;border:4px dashed #fff;font:700 18px 'Fredoka','Trebuchet MS',sans-serif;color:#fff;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.5);text-shadow:0 2px 0 rgba(0,0,0,.5)}
+.chip.c5{background:#d62a1c}.chip.c10{background:#1670d8}.chip.c25{background:#1a8f3a}.chip.c50{background:#6a2fc4}
+.chip.sel{outline:4px solid #ffe14a;transform:translateY(-4px)}
+.chip[disabled]{background:#7d8aa0;cursor:default}
+#acts .btn,#bets .btn.g{font-size:20px;min-height:52px;padding:0 22px}
+@media(orientation:landscape) and (max-height:520px){#stage{flex-direction:row}#ctl{width:170px;justify-content:center}#bets,#acts{flex-direction:column}}
+</style></head><body>
+<a class="home" href="index.html">⌂ Home</a>
+<div id="top"><h1>Twenty-One</h1><span class="pill">Points <b id="pts">100</b></span><span class="pill">Bet <b id="bt">10</b></span><span class="pill">Streak <b id="st">0</b>🔥</span><span class="pill">Best <b id="bs">0</b></span><button class="btn o" id="cash">💰 Cash out</button><button class="mute" id="mute">🔊</button></div>
+<div id="stage"><div id="table">
+<div class="zone"><span class="pill" id="dt">Dealer</span><div class="hand" id="dh"></div></div>
+<div id="banner"></div>
+<div class="zone"><div class="hand" id="ph"></div><span class="pill" id="pt">You</span></div>
+</div>
+<div id="ctl"><div id="bets"><button class="chip c5" data-b="5">5</button><button class="chip c10" data-b="10">10</button><button class="chip c25" data-b="25">25</button><button class="chip c50" data-b="50">50</button><button class="btn g" id="deal">Deal</button></div>
+<div id="acts"><button class="btn g" id="hit">Hit</button><button class="btn r" id="stand">Stand</button><button class="btn o" id="dbl">Double</button></div></div></div>
+<canvas id="fx"></canvas>
+<div id="msg"><div id="box"><div id="em"></div><div id="mt"></div><div id="stars"></div><div id="ms"></div><button class="go" id="again">Play</button></div></div>
+<script>
+const GAME="twenty-one.html";
+const $=id=>document.getElementById(id);
+const RK=['','A','2','3','4','5','6','7','8','9','10','J','Q','K'],SU=['♠','♥','♦','♣'];
+const rnd=n=>Math.floor(Math.random()*n),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+function deck(){const d=[];let id=0;for(let s=0;s<4;s++)for(let r=1;r<=13;r++)d.push({r,s,id:id++});return d}
+const isRed=c=>c.s==1||c.s==2;
+function cardEl(c,up=true){const d=document.createElement('div');d.className='card'+(up?'':' back')+(up&&isRed(c)?' red':'');if(up){const t=RK[c.r]+'<br>'+SU[c.s];d.innerHTML='<i class="c1">'+t+'</i><i class="mid'+(c.r>10?' f':'')+'">'+(c.r>10?RK[c.r]+SU[c.s]:SU[c.s])+'</i><i class="c2">'+t+'</i>'}d.dataset.id=c?c.id:'';return d}
+let muted=false,ac;
+try{muted=localStorage.getItem('cardgames:muted')=='1'}catch(e){}
+function beep(f,d=.12,type='triangle',v=.15){if(muted)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type=type;g.gain.setValueAtTime(v,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+function jingle(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.18),i*120))}
+function sadTone(){[330,262,196].forEach((f,i)=>setTimeout(()=>beep(f,.22,'sawtooth',.1),i*160))}
+(function(){const m=$('mute');if(!m)return;m.textContent=muted?'🔇':'🔊';m.onclick=function(){muted=!muted;this.textContent=muted?'🔇':'🔊';try{localStorage.setItem('cardgames:muted',muted?'1':'0')}catch(e){}beep(600)}})();
+function getBest(k,def=0){try{const v=localStorage.getItem(GAME+':'+k);return v===null?def:+v}catch(e){return def}}
+function setBest(k,v){try{localStorage.setItem(GAME+':'+k,v)}catch(e){}}
+const fx=$('fx'),fc=fx.getContext('2d');let PARTS=[],raf=0,lt=0;
+function fxfit(){fx.width=innerWidth;fx.height=innerHeight}fxfit();addEventListener('resize',fxfit);addEventListener('orientationchange',fxfit);
+function confetti(x,y,n=40){const C=['#ff4a5a','#ffe14a','#4ade5a','#3aa0ff','#ff8bd0','#ff9a1f'];for(let i=0;i<n;i++){const a=Math.random()*6.283,s=150+Math.random()*350;PARTS.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-200,l:1.2+Math.random()*.6,c:C[i%6],r:Math.random()*6,s:5+Math.random()*6})}lt=performance.now();if(!raf)raf=requestAnimationFrame(tick)}
+function tick(t){const dt=Math.min(.05,(t-lt)/1000||0);lt=t;fc.clearRect(0,0,fx.width,fx.height);PARTS.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=700*dt;p.l-=dt;p.r+=dt*8;fc.save();fc.globalAlpha=Math.min(1,p.l*2);fc.fillStyle=p.c;fc.translate(p.x,p.y);fc.rotate(p.r);fc.fillRect(-p.s/2,-p.s/3,p.s,p.s*.6);fc.restore()});PARTS=PARTS.filter(p=>p.l>0&&p.y<fx.height+20);raf=PARTS.length?requestAnimationFrame(tick):0;if(!raf)fc.clearRect(0,0,fx.width,fx.height)}
+function bigConfetti(){for(let i=0;i<6;i++)setTimeout(()=>confetti(innerWidth*(.15+.14*i),innerHeight*.35,40),i*150)}
+function floatText(txt,x,y,color='#ffe14a'){const d=document.createElement('div');d.className='fl';d.textContent=txt;d.style.left=x+'px';d.style.top=y+'px';d.style.color=color;d.style.transform='translateX(-50%)';document.body.appendChild(d);setTimeout(()=>d.remove(),1000)}
+function floatAt(el,txt,color){const r=el.getBoundingClientRect();floatText(txt,r.left+r.width/2,r.top+r.height/2,color)}
+function overlay(o){$('em').textContent=o.em||'';$('mt').textContent=o.title||'';$('stars').textContent=o.stars?'★'.repeat(o.stars)+'☆'.repeat(3-o.stars):'';$('ms').innerHTML=o.html||'';const b=$('again');b.textContent=o.btn||'Play Again';b.onclick=()=>{beep(520);$('msg').style.display='none';o.cb()};$('msg').style.display='flex';if(o.win){jingle();bigConfetti()}else if(o.lose)sadTone()}
+
+let pts,bet,streak,peak,phase='idle',P=[],D=[],dk=[],holeEl=null,busy=false,total=0;
+const val=h=>{let t=0,a=0;h.forEach(c=>{t+=c.r>10?10:c.r==1?11:c.r;if(c.r==1)a++});while(t>21&&a){t-=10;a--}return t};
+function drawC(){if(dk.length<15)dk=shuffle(deck());return dk.pop()}
+function hud(){$('pts').textContent=pts;$('bt').textContent=bet;$('st').textContent=streak;$('bs').textContent=getBest('peak',100);
+  document.querySelectorAll('.chip').forEach(c=>{const v=+c.dataset.b;c.disabled=v>pts;c.classList.toggle('sel',v==bet)});
+  $('deal').disabled=pts<bet;$('cash').disabled=phase!='bet'}
+function totals(reveal){
+  $('pt').textContent='You: '+val(P);
+  $('dt').textContent=!D.length?'Dealer':reveal?'Dealer: '+val(D):'Dealer: '+val([D[0]])+' + ?'}
+function banner(txt,cls){const b=$('banner');b.textContent=txt;b.className=cls?'show '+cls:'show';b.style.animation='none';void b.offsetWidth;b.style.animation=''}
+function add(who,c,up=true){const h=$(who?'ph':'dh');(who?P:D).push(c);const e=cardEl(c,up);e.classList.add('dealin');h.appendChild(e);beep(who?480:380,.06);return e}
+function mode(m){$('bets').style.display=m=='bet'?'flex':'none';$('acts').style.display=m=='play'?'flex':'none'}
+function fit(){const t=$('table'),H=t.clientHeight,W=t.clientWidth;const ah=(H-48-76)/2;document.documentElement.style.setProperty('--cw',Math.max(26,Math.min(ah/1.4-6,W/4.2,100))+'px')}
+async function deal(){
+  if(busy||phase!='bet'||pts<bet)return;busy=true;phase='play';
+  $('dh').innerHTML='';$('ph').innerHTML='';P=[];D=[];$('banner').className='';
+  pts-=bet;total=bet;hud();mode('none');
+  add(1,drawC());totals();await sleep(240);add(0,drawC());totals();await sleep(240);add(1,drawC());totals();await sleep(240);holeEl=add(0,drawC(),false);totals();await sleep(300);
+  const pb=val(P)==21,db=val(D)==21;
+  if(pb||db){await reveal();finish(pb&&db?'push':pb?'bj':'lose');return}
+  busy=false;mode('play');$('dbl').disabled=pts<total;hud()}
+async function reveal(){
+  const c=D[1],e=cardEl(c,true);e.classList.add('flip');holeEl.replaceWith(e);holeEl=null;beep(600,.08);totals(true);await sleep(450)}
+function hit(){
+  if(busy||phase!='play')return;add(1,drawC());totals();const v=val(P);
+  $('dbl').disabled=true;
+  if(v>21){busy=true;reveal().then(()=>finish('bust'))}
+  else if(v==21)stand()}
+async function stand(){
+  if(busy&&phase!='play')return;if(phase!='play')return;busy=true;phase='dealer';mode('none');
+  await reveal();
+  while(val(D)<17){await sleep(550);add(0,drawC());totals(true)}
+  await sleep(450);const p=val(P),d=val(D);
+  finish(d>21?'dbust':p>d?'win':p<d?'lose':'push')}
+function dbl(){
+  if(busy||phase!='play'||P.length!=2||pts<total)return;
+  pts-=total;total*=2;hud();const c=drawC();add(1,c);totals();
+  if(val(P)>21){busy=true;phase='dealer';reveal().then(()=>finish('bust'))}else stand()}
+function finish(r){
+  phase='end';let pay=0,msg,cls='lose',txt=null;
+  if(r=='bj'){pay=Math.floor(total*2.5);msg='TWENTY-ONE! 🎉';cls='win'}
+  else if(r=='win'){pay=total*2;msg='YOU WIN!';cls='win'}
+  else if(r=='dbust'){pay=total*2;msg='DEALER BUSTS!';cls='win'}
+  else if(r=='push'){pay=total;msg='PUSH - tie';cls=''}
+  else if(r=='bust'){msg='BUST! Over 21'}
+  else msg='Dealer wins';
+  const won=cls=='win';
+  if(won){streak++;const bonus=streak>=2?Math.min(25,5*(streak-1)):0;pay+=bonus;if(bonus)msg+=' +'+bonus+' streak';beep(784,.15);setTimeout(()=>beep(1047,.2),130);
+    const r2=$('ph').getBoundingClientRect();confetti(r2.left+r2.width/2,r2.top,30)}
+  else if(r!='push'){streak=0;sadTone();$('table').classList.add('shake');setTimeout(()=>$('table').classList.remove('shake'),400)}
+  pts+=pay;const net=pay-total;
+  banner(msg+(net?' ('+(net>0?'+':'')+net+')':''),cls);
+  if(net>0)floatText('+'+net,innerWidth/2,innerHeight*.5,'#7dff7d');
+  peak=Math.max(peak,pts);if(peak>getBest('peak',100))setBest('peak',peak);
+  bet=[50,25,10,5].find(v=>v<=Math.min(bet,pts))||5;
+  phase='bet';busy=false;hud();
+  if(pts<5){busy=true;phase='over';setTimeout(()=>over(true),1300)}else mode('bet')}
+function over(broke){
+  const st=peak>=250?3:peak>=150?2:1;busy=false;hud();
+  overlay({em:broke?'💸':'🏁',title:broke?'Out of points!':'Cashed out!',stars:st,lose:broke,win:!broke&&peak>100,html:'Final points <b>'+pts+'</b><br>Peak <b>'+peak+'</b> · Best <b>'+getBest('peak',100)+'</b>',cb:newGame})}
+function newGame(){pts=100;bet=10;streak=0;peak=100;phase='bet';busy=false;P=[];D=[];holeEl=null;$('dh').innerHTML='';$('ph').innerHTML='';$('banner').className='';totals();mode('bet');hud();fit()}
+document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{if(phase!='bet'||busy)return;bet=+c.dataset.b;beep(700,.05);hud()});
+$('deal').onclick=deal;$('hit').onclick=hit;$('stand').onclick=stand;$('dbl').onclick=dbl;
+$('cash').onclick=()=>{if(phase=='bet'&&!busy)over(false)};
+addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(k=='h')hit();else if(k=='s')stand();else if(k=='d'&&phase=='play')dbl();else if(k==' '||k=='enter'){if(phase=='bet'&&$('msg').style.display!='flex')deal()}});
+addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,200));
+newGame();
+overlay({em:'🂡',title:'Twenty-One',btn:'Deal me in ▶',cb:()=>{},html:'Beat the dealer to <b>21</b> without going over.<br>Start with <b>100 points</b>. Hit, Stand or Double.<br>Win streaks earn bonus points!'});
+</script></body></html>

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Card War</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--cw:64px}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
+body{height:100dvh;display:flex;flex-direction:column;font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:radial-gradient(ellipse at 50% 35%,#22a65c,#0d5a30 75%);color:#fff;text-align:center;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+a.home{position:fixed;left:10px;top:10px;z-index:1000;background:#f08a12;color:#fff;border-radius:999px;padding:0 14px;min-height:40px;display:inline-flex;align-items:center;font-weight:700;font-size:17px;text-decoration:none;box-shadow:0 4px 0 #a9560b}
+#top{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 8px;padding:8px 8px 4px 96px;min-height:56px}
+@media(min-width:700px){#top{padding:8px 96px 4px}}
+h1{margin:0;font-size:clamp(20px,3.6vw,34px);text-shadow:0 3px 0 #0b3a78,2px 2px 0 #0b3a78,-2px -2px 0 #0b3a78,2px -2px 0 #0b3a78,-2px 2px 0 #0b3a78}
+@media(max-height:520px){h1{display:none}#top{padding-top:4px;min-height:48px}}
+.pill{background:#0b3a78;color:#fff;border-radius:999px;padding:3px 12px;font-weight:700;font-size:clamp(15px,2.6vw,20px);box-shadow:0 3px 0 #06244d;border:2px solid #ffe14a;white-space:nowrap}
+.pill b{color:#ffe14a}
+.btn,.mute{font:700 16px 'Fredoka','Trebuchet MS',sans-serif;min-height:44px;min-width:44px;padding:0 14px;border:0;border-radius:999px;color:#fff;background:linear-gradient(#4aa8ff,#1670d8);box-shadow:0 4px 0 #0b3a78;cursor:pointer;text-shadow:0 2px 0 #0b3a78}
+.btn:active,.mute:active{transform:translateY(3px);box-shadow:0 1px 0 #0b3a78}
+.btn.g{background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 4px 0 #1c701c;text-shadow:0 2px 0 #1c701c}
+.btn.r{background:linear-gradient(#ff6a5a,#d62a1c);box-shadow:0 4px 0 #8a1209;text-shadow:0 2px 0 #8a1209}
+.btn.o{background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 4px 0 #a9560b;text-shadow:0 2px 0 #a9560b}
+.btn[disabled]{background:#7d8aa0;box-shadow:0 4px 0 #4a5568;text-shadow:none;cursor:default}
+.mute{padding:0 10px;background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 4px 0 #a9560b}
+#stage{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;padding:4px 6px 8px}
+.card{width:var(--cw);height:calc(var(--cw)*1.4);font-size:calc(var(--cw)*.3);position:relative;border-radius:calc(var(--cw)*.1);background:#fff;border:2px solid #1b2a41;box-shadow:0 3px 6px rgba(0,0,0,.45);color:#14161c;font-weight:700;line-height:1;flex:none;font-family:Georgia,'Trebuchet MS',serif;overflow:hidden}
+.card.red{color:#d4101f}
+.card i{font-style:normal}
+.card .c1,.card .c2{position:absolute;text-align:center;line-height:.95;font-size:.9em}
+.card .c1{left:.14em;top:.1em}
+.card .c2{right:.14em;bottom:.1em;transform:rotate(180deg)}
+.card .mid{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.1em;padding-top:.05em}
+.card .mid.f{font-size:1.5em}
+.card.back{background:repeating-linear-gradient(45deg,#d4202f 0 .3em,#9c0f1c .3em .6em);border:calc(var(--cw)*.07) solid #fff;outline:2px solid #1b2a41;outline-offset:calc(var(--cw)*-.07)}
+.card.back *{display:none}
+.card.sel{box-shadow:0 0 0 4px #ffe14a,0 6px 10px rgba(0,0,0,.5);transform:translateY(-8px)}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:60}
+#msg{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(5,25,15,.85);z-index:50;padding:12px}
+#box{background:linear-gradient(#2f8cff,#0b4fb3);border:5px solid #ffe14a;border-radius:28px;padding:16px 26px 20px;box-shadow:0 8px 0 #06244d;max-width:94vw;max-height:96dvh;overflow:auto;animation:pop2 .5s}
+@keyframes pop2{0%{transform:scale(.5)}70%{transform:scale(1.08)}}
+#em{font-size:clamp(46px,12vmin,80px);line-height:1.1}
+#mt{font-size:clamp(26px,6vw,40px);font-weight:700;text-shadow:0 3px 0 #0b3a78}
+#stars{font-size:clamp(34px,9vmin,54px);color:#ffe14a;letter-spacing:4px;text-shadow:0 3px 0 #7a4a00}
+#ms{font-size:clamp(17px,3.4vw,24px);font-weight:700;margin:4px 0;line-height:1.5}
+#ms b{color:#ffe14a}
+#ms .btn{margin:4px}
+#ms .btn.on{background:linear-gradient(#ffd23a,#f0a000);color:#3a2500;text-shadow:none;box-shadow:0 4px 0 #8a5a00}
+button.go{font:700 clamp(20px,5vw,28px) 'Fredoka','Trebuchet MS',sans-serif;margin-top:10px;padding:.4em 1.5em;min-height:48px;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}
+button.go:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
+.fl{position:fixed;font-weight:700;font-size:clamp(22px,4vw,34px);pointer-events:none;z-index:70;text-shadow:0 2px 0 #0b3a78,1px 1px 0 #0b3a78,-1px -1px 0 #0b3a78;animation:fl 1s forwards;white-space:nowrap}
+@keyframes fl{to{transform:translateY(-70px);opacity:0}}
+@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.shake{animation:shake .35s}
+
+:root{--cw:clamp(40px,min(19vw,14dvh),100px)}
+#stage{flex-direction:column;justify-content:space-around;gap:4px}
+.row{display:flex;align-items:center;justify-content:center;gap:clamp(10px,5vw,40px)}
+.deck{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.deck b{background:#0b3a78;border:2px solid #ffe14a;border-radius:999px;padding:1px 12px;font-size:clamp(15px,3vw,20px)}
+.deck.me .card{box-shadow:0 0 0 4px #ffe14a,0 4px 8px rgba(0,0,0,.5)}
+.slot2{min-width:calc(var(--cw)*1.2);min-height:calc(var(--cw)*1.4 + 6px);display:flex;align-items:center;justify-content:center}
+.slot2 .card+.card{margin-left:calc(var(--cw)*-.78)}
+.slot2.cpu .card+.card{margin-left:calc(var(--cw)*-.78)}
+.slot2.win .card:last-child{box-shadow:0 0 0 5px #7dff7d,0 0 24px #7dff7d}
+.slot2.lose .card:last-child{box-shadow:0 0 0 5px #ff5a4a}
+.flip{animation:flip .3s}
+@keyframes flip{from{transform:scaleX(.05) translateY(-30px)}to{transform:none}}
+#vs{font-size:clamp(26px,6vw,44px);font-weight:700;color:#ffe14a;text-shadow:0 3px 0 #7a4a00;min-width:70px}
+#banner{min-height:44px;min-width:200px;display:flex;align-items:center;justify-content:center;padding:0 20px;border-radius:14px;font-size:clamp(19px,4.6vw,28px);font-weight:700;background:#0b3a78;border:3px solid #ffe14a;box-shadow:0 4px 0 #06244d}
+#banner.w{background:linear-gradient(#34c759,#1a8f3a);border-color:#fff}
+#banner.l{background:linear-gradient(#e8423a,#a5120b);border-color:#fff}
+#banner.war{background:linear-gradient(#ff9a1f,#d95a00);border-color:#fff;animation:pop2 .4s}
+#ctl{display:flex;justify-content:center;gap:12px}
+#flipb{font-size:22px;min-width:150px;min-height:54px}
+@media(orientation:landscape) and (max-height:520px){:root{--cw:clamp(34px,min(12vw,17dvh),80px)}#stage{flex-direction:row}#mid{display:flex;flex-direction:column;align-items:center;gap:6px}}
+</style></head><body>
+<a class="home" href="index.html">⌂ Home</a>
+<div id="top"><h1>Card War</h1><span class="pill">Round <b id="rd">0</b></span><span class="pill">Fastest win <b id="bs">-</b></span><button class="mute" id="mute">🔊</button></div>
+<div id="stage">
+<div class="deck" id="cd"><div id="cdc"></div><b id="cn">26</b></div>
+<div id="mid"><div class="row"><div class="slot2 cpu" id="pb"></div><div id="vs">VS</div><div class="slot2" id="pa"></div></div><div class="row" style="margin-top:8px"><div id="banner">Flip a card!</div></div></div>
+<div class="deck me" id="yd"><div id="ydc"></div><b id="yn">26</b></div>
+<div id="ctl"><button class="btn g" id="flipb">⚔ Flip!</button><button class="btn o" id="spd">▶ Manual</button></div>
+</div>
+<canvas id="fx"></canvas>
+<div id="msg"><div id="box"><div id="em"></div><div id="mt"></div><div id="stars"></div><div id="ms"></div><button class="go" id="again">Play</button></div></div>
+<script>
+const GAME="card-war.html";
+const $=id=>document.getElementById(id);
+const RK=['','A','2','3','4','5','6','7','8','9','10','J','Q','K'],SU=['♠','♥','♦','♣'];
+const rnd=n=>Math.floor(Math.random()*n),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+function deck(){const d=[];let id=0;for(let s=0;s<4;s++)for(let r=1;r<=13;r++)d.push({r,s,id:id++});return d}
+const isRed=c=>c.s==1||c.s==2;
+function cardEl(c,up=true){const d=document.createElement('div');d.className='card'+(up?'':' back')+(up&&isRed(c)?' red':'');if(up){const t=RK[c.r]+'<br>'+SU[c.s];d.innerHTML='<i class="c1">'+t+'</i><i class="mid'+(c.r>10?' f':'')+'">'+(c.r>10?RK[c.r]+SU[c.s]:SU[c.s])+'</i><i class="c2">'+t+'</i>'}d.dataset.id=c?c.id:'';return d}
+let muted=false,ac;
+try{muted=localStorage.getItem('cardgames:muted')=='1'}catch(e){}
+function beep(f,d=.12,type='triangle',v=.15){if(muted)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type=type;g.gain.setValueAtTime(v,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+function jingle(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.18),i*120))}
+function sadTone(){[330,262,196].forEach((f,i)=>setTimeout(()=>beep(f,.22,'sawtooth',.1),i*160))}
+(function(){const m=$('mute');if(!m)return;m.textContent=muted?'🔇':'🔊';m.onclick=function(){muted=!muted;this.textContent=muted?'🔇':'🔊';try{localStorage.setItem('cardgames:muted',muted?'1':'0')}catch(e){}beep(600)}})();
+function getBest(k,def=0){try{const v=localStorage.getItem(GAME+':'+k);return v===null?def:+v}catch(e){return def}}
+function setBest(k,v){try{localStorage.setItem(GAME+':'+k,v)}catch(e){}}
+const fx=$('fx'),fc=fx.getContext('2d');let PARTS=[],raf=0,lt=0;
+function fxfit(){fx.width=innerWidth;fx.height=innerHeight}fxfit();addEventListener('resize',fxfit);addEventListener('orientationchange',fxfit);
+function confetti(x,y,n=40){const C=['#ff4a5a','#ffe14a','#4ade5a','#3aa0ff','#ff8bd0','#ff9a1f'];for(let i=0;i<n;i++){const a=Math.random()*6.283,s=150+Math.random()*350;PARTS.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-200,l:1.2+Math.random()*.6,c:C[i%6],r:Math.random()*6,s:5+Math.random()*6})}lt=performance.now();if(!raf)raf=requestAnimationFrame(tick)}
+function tick(t){const dt=Math.min(.05,(t-lt)/1000||0);lt=t;fc.clearRect(0,0,fx.width,fx.height);PARTS.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=700*dt;p.l-=dt;p.r+=dt*8;fc.save();fc.globalAlpha=Math.min(1,p.l*2);fc.fillStyle=p.c;fc.translate(p.x,p.y);fc.rotate(p.r);fc.fillRect(-p.s/2,-p.s/3,p.s,p.s*.6);fc.restore()});PARTS=PARTS.filter(p=>p.l>0&&p.y<fx.height+20);raf=PARTS.length?requestAnimationFrame(tick):0;if(!raf)fc.clearRect(0,0,fx.width,fx.height)}
+function bigConfetti(){for(let i=0;i<6;i++)setTimeout(()=>confetti(innerWidth*(.15+.14*i),innerHeight*.35,40),i*150)}
+function floatText(txt,x,y,color='#ffe14a'){const d=document.createElement('div');d.className='fl';d.textContent=txt;d.style.left=x+'px';d.style.top=y+'px';d.style.color=color;d.style.transform='translateX(-50%)';document.body.appendChild(d);setTimeout(()=>d.remove(),1000)}
+function floatAt(el,txt,color){const r=el.getBoundingClientRect();floatText(txt,r.left+r.width/2,r.top+r.height/2,color)}
+function overlay(o){$('em').textContent=o.em||'';$('mt').textContent=o.title||'';$('stars').textContent=o.stars?'★'.repeat(o.stars)+'☆'.repeat(3-o.stars):'';$('ms').innerHTML=o.html||'';const b=$('again');b.textContent=o.btn||'Play Again';b.onclick=()=>{beep(520);$('msg').style.display='none';o.cb()};$('msg').style.display='flex';if(o.win){jingle();bigConfetti()}else if(o.lose)sadTone()}
+
+let A=[],B=[],busy=false,mode=0,rounds=0,over=false;
+const T=()=>mode==2?110:mode==1?800:900;
+const V=c=>c.r==1?14:c.r;
+function counts(){$('yn').textContent=A.length+' cards';$('cn').textContent='CPU '+B.length+' cards';$('rd').textContent=rounds;
+  ['ydc','cdc'].forEach((id,k)=>{const e=$(id);e.innerHTML='';if((k?B:A).length)e.appendChild(cardEl(null,false))})}
+function banner(t,c){const b=$('banner');b.textContent=t;b.className=c||'';b.style.animation='none';void b.offsetWidth;b.style.animation=''}
+function show(who,c,up=true){const e=cardEl(c,up);e.classList.add('flip');$(who?'pa':'pb').appendChild(e)}
+function stars(){return rounds<=60?3:rounds<=110?2:1}
+async function round(){
+  if(busy||over)return;busy=true;rounds++;
+  $('pa').innerHTML='';$('pb').innerHTML='';$('pa').className='slot2';$('pb').className='slot2 cpu';
+  const pot=[];let res=0;
+  while(true){
+    const a=A.shift(),b=B.shift();pot.push(a,b);show(1,a);show(0,b);beep(500,.08);counts();await sleep(T()*.7);
+    if(V(a)!=V(b)){res=V(a)>V(b)?1:-1;break}
+    banner('⚔ WAR! ⚔','war');beep(220,.3,'sawtooth',.1);$('stage').classList.add('shake');setTimeout(()=>$('stage').classList.remove('shake'),400);
+    if(A.length<4||B.length<4){res=A.length<4?-1:1;if(A.length<4)pot.push(...A.splice(0));else pot.push(...B.splice(0));break}
+    for(let i=0;i<3;i++){pot.push(A.shift(),B.shift());show(1,{r:1,s:0,id:-1},false);show(0,{r:1,s:0,id:-1},false)}
+    counts();await sleep(T()*.8)}
+  const w=res>0?A:B;w.push(...shuffle(pot));
+  $('pa').classList.add(res>0?'win':'lose');$('pb').classList.add(res>0?'lose':'win');
+  if(res>0){banner('You win '+pot.length+' cards!','w');beep(784,.12);setTimeout(()=>beep(1047,.12),100);floatAt($('pa'),'+'+pot.length,'#7dff7d')}
+  else{banner('CPU wins '+pot.length+' cards','l');beep(200,.2,'square',.08)}
+  counts();await sleep(T()*.5);
+  if(!A.length||!B.length||rounds>=300){end();return}
+  busy=false;if(mode)round()}
+function end(){
+  over=true;const win=A.length>B.length,best=getBest('best',0);
+  if(win&&(!best||rounds<best)){setBest('best',rounds);$('bs').textContent=rounds}
+  overlay({em:win?'🏆':'😵',title:win?'You win the war!':'CPU wins the war',stars:win?stars():1,win,lose:!win,html:'Rounds <b>'+rounds+'</b><br>Your cards <b>'+A.length+'</b> · CPU <b>'+B.length+'</b><br>Fastest win <b>'+(getBest('best',0)||'-')+'</b> rounds',cb:newGame})}
+function newGame(){const d=shuffle(deck());A=d.slice(0,26);B=d.slice(26);rounds=0;busy=false;over=false;$('pa').innerHTML='';$('pb').innerHTML='';banner('Flip a card!');$('bs').textContent=getBest('best',0)||'-';counts()}
+$('flipb').onclick=round;$('yd').onclick=round;
+$('spd').onclick=function(){mode=(mode+1)%3;this.textContent=['▶ Manual','⏩ Auto','⚡ Turbo'][mode];beep(500);if(mode&&!busy&&!over)round()};
+addEventListener('keydown',e=>{if(e.key==' '||e.key=='Enter')round()});
+newGame();
+overlay({em:'⚔️',title:'Card War',btn:'Start ▶',cb:()=>{},html:'Flip a card - highest wins both!<br>Tie = <b>WAR</b>: 3 cards down, 1 up.<br>Win all 52 cards. Tap <b>Speed</b> to auto-play!'});
+</script></body></html>

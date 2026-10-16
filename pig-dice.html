@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Pig Dice</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
+body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;color:#fff;text-shadow:0 2px 0 #1b4f86;user-select:none;-webkit-user-select:none;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;height:100dvh}
+.home{position:fixed;left:10px;top:10px;z-index:1000;background:#f08a12;color:#fff;border-radius:999px;padding:6px 14px;text-decoration:none;font-weight:bold;box-shadow:0 3px 0 #a85d00;text-shadow:none}
+#mute{position:fixed;right:10px;top:8px;z-index:1000;font-size:22px;background:#fff;border:0;border-radius:50%;width:44px;height:44px;box-shadow:0 3px 0 #1b4f86;cursor:pointer;padding:0;text-shadow:none}
+.btn{font:inherit;font-size:20px;font-weight:bold;color:#fff;text-shadow:0 2px 0 #1c701c;background:linear-gradient(#5fd35f,#2ea32e);border:3px solid #fff;border-radius:16px;padding:8px 22px;min-height:44px;box-shadow:0 5px 0 #1c701c;cursor:pointer}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
+.btn[disabled]{background:linear-gradient(#b8c4cf,#8a98a6);box-shadow:0 5px 0 #5d6a77;text-shadow:0 2px 0 #5d6a77;cursor:default}
+.btn[disabled]:active{transform:none;box-shadow:0 5px 0 #5d6a77}
+.btn.o{background:linear-gradient(#ffb347,#f08a12);box-shadow:0 5px 0 #a85d00;text-shadow:0 2px 0 #a85d00}.btn.o:active{box-shadow:0 1px 0 #a85d00}
+.btn.r{background:linear-gradient(#ff8a8a,#d63030);box-shadow:0 5px 0 #8f1c1c;text-shadow:0 2px 0 #8f1c1c}.btn.r:active{box-shadow:0 1px 0 #8f1c1c}
+.btn.p{background:linear-gradient(#c59cff,#7b3fe0);box-shadow:0 5px 0 #4a1fa0;text-shadow:0 2px 0 #4a1fa0}.btn.p:active{box-shadow:0 1px 0 #4a1fa0}
+.btn.b{background:linear-gradient(#5fb8ff,#2a7fe0);box-shadow:0 5px 0 #174f95;text-shadow:0 2px 0 #174f95}.btn.b:active{box-shadow:0 1px 0 #174f95}
+#top{padding:52px 8px 0;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;flex:none}
+.pill{background:linear-gradient(#3b86e0,#1b4f86);border:2px solid #fff;border-radius:999px;padding:2px clamp(8px,2.6vw,14px);font-weight:bold;font-size:clamp(13px,3.8vw,19px);box-shadow:0 3px 0 #0f2f57;text-shadow:0 2px 0 #0f2f57;white-space:nowrap}
+.ov{position:fixed;inset:0;background:rgba(15,47,87,.88);display:flex;align-items:center;justify-content:center;z-index:100;padding:48px 12px 12px}
+.card{background:linear-gradient(#fff,#e3f3ff);color:#1b4f86;text-shadow:none;border:5px solid #ffd84a;border-radius:28px;box-shadow:0 10px 0 #0f2f57,0 20px 40px rgba(0,0,0,.35);padding:clamp(14px,4vmin,28px);display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2vmin,12px);text-align:center;width:min(94vw,520px);max-height:calc(100dvh - 60px);overflow-y:auto;animation:cardin .4s cubic-bezier(.2,1.6,.4,1)}
+.card h1{margin:0;font-size:clamp(26px,7.5vmin,42px);color:#e8590c;text-shadow:0 3px 0 #ffd84a}
+.card p{margin:0;font-size:clamp(15px,3.6vmin,19px);line-height:1.35;font-weight:bold}
+.card .btn{width:100%}
+.stars{font-size:clamp(28px,8vmin,44px);letter-spacing:4px}.stars:empty{display:none}
+@keyframes cardin{0%{transform:scale(.6)}100%{transform:scale(1)}}
+.hide{display:none!important}
+@media (max-height:480px){#top{padding-top:6px}.ov{padding:8px 12px}.card{flex-direction:row;flex-wrap:wrap;justify-content:center;max-height:calc(100dvh - 16px);width:min(94vw,640px)}.card h1,.card p,.stars{flex:1 1 100%}.card .btn{width:auto;flex:1 1 auto;padding:6px 14px;font-size:16px}}
+.shake{animation:shk .4s}@keyframes shk{20%{transform:translateX(-9px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+.flt{position:fixed;pointer-events:none;z-index:150;font-weight:bold;font-size:26px;text-shadow:0 2px 0 #0f2f57,0 0 6px #0f2f57;white-space:nowrap}
+/* 3D dice */
+.die{--ds:64px;width:var(--ds);height:var(--ds);perspective:calc(var(--ds)*5);position:relative;flex:none;cursor:pointer;text-shadow:none}
+.tilt{width:100%;height:100%;transform-style:preserve-3d;transform:rotateX(-20deg) rotateY(24deg)}
+.cube{width:100%;height:100%;position:relative;transform-style:preserve-3d}
+.face{position:absolute;inset:0;background:linear-gradient(145deg,#fff,#d9e4f3);border:2px solid #8aa4cc;border-radius:16%;display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);padding:13%;box-shadow:inset 0 0 8px rgba(40,70,120,.35)}
+.f1{transform:translateZ(calc(var(--ds)/2))}.f6{transform:rotateY(180deg) translateZ(calc(var(--ds)/2))}
+.f2{transform:rotateY(90deg) translateZ(calc(var(--ds)/2))}.f5{transform:rotateY(-90deg) translateZ(calc(var(--ds)/2))}
+.f3{transform:rotateX(90deg) translateZ(calc(var(--ds)/2))}.f4{transform:rotateX(-90deg) translateZ(calc(var(--ds)/2))}
+.pip{border-radius:50%;margin:14%;background:radial-gradient(circle at 35% 30%,#4a4a4a,#0b0b0b)}
+.f1 .pip{background:radial-gradient(circle at 35% 30%,#ff7b7b,#c41414)}
+.die.red .face{background:linear-gradient(145deg,#ff7a7a,#c91c1c);border-color:#7a0f0f}.die.red .pip{background:radial-gradient(circle at 35% 30%,#fff,#e8e8e8)}
+.die.gold .face{background:linear-gradient(145deg,#ffe58a,#f0a810);border-color:#a56d00}
+.die.hop{animation:hop .9s}
+@keyframes hop{0%{transform:translateY(0)}30%{transform:translateY(-34%) scale(1.08)}60%{transform:translateY(0)}78%{transform:translateY(-9%)}100%{transform:translateY(0)}}
+.die::after{content:'';position:absolute;left:12%;right:12%;bottom:-9%;height:12%;border-radius:50%;background:rgba(10,30,60,.35);z-index:-1}
+
+body{background:linear-gradient(#ff7fb0,#ffdcec) fixed}
+#main{flex:1;min-height:0;width:100%;max-width:640px;display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;gap:8px;padding:4px 10px 10px}
+#cards{display:flex;gap:10px;width:100%}
+.pc{flex:1;background:#fff;color:#1b4f86;text-shadow:none;border:4px solid #1b4f86;border-radius:20px;box-shadow:0 6px 0 #0f2f57;padding:6px 8px 8px;text-align:center;transition:transform .2s}
+.pc.on{border-color:#ffb300;box-shadow:0 6px 0 #a56d00,0 0 0 4px #ffe58a;transform:scale(1.04)}
+.pc .nm{font-weight:bold;font-size:clamp(14px,4vw,19px)}
+.pc .sc{font-weight:bold;font-size:clamp(34px,10vmin,56px);line-height:1;color:#e8590c}
+.pc .bar{height:14px;border-radius:9px;background:#dbe7f5;border:2px solid #1b4f86;overflow:hidden;margin-top:4px}
+.pc .bar i{display:block;height:100%;width:0;background:linear-gradient(#ffd84a,#f08a12);transition:width .5s}
+#felt{background:radial-gradient(#2fbf74,#16784a);border:5px solid #0a3a22;border-radius:28px;box-shadow:0 8px 0 #0a3a22,inset 0 4px 14px rgba(0,0,0,.4);width:100%;padding:clamp(12px,3vmin,24px) 10px 12px;display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2vmin,14px)}
+#dice{display:flex;gap:clamp(14px,5vw,30px);align-items:center;justify-content:center;min-height:calc(var(--dsz)*1.3);--dsz:clamp(60px,15vmin,100px)}
+#tt{background:#fff;color:#1b4f86;text-shadow:none;font-weight:bold;border:4px solid #ffd84a;border-radius:16px;padding:2px 18px;font-size:clamp(18px,5vw,26px);box-shadow:0 4px 0 #0a3a22;white-space:nowrap}
+#tt b{color:#e8590c;font-size:1.25em}
+#msg{background:#1b4f86;color:#fff;font-weight:bold;border:3px solid #fff;border-radius:14px;padding:3px 12px;font-size:clamp(14px,3.8vw,18px);min-height:34px;display:flex;align-items:center;text-align:center;text-shadow:0 2px 0 #0f2f57}
+#btns{display:flex;gap:12px;width:100%}
+#btns .btn{flex:1;font-size:clamp(20px,5.5vw,28px);min-height:56px}
+@media (max-height:480px){#main{max-width:none;flex-direction:row;flex-wrap:wrap;justify-content:center;align-content:center;gap:6px}#cards{width:100%}.pc{padding:2px 6px 4px}.pc .sc{font-size:30px}#felt{width:min(60%,420px);padding:8px;flex-direction:row;flex-wrap:wrap;justify-content:center}#dice{--dsz:50px}#btns{width:34%;flex-direction:column}#btns .btn{min-height:44px;font-size:18px;padding:4px}#msg{min-height:26px;font-size:13px}}
+</style></head><body>
+<a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
+<div id="top"><div class="pill" id="pMode">🐷 Pig Dice</div><div class="pill">🏆 Wins <b id="bw">0</b></div><div class="pill">⚡ Fewest turns <b id="bs">-</b></div></div>
+<div id="main"><div id="cards"></div>
+<div id="felt"><div id="dice"></div><div id="tt">Turn total: <b id="tv">0</b></div><div id="msg"></div></div>
+<div id="btns"><button class="btn" id="roll">🎲 ROLL</button><button class="btn o" id="hold">🛑 HOLD</button></div></div>
+<div class="ov" id="ov"><div class="card"><h1 id="ovT">🐷 Pig Dice</h1><div class="stars" id="ovS"></div><p id="ovP"></p><div id="ovB" style="display:contents"></div></div></div>
+<script>
+const KEY='pig-dice';
+const $=s=>document.querySelector(s),R=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let muted=false;try{muted=localStorage.getItem(KEY+'_mute')==='1'}catch(e){}
+let AC;function beep(f,d=.1,t='sine',v=.12){if(muted)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
+function jingle(a,t='triangle'){a.forEach((f,i)=>setTimeout(()=>beep(f,.14,t),i*90))}
+function load(k){try{return +localStorage.getItem(KEY+'_'+k)||0}catch(e){return 0}}
+function save(k,v){try{localStorage.setItem(KEY+'_'+k,v)}catch(e){}}
+function burst(x,y,list,n=12){for(let i=0;i<n;i++){const s=document.createElement('div');s.textContent=list[i%list.length];s.style.cssText=`position:fixed;left:${x}px;top:${y}px;font-size:${14+Math.random()*16}px;pointer-events:none;z-index:150;text-shadow:none`;document.body.appendChild(s);const a=Math.random()*6.28,d=40+Math.random()*90;s.animate([{transform:'translate(-50%,-50%) scale(1)',opacity:1},{transform:`translate(calc(-50% + ${Math.cos(a)*d}px),calc(-50% + ${Math.sin(a)*d+30}px)) scale(.3)`,opacity:0}],{duration:600+Math.random()*400,easing:'ease-out'}).onfinish=()=>s.remove()}}
+function burstEl(el,list,n){const r=el.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,list,n)}
+function floatText(x,y,txt,col='#ffd84a'){const s=document.createElement('div');s.className='flt';s.textContent=txt;s.style.cssText+=`left:${x}px;top:${y}px;color:${col}`;document.body.appendChild(s);s.animate([{transform:'translate(-50%,0) scale(.6)',opacity:1},{transform:'translate(-50%,-60px) scale(1.15)',opacity:1,offset:.7},{transform:'translate(-50%,-80px) scale(1)',opacity:0}],{duration:1000,easing:'ease-out'}).onfinish=()=>s.remove()}
+function floatEl(el,txt,col){const r=el.getBoundingClientRect();floatText(r.left+r.width/2,r.top+r.height/3,txt,col)}
+function shake(el){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake')}
+(function(){const m=$('#mute');m.textContent=muted?'🔇':'🔊';m.onclick=()=>{muted=!muted;save('mute',muted?1:0);try{localStorage.setItem(KEY+'_mute',muted?'1':'0')}catch(e){}m.textContent=muted?'🔇':'🔊';beep(600,.08)}})();
+document.addEventListener('pointerdown',()=>{try{if(AC&&AC.state==='suspended')AC.resume()}catch(e){}});
+function ov(title,stars,html,btns){$('#ovT').textContent=title;$('#ovS').textContent=stars||'';$('#ovP').innerHTML=html||'';const b=$('#ovB');b.innerHTML='';btns.forEach(([l,c,f])=>{const e=document.createElement('button');e.className='btn '+(c||'');e.innerHTML=l;e.onclick=()=>{beep(520,.06);f()};b.appendChild(e)});$('#ov').classList.remove('hide')}
+function ovHide(){$('#ov').classList.add('hide')}
+const PIPS=[null,[4],[0,8],[0,4,8],[0,2,6,8],[0,2,4,6,8],[0,2,3,5,6,8]];
+const ROT=[null,[0,0],[0,-90],[-90,0],[90,0],[0,90],[0,180]];
+function mkDie(parent,size,cls){const el=document.createElement('div');el.className='die'+(cls?' '+cls:'');el.style.setProperty('--ds',size);let h='<div class="tilt"><div class="cube">';for(let f=1;f<=6;f++){h+='<div class="face f'+f+'">';for(let i=0;i<9;i++)h+=PIPS[f].includes(i)?'<span class="pip" style="grid-area:'+(Math.floor(i/3)+1)+'/'+(i%3+1)+'"></span>':'';h+='</div>'}el.innerHTML=h+'</div></div>';parent.appendChild(el);const cube=el.querySelector('.cube');
+const d={el,v:1,kx:0,ky:0,show(v,dur=900){d.v=v;const r=ROT[v];if(dur){d.kx+=R(1,2);d.ky+=R(1,3)}cube.style.transition=dur?'transform '+dur+'ms cubic-bezier(.2,.75,.3,1)':'none';cube.style.transform='rotateX('+(r[0]+d.kx*360)+'deg) rotateY('+(r[1]+d.ky*360)+'deg)';if(dur){el.classList.remove('hop');void el.offsetWidth;el.classList.add('hop');for(let i=1;i<5;i++)setTimeout(()=>beep(220+R(0,200),.04,'square',.05),i*dur/6)}return dur?sleep(dur):Promise.resolve()}};d.show(1,0);return d}
+function fitBoard(cv,main,sideLand,sideBot){const W=innerWidth,H=innerHeight,tp=$('#top').offsetHeight,land=W/H>1.15;let s=land?Math.min(H-tp-14,W-sideLand-24):Math.min(W-14,H-tp-sideBot-14);s=Math.max(160,Math.floor(s||0));cv.style.width=cv.style.height=s+'px';main.style.flexDirection=land?'row':'column';return s}
+const CANCEL='cancel';
+
+let S=[0,0],names=['You','CPU'],ai=[false,true],cur=0,turn=0,over=true,busy=false,lvl='n',two=false,mode='cpu',myTurns=0,gen=0,wins=0,bestT=0,D=[];
+function mkDice(){const box=$('#dice');box.innerHTML='';D=[];for(let i=0;i<(two?2:1);i++)D.push(mkDie(box,'var(--dsz)',i?'gold':''))}
+function msg(t){$('#msg').textContent=t}
+function ui(){$('#cards').innerHTML=[0,1].map(i=>'<div class="pc'+(i===cur&&!over?' on':'')+'"><div class="nm">'+(ai[i]?'🤖 ':'🧑 ')+names[i]+'</div><div class="sc">'+S[i]+'</div><div class="bar"><i style="width:'+Math.min(100,S[i])+'%"></i></div></div>').join('');
+$('#tv').textContent=turn;const my=!over&&!busy&&!ai[cur];$('#roll').disabled=!my;$('#hold').disabled=!my||turn===0;$('#bw').textContent=wins;$('#bs').textContent=bestT||'-'}
+async function doRoll(){const g=gen;busy=true;ui();const vs=D.map(()=>R(1,6));await Promise.all(D.map((d,i)=>d.show(vs[i],700+i*120)));if(g!==gen)return;
+const ones=vs.filter(v=>v===1).length;
+if(ones){beep(130,.35,'sawtooth');shake($('#felt'));if(two&&ones===2){S[cur]=0;msg('🐍🐍 SNAKE EYES! Score wiped to 0!');floatEl($('#tt'),'💥 -ALL','#ff8a8a')}else{msg('🐷 PIG OUT! Rolled a 1 - turn total lost');floatEl($('#tt'),'-'+turn,'#ff8a8a')}turn=0;ui();await sleep(1300);if(g!==gen)return;endTurn()}
+else{const s=vs.reduce((a,b)=>a+b,0);turn+=s;beep(500+Math.min(turn,60)*8,.1,'triangle');floatEl($('#tt'),'+'+s,'#ffd84a');msg(turn>=20?'Nice pile! Hold or push your luck?':'Roll again or Hold?');busy=false;ui()}}
+function endTurn(){if(!ai[cur])myTurns++;cur=1-cur;turn=0;busy=false;ui();msg(ai[cur]?'🤖 '+names[cur]+' is thinking...':names[cur]+', your turn! Roll!');if(ai[cur])aiTurn()}
+function doHold(){if(over||busy||turn===0)return;S[cur]+=turn;floatEl($('#cards').children[cur],'+'+turn,'#7dff7d');jingle([523,659,784]);turn=0;ui();
+if(S[cur]>=100)return win(cur);endTurn()}
+function aiLimit(){const me=S[cur],opp=S[1-cur];if(lvl==='e')return 12;if(lvl==='n')return 20;let b=25-(me-opp)/6;if(opp>=75)b=Math.max(b,100-me);if(me>=70)b=Math.min(b,100-me);return Math.max(12,Math.min(b,38))}
+async function aiTurn(){const g=gen;busy=true;ui();await sleep(900);
+while(g===gen&&!over){if(turn>0&&(S[cur]+turn>=100||turn>=aiLimit())){msg('🤖 Holds '+turn);await sleep(700);if(g!==gen)return;busy=false;doHold();return}
+const who=cur;await doRoll();if(g!==gen||cur!==who)return;busy=true;await sleep(650)}}
+function win(w){over=true;busy=false;ui();let title,stars,html;
+if(mode==='pp'){title='🏆 '+names[w]+' wins!';stars='⭐⭐⭐';html=names[0]+' <b>'+S[0]+'</b> - '+names[1]+' <b>'+S[1]+'</b>'}
+else if(w===0){title='🏆 You win!';stars=S[1]<60?'⭐⭐⭐':'⭐⭐';wins++;save('wins',wins);html='You: <b>'+S[0]+'</b> - CPU: <b>'+S[1]+'</b><br>Won in <b>'+myTurns+'</b> turns';if(!bestT||myTurns<bestT){bestT=myTurns;save('bestT',bestT);html+='<br>🌟 New fastest win!'}}
+else{title='🤖 CPU wins';stars=S[0]>=70?'⭐⭐':'⭐';html='You: <b>'+S[0]+'</b> - CPU: <b>'+S[1]+'</b><br>So close - rematch?'}
+jingle(w===0||mode==='pp'?[392,523,659,784,1047]:[392,330,262]);if(w===0||mode==='pp')burst(innerWidth/2,innerHeight/3,['🐷','⭐','🎉','✨'],24);
+setTimeout(()=>ov(title,stars,html,[['▶ Play Again','',()=>start(mode,lvl)],['🏠 Menu','o',menu]]),900)}
+function start(m,l){gen++;mode=m;lvl=l||lvl;S=[0,0];cur=0;turn=0;over=false;busy=false;myTurns=0;names=m==='pp'?['P1','P2']:['You','CPU'];ai=[false,m!=='pp'];wins=load('wins');bestT=load('bestT');mkDice();ovHide();
+$('#pMode').textContent=(two?'🎲🎲 ':'🎲 ')+(m==='pp'?'Pass & Play':lvl==='e'?'Easy CPU':lvl==='n'?'Normal CPU':'Hard CPU');ui();msg('First to 100 wins! Roll to start.')}
+function menu(){gen++;over=true;ui();ov('🐷 Pig Dice','','Roll the die and pile up points - but roll a <b>1</b> and you lose the pile! <b>HOLD</b> to bank it. First to <b>100</b> wins.',[['🤖 vs Easy CPU','',()=>start('cpu','e')],['🤖 vs Normal CPU','b',()=>start('cpu','n')],['🤖 vs Hard CPU','r',()=>start('cpu','h')],['👫 Pass &amp; Play','p',()=>start('pp')],[two?'🎲🎲 Big Pig: ON (2 dice, double 1s wipe score)':'🎲 One die (tap for Big Pig 2-dice mode)','o',()=>{two=!two;menu()}]])}
+$('#roll').onclick=()=>{if(!over&&!busy&&!ai[cur])doRoll()};$('#hold').onclick=()=>{if(!ai[cur])doHold()};
+addEventListener('keydown',e=>{if(e.key===' '||e.key==='r'||e.key==='Enter'){e.preventDefault();if(!over&&!busy&&!ai[cur])doRoll()}else if(e.key==='h'&&!ai[cur])doHold()});
+wins=load('wins');bestT=load('bestT');mkDice();menu();
+</script></body></html>

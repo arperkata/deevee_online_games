@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Candy Cascade Slots</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--b1:#6a1b9a;--b2:#ff5fb0;--f1:#ff8fd0;--f2:#c2185b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;color:#fff;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+body{background:radial-gradient(ellipse at 50% 0%,var(--b2),var(--b1) 75%)}
+.home{position:fixed;left:10px;top:10px;z-index:1000;background:#f08a12;color:#fff;border-radius:999px;padding:8px 14px;font-weight:700;text-decoration:none;font-size:15px;box-shadow:0 3px 0 #a85a00;line-height:20px}
+#app{height:100dvh;display:flex;flex-direction:column;padding:50px 8px 4px;gap:6px}
+header{display:flex;flex-direction:column;align-items:center;gap:4px}
+h1{margin:0;font-size:clamp(20px,5vw,34px);text-shadow:0 3px 0 #1b4f86,0 0 10px #000;letter-spacing:1px}
+.hud{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.pill{background:#1b4f86;border:3px solid #0d2f57;border-radius:999px;padding:3px 12px;font-size:clamp(14px,3.6vw,20px);font-weight:700;box-shadow:0 3px 0 #0d2f57;white-space:nowrap}
+.pill b{color:#ffe44d}
+.stage{flex:1;min-height:0;display:flex;flex-direction:column;gap:6px}
+.machine{flex:1;min-height:0;min-width:0;display:flex;align-items:center;justify-content:center}
+.frame{position:relative;padding:8px;border-radius:26px;background:linear-gradient(180deg,var(--f1),var(--f2));box-shadow:0 8px 0 rgba(0,0,0,.45),0 0 28px rgba(255,255,255,.25);border:4px solid #fff4b8}
+canvas#cv{display:block;border-radius:18px;background:#0b1d44;touch-action:none}
+#fx{position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:500}
+.banner{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(0);background:linear-gradient(#ff5a5a,#c4151c);border:5px solid #ffe44d;border-radius:24px;padding:8px 24px;font-size:clamp(26px,7vw,52px);font-weight:900;color:#fff;text-shadow:0 3px 0 #7a0a10;box-shadow:0 8px 0 #7a0a10;white-space:nowrap;z-index:5;pointer-events:none}
+.banner.show{animation:pop 1.4s ease-out forwards}
+@keyframes pop{0%{transform:translate(-50%,-50%) scale(0) rotate(-8deg)}15%{transform:translate(-50%,-50%) scale(1.25) rotate(3deg)}30%{transform:translate(-50%,-50%) scale(1) rotate(0)}85%{transform:translate(-50%,-50%) scale(1)}100%{transform:translate(-50%,-50%) scale(0)}}
+.controls{display:flex;flex-direction:column;align-items:center;gap:6px}
+.msg{min-height:26px;font-size:clamp(15px,3.6vw,22px);font-weight:700;text-align:center;background:#1b4f86;border-radius:14px;padding:3px 14px;border:3px solid #0d2f57;max-width:100%}
+.ctl{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+button{font:inherit;font-weight:800;color:#fff;border:0;border-radius:16px;min-height:46px;min-width:46px;padding:6px 16px;font-size:18px;cursor:pointer;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;text-shadow:0 2px 0 #1c701c}
+button:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
+button.blue{background:linear-gradient(#4aa8ff,#1f6fd1);box-shadow:0 5px 0 #124a96;text-shadow:0 2px 0 #124a96}
+button.blue:active{box-shadow:0 1px 0 #124a96}
+button.gray{background:linear-gradient(#8a9bb5,#5d6f8c);box-shadow:0 5px 0 #3b4a63}
+#spin{min-width:150px;min-height:58px;font-size:28px;letter-spacing:1px}
+#spin.go{animation:pulse 1s infinite}
+@keyframes pulse{50%{transform:scale(1.07)}}
+.bet{display:flex;align-items:center;gap:6px;background:#1b4f86;border:3px solid #0d2f57;border-radius:18px;padding:4px 8px}
+.bet span{font-size:20px;font-weight:800;min-width:92px;text-align:center}
+.bet span i{display:block;font-style:normal;font-size:11px;color:#bfe3ff;line-height:10px}
+.note{text-align:center;font-size:clamp(11px,2.8vw,14px);font-weight:700;background:#0d2f57;border-radius:999px;padding:2px 12px;align-self:center;color:#fff}
+.ov{position:fixed;inset:0;z-index:900;background:rgba(6,14,36,.88);display:flex;align-items:center;justify-content:center;padding:10px}
+.card{background:linear-gradient(#2a6fd0,#14407a);border:5px solid #ffe44d;border-radius:26px;padding:16px 18px;max-width:560px;width:100%;max-height:94dvh;overflow:auto;text-align:center;box-shadow:0 10px 0 #0a2550;animation:cardin .35s ease-out}
+@keyframes cardin{from{transform:scale(.6)}to{transform:scale(1)}}
+.card h2{margin:4px 0 6px;font-size:30px;text-shadow:0 3px 0 #0a2550}
+.card p{margin:6px 0;font-size:17px;font-weight:600}
+.big-e{font-size:68px;line-height:1.1}
+.card table{width:100%;border-collapse:collapse;text-align:left;font-size:16px;font-weight:700}
+.card td{padding:4px 6px;border-bottom:2px solid #0a2550}
+.card td.e{font-size:30px;width:46px;text-align:center}
+.card td b{color:#ffe44d}
+.stars{font-size:46px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0}
+.bub{aspect-ratio:1;border-radius:50%;border:4px solid #fff;background:radial-gradient(circle at 30% 28%,#fff 0,#8fe3ff 18%,#1fa4e8 70%,#0b6fb5);font-size:clamp(14px,4vw,22px);font-weight:900;color:#fff;box-shadow:0 5px 0 #08508a;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;min-height:0}
+.bub.open{background:#ffe44d;color:#7a3b00;box-shadow:0 5px 0 #b38a00;text-shadow:none}
+.bub.rest{background:#5d6f8c;color:#fff;box-shadow:none;border-color:#3b4a63}
+@media (min-width:700px){#app{padding:8px 12px 4px}header{flex-direction:row;justify-content:space-between;padding-left:110px;padding-right:110px}}
+@media (max-height:520px){h1{display:none}#app{padding-top:8px;gap:4px}header{padding-left:100px;justify-content:flex-start}.pill{padding:1px 10px}}
+@media (orientation:landscape) and (max-height:520px){.stage{flex-direction:row;align-items:stretch}.controls{width:210px;justify-content:center}.ctl{flex-direction:column}#spin{min-height:52px;font-size:24px}.card{padding:8px 14px}.big-e{font-size:40px}.card h2{font-size:22px}}
+@media (max-width:520px){.ctl{display:grid;grid-template-columns:auto auto;justify-content:center}#spin{grid-column:1/3;width:100%}}
+</style></head><body>
+<a class="home" href="index.html">&#8962; Home</a>
+<div id="app">
+<header><h1>🍭 Candy Cascade Slots</h1>
+<div class="hud"><div class="pill">&#129689; <b id="coins">0</b></div><div class="pill">Win <b id="win">0</b></div><div class="pill" id="fsp" hidden>&#127873; <b id="fsn"></b></div></div></header>
+<main class="stage">
+<div class="machine" id="mach"><div class="frame"><canvas id="cv"></canvas><div class="banner" id="banner"></div></div></div>
+<div class="controls"><div class="msg" id="msg">Pick your bet and SPIN!</div>
+<div class="ctl"><button id="spin">SPIN</button>
+<div class="bet"><button class="blue" id="bm" aria-label="Lower bet">&minus;</button><span id="betv">20<i>BET</i></span><button class="blue" id="bp" aria-label="Raise bet">+</button></div>
+<div style="display:flex;gap:8px"><button class="blue" id="pay">&#128203; Pays</button><button class="gray" id="snd" aria-label="Sound">&#128266;</button></div></div></div>
+</main>
+<div class="note">Just for fun - no real money, no purchases</div>
+</div>
+<canvas id="fx"></canvas>
+<div class="ov" id="ov" hidden><div class="card"><div id="ovc"></div><button id="ovb" style="margin-top:10px;min-width:180px;font-size:22px">OK</button></div></div>
+<script>
+(function(){
+'use strict';
+const CFG={"title":"Candy Cascade Slots","emoji":"🍭","cols":5,"lines":[[1,1,1,1,1],[0,0,0,0,0],[2,2,2,2,2],[0,1,2,1,0],[2,1,0,1,2],[0,0,1,2,2],[2,2,1,0,0],[1,0,0,0,1],[1,2,2,2,1],[0,1,0,1,0]],"seed":23,"theme":["#6a1b9a","#ff5fb0","#ff8fd0","#c2185b"],"intro":"Sweet cascades! Winning candies pop and new ones tumble down, and every cascade raises your multiplier up to x5.","syms":[{"id":"gum","e":"🍬","c1":"#bfe3ff","c2":"#4aa8ff"},{"id":"pop","e":"🍭","c1":"#ffc0e0","c2":"#ff4fa0"},{"id":"donut","e":"🍩","c1":"#ffe0b0","c2":"#ff9f43"},{"id":"cup","e":"🧁","c1":"#e9c8ff","c2":"#b266ff"},{"id":"cake","e":"🍰","c1":"#ffd0d0","c2":"#ff5d73"},{"id":"bday","e":"🎂","c1":"#fff0a0","c2":"#ffb700"},{"id":"wild","e":"🌈","c1":"#ffe44d","c2":"#ff9a00","tag":"WILD"},{"id":"gift","e":"🎁","c1":"#d98bff","c2":"#7b2ff7","tag":"SCATTER"}],"weights":{"gum":8,"pop":7,"donut":6,"cup":5,"cake":4,"bday":3,"wild":2,"gift":2},"wild":"wild","scatter":"gift","wildReels":[1,2,3],"cascade":{"cap":5},"pay":{"gum":{"3":2,"4":5.5,"5":19},"pop":{"3":3,"4":7.5,"5":23.5},"donut":{"3":4,"4":11.5,"5":37.5},"cup":{"3":5.5,"4":19,"5":56.5},"cake":{"3":9.5,"4":28,"5":94},"bday":{"3":14,"4":56.5,"5":235},"wild":{"3":19,"4":75,"5":282}},"scatterPay":{"3":2,"4":10,"5":50},"fs":{"award":{"3":8,"4":12,"5":20},"mode":"flat","mult":1,"retrig":false},"wildText":"rainbow substitutes for every candy (not the gift).","scatterText":"3+ gifts anywhere pay and start FREE SPINS (8 / 12 / 20).","featureText":"Cascades: winning candies disappear, new ones tumble in, and the multiplier grows x1 to x5 with each cascade.","file":"candy-slots.html","_s":1};
+const KEY=CFG.file,COLS=CFG.cols,ROWS=3,M=12,CW=118,CH=118,W=COLS*CW+M*2,H=ROWS*CH+M*2;
+const BETS=[20,50,100,200,500],NL=CFG.lines.length;
+const SYM={};CFG.syms.forEach(s=>{SYM[s.id]=s;});
+const $=id=>document.getElementById(id);
+const rnd=()=>Math.random();
+/* ---------- weighted reel strips ---------- */
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function buildStrips(){
+ const out=[];
+ for(let c=0;c<COLS;c++){
+  const r=mulberry(CFG.seed+c*7919),arr=[];
+  for(const id in CFG.weights){
+   if(id===CFG.wild&&CFG.wildReels&&CFG.wildReels.indexOf(c)<0)continue;
+   for(let k=0;k<CFG.weights[id];k++)arr.push(id);
+  }
+  for(let i=arr.length-1;i>0;i--){const j=Math.floor(r()*(i+1));const t=arr[i];arr[i]=arr[j];arr[j]=t;}
+  for(let i=1;i<arr.length;i++){ // spread out neighbours
+   if(arr[i]===arr[i-1]){for(let j=i+1;j<arr.length;j++){if(arr[j]!==arr[i-1]&&arr[j]!==arr[i+1]){const t=arr[i];arr[i]=arr[j];arr[j]=t;break;}}}
+  }
+  out.push(arr);
+ }
+ return out;
+}
+const strips=buildStrips();
+const symAt=(c,k)=>{const s=strips[c];return s[((k%s.length)+s.length)%s.length];};
+/* ---------- pure game logic ---------- */
+function evalLines(g){
+ const wins=[];
+ CFG.lines.forEach((ln,li)=>{
+  const row=[];for(let c=0;c<COLS;c++)row.push(g[c][ln[c]]);
+  let i=0;while(i<COLS&&row[i]===CFG.wild)i++;
+  const wildRun=i;let sym=null,n=0;
+  if(i<COLS&&row[i]!==CFG.scatter){sym=row[i];n=i;for(let c=i;c<COLS;c++){if(row[c]===sym||row[c]===CFG.wild)n++;else break;}}
+  let best=0,bs=null,bn=0;
+  if(sym&&CFG.pay[sym]&&CFG.pay[sym][n]){best=CFG.pay[sym][n];bs=sym;bn=n;}
+  if(CFG.wild&&wildRun>0&&CFG.pay[CFG.wild]&&CFG.pay[CFG.wild][wildRun]>best){best=CFG.pay[CFG.wild][wildRun];bs=CFG.wild;bn=wildRun;}
+  if(best>0)wins.push({line:li,sym:bs,n:bn,mult:best,cells:ln.slice(0,bn).map((r,c)=>[c,r])});
+ });
+ return wins;
+}
+const cp=g=>g.map(c=>c.slice());
+function computeSpin(bet,m){
+ const stops=strips.map(s=>Math.floor(rnd()*s.length));
+ let grid=stops.map((p,c)=>[symAt(c,p),symAt(c,p+1),symAt(c,p+2)]);
+ const grid0=cp(grid),expand=[];
+ if(CFG.expandWild){for(let c=1;c<COLS-1;c++){if(grid[c].indexOf(CFG.wild)>=0){expand.push(c);grid[c]=grid[c].map(s=>s===CFG.scatter?s:CFG.wild);}}}
+ const lineBet=bet/NL,steps=[];let total=0,k=0;
+ while(k<14){
+  const wins=evalLines(grid);if(!wins.length)break;
+  const sm=CFG.cascade?Math.min(k+1,CFG.cascade.cap):1;
+  let amt=0;wins.forEach(w=>{amt+=w.mult*lineBet;});amt=Math.round(amt*sm*m);
+  const st={wins,amt,sm};
+  if(CFG.cascade){
+   const rem=[],keys={};wins.forEach(w=>w.cells.forEach(([c,r])=>{if(!keys[c+','+r]){keys[c+','+r]=1;rem.push(c+','+r);}}));
+   st.removed=rem;
+   grid=grid.map((col,c)=>{const sv=col.filter((s,r)=>!keys[c+','+r]);const fill=[];for(let i=col.length-sv.length;i>0;i--)fill.push(symAt(c,Math.floor(rnd()*strips[c].length)));return fill.concat(sv);});
+   st.next=cp(grid);
+  }
+  steps.push(st);total+=amt;k++;if(!CFG.cascade)break;
+ }
+ let sc=0;grid.forEach(col=>col.forEach(s=>{if(s===CFG.scatter)sc++;}));
+ const scWin=Math.round((CFG.scatterPay[Math.min(sc,COLS)]||0)*bet*m);
+ const fsAward=(CFG.fs&&sc>=3)?(CFG.fs.award[Math.min(sc,COLS)]||CFG.fs.award[3]):0;
+ return{stops,grid0,expand,steps,grid,scCount:sc,scWin,fsAward,pick:!!(CFG.pick&&sc>=3),total:total+scWin};
+}
+const fsNext=(m,won)=>CFG.fs&&CFG.fs.mode==='grow'?(won?Math.min(CFG.fs.cap,m+1):m):m;
+const fsStart=()=>CFG.fs?(CFG.fs.mode==='grow'?1:CFG.fs.mult):1;
+function drawPrize(){const P=CFG.pick.prizes;let t=0;P.forEach(p=>{t+=p[1];});let x=rnd()*t;for(const p of P){x-=p[1];if(x<0)return p[0];}return P[0][0];}
+function simulate(n,bet){
+ bet=bet||100;let tot=0,hits=0,fsn=0,max=0;
+ for(let i=0;i<n;i++){
+  const r=computeSpin(bet,1);let w=r.total;if(w>0)hits++;
+  if(r.pick){let p=0;for(let k=0;k<CFG.pick.picks;k++)p+=drawPrize();w+=p*bet;}
+  if(r.fsAward){fsn++;let left=r.fsAward,m=fsStart(),g=0;
+   while(left>0&&g++<400){left--;const q=computeSpin(bet,m);w+=q.total;if(CFG.fs.retrig&&q.fsAward)left+=q.fsAward;
+    if(q.pick){let p=0;for(let k=0;k<CFG.pick.picks;k++)p+=drawPrize();w+=p*bet;}
+    m=fsNext(m,q.total>0);}}
+  tot+=w;if(w>max)max=w;
+ }
+ return{rtp:tot/(n*bet),hit:hits/n,fsFreq:fsn/n,max:max/bet};
+}
+window.SLOT={CFG,evalLines,computeSpin,simulate,strips,fsNext};
+/* ---------- state ---------- */
+let coins=1000,bi=0,best=0,phase='idle',muted=false;
+let fs={left:0,mult:1,total:0,bet:0,on:false};
+try{const c=parseInt(localStorage.getItem(KEY+':coins'),10);if(c>=0)coins=c;best=parseInt(localStorage.getItem(KEY+':best'),10)||0;const b=parseInt(localStorage.getItem(KEY+':bet'),10);if(b>=0&&b<BETS.length)bi=b;}catch(e){}
+function save(){try{localStorage.setItem(KEY+':coins',coins);localStorage.setItem(KEY+':best',best);localStorage.setItem(KEY+':bet',bi);}catch(e){}}
+/* ---------- audio ---------- */
+let AC=null;
+function beep(f,d,t,v,delay){if(muted)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain(),t0=AC.currentTime+(delay||0);o.type=t||'square';o.frequency.value=f;g.gain.setValueAtTime(v||.05,t0);g.gain.exponentialRampToValueAtTime(.0001,t0+d);o.connect(g);g.connect(AC.destination);o.start(t0);o.stop(t0+d);}catch(e){}}
+const sfx={tick(){beep(180,.08,'triangle',.12);},spin(){beep(330,.06,'square',.03);},win(n){for(let i=0;i<n;i++)beep(520+i*130,.14,'square',.05,i*.09);},big(){for(let i=0;i<8;i++)beep(400+i*90,.16,'triangle',.07,i*.07);},pop(){beep(700,.07,'sine',.08);}};
+/* ---------- canvas ---------- */
+const cv=$('cv'),ctx=cv.getContext('2d'),fx=$('fx'),fctx=fx.getContext('2d');
+let dpr=1,scale=1;
+function fit(){
+ dpr=Math.min(window.devicePixelRatio||1,2);
+ const m=$('mach');const aw=m.clientWidth-40,ah=m.clientHeight-40;
+ scale=Math.max(.15,Math.min(aw/W,ah/H));
+ cv.style.width=Math.floor(W*scale)+'px';cv.style.height=Math.floor(H*scale)+'px';
+ cv.width=Math.round(W*scale*dpr);cv.height=Math.round(H*scale*dpr);
+ fx.width=Math.round(window.innerWidth*dpr);fx.height=Math.round(window.innerHeight*dpr);
+}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+let gt=0,last=0,hl={},lineWins=[],timers=[],bubbles=[];
+const sleep=ms=>new Promise(r=>timers.push({t:ms/1000,r}));
+const reels=[];for(let c=0;c<COLS;c++)reels.push({mode:'idle',y:Math.floor(rnd()*strips[c].length),cells:null,tg:0,stopAt:0,bump:0,dur:.7});
+let stopped=0,allDone=null,quick=false;
+const LC=['#ff3b3b','#2f9bff','#ffe135','#3ddc4a','#ff8a00','#c04bff','#00d4c8','#ff5ac8','#9aff2e','#ffffff'];
+const FONT='72px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
+function drawTile(id,cx,cy,sc,on){
+ const s=SYM[id];ctx.save();ctx.translate(cx,cy);const p=on?1+.07*Math.sin(gt*12):1;ctx.scale(sc*p,sc*p);
+ const w=CW-14,h=CH-14,g=ctx.createLinearGradient(0,-h/2,0,h/2);g.addColorStop(0,s.c1);g.addColorStop(1,s.c2);
+ ctx.fillStyle=g;rr(-w/2,-h/2,w,h,18);ctx.fill();ctx.lineWidth=on?7:3;ctx.strokeStyle=on?'#ffe44d':'#ffffff';ctx.stroke();
+ ctx.globalAlpha=1;ctx.fillStyle='#000';ctx.font=FONT;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(s.e,0,s.tag?-2:4);
+ if(s.tag){ctx.fillStyle='#1b0a3a';rr(-w/2+8,h/2-26,w-16,20,8);ctx.fill();ctx.fillStyle='#ffe44d';ctx.font='bold 14px sans-serif';ctx.fillText(s.tag,0,h/2-15);}
+ ctx.restore();
+}
+function draw(){
+ ctx.setTransform(cv.width/W,0,0,cv.height/H,0,0);ctx.globalAlpha=1;
+ const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#1d3f82');bg.addColorStop(1,'#0b1d44');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+ reels.forEach((r,c)=>{
+  const x=M+c*CW;ctx.save();ctx.fillStyle='#08142f';rr(x+2,M,CW-4,ROWS*CH,14);ctx.fill();ctx.clip();
+  ctx.translate(0,Math.sin(r.bump*14)*r.bump*10);
+  if(!r.cells){const base=Math.floor(r.y),fr=r.y-base;for(let rw=0;rw<=ROWS;rw++)drawTile(symAt(c,base+rw),x+CW/2,M+(rw-fr)*CH+CH/2,1,false);}
+  else r.cells.forEach((cl,rw)=>{if(cl.sc>.01)drawTile(cl.s,x+CW/2,M+rw*CH+CH/2+cl.dy,cl.sc,!!hl[c+','+rw]&&!cl.pop);});
+  ctx.restore();
+ });
+ lineWins.forEach(w=>{ctx.save();ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();
+  CFG.lines[w.line].forEach((r,c)=>{const px=M+c*CW+CW/2,py=M+r*CH+CH/2;if(c===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);});
+  ctx.lineWidth=11;ctx.strokeStyle='#1b0a00';ctx.stroke();ctx.lineWidth=6;ctx.strokeStyle=LC[w.line%LC.length];ctx.stroke();ctx.restore();});
+ // fx layer
+ fctx.setTransform(dpr,0,0,dpr,0,0);fctx.clearRect(0,0,fx.width,fx.height);
+ parts.forEach(p=>{fctx.save();fctx.globalAlpha=1;fctx.translate(p.x,p.y);fctx.scale(Math.max(.15,Math.abs(Math.cos(p.rot))),1);
+  const g=fctx.createRadialGradient(-3,-3,1,0,0,p.r);g.addColorStop(0,'#fff3a0');g.addColorStop(1,'#ffb300');
+  fctx.beginPath();fctx.arc(0,0,p.r,0,6.3);fctx.fillStyle=g;fctx.fill();fctx.lineWidth=3;fctx.strokeStyle='#9a5b00';fctx.stroke();
+  fctx.beginPath();fctx.arc(0,0,p.r*.55,0,6.3);fctx.lineWidth=2;fctx.strokeStyle='#ffef9a';fctx.stroke();fctx.restore();});
+}
+const parts=[];
+function burst(n){
+ const r=cv.getBoundingClientRect();
+ for(let i=0;i<n&&parts.length<160;i++)parts.push({x:r.left+r.width*(.2+rnd()*.6),y:r.top+r.height*.6,vx:(rnd()-.5)*520,vy:-(500+rnd()*750),r:9+rnd()*6,rot:rnd()*6,rs:6+rnd()*10,life:2.6+rnd(),b:0});
+}
+let coinsShown=coins,winShown=0,winTarget=0;
+function updHud(){
+ setH('coins',Math.round(coinsShown));setH('win',Math.round(winShown));
+ setH('betv',(fs.left>0?fs.bet:BETS[bi])+'<i>BET</i>',1);
+ setH('spin',phase==='spin'?'STOP':phase==='busy'?'...':fs.left>0?'FREE SPIN '+fs.left:'SPIN');
+ const cl=phase==='idle'?'go':(phase==='busy'?'gray':'');if(cache.cls!==cl){cache.cls=cl;$('spin').className=cl;}
+ const h=!fs.on;if(cache.fh!==h){cache.fh=h;$('fsp').hidden=h;}
+ setH('fsn',fs.on?(fs.left+' left'+(fs.mult>1?'  x'+fs.mult:'')):'');
+}
+const cache={};
+function setH(id,v,html){if(cache[id]===v)return;cache[id]=v;const e=$(id);if(html)e.innerHTML=v;else e.textContent=v;}
+function update(dt){
+ gt+=dt;
+ for(let i=timers.length-1;i>=0;i--){const t=timers[i];t.t-=dt;if(t.t<=0){timers.splice(i,1);t.r();}}
+ reels.forEach((r,c)=>{
+  if(r.bump>0)r.bump=Math.max(0,r.bump-dt*3);
+  if(r.mode==='spin'){r.y-=22*dt;if(gt>=r.stopAt){r.mode='stop';r.y0=r.tg+5+(r.y-Math.floor(r.y));r.t=0;r.dur=quick?.38:.7;}}
+  else if(r.mode==='stop'){r.t+=dt;const k=Math.min(1,r.t/r.dur),e=1-Math.pow(1-k,3);r.y=r.y0+(r.tg-r.y0)*e;
+   if(k>=1){r.y=r.tg;r.mode='idle';r.cells=[0,1,2].map(i=>({s:symAt(c,r.tg+i),sc:1,dy:0,v:0}));r.bump=1;sfx.tick();stopped++;if(stopped===COLS&&allDone){const f=allDone;allDone=null;f();}}}
+  if(r.cells)r.cells.forEach(cl=>{if(cl.pop)cl.sc=Math.max(0,cl.sc-dt*4);if(cl.dy<0){cl.v+=2800*dt;cl.dy=Math.min(0,cl.dy+cl.v*dt);if(cl.dy===0){cl.v=0;}}});
+ });
+ const d1=coins-coinsShown;coinsShown=Math.abs(d1)<=1?coins:coinsShown+Math.sign(d1)*Math.max(1,Math.abs(d1)*Math.min(1,dt*5));
+ const d2=winTarget-winShown;winShown=Math.abs(d2)<=1?winTarget:winShown+Math.sign(d2)*Math.max(1,Math.abs(d2)*Math.min(1,dt*5));
+ for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.vy+=1500*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.rot+=p.rs*dt;p.life-=dt;
+  const fl=window.innerHeight-12;if(p.y>fl&&p.vy>0){p.y=fl;p.vy*=-.55;p.vx*=.8;p.b++;}
+  if(p.life<=0||p.b>3)parts.splice(i,1);}
+ updHud();
+}
+function frame(ts){requestAnimationFrame(frame);const dt=Math.min(.05,(ts-last)/1000||.016);last=ts;update(dt);draw();}
+/* ---------- UI helpers ---------- */
+const setMsg=t=>{$('msg').textContent=t;};
+function modal(html,btn,hideBtn){return new Promise(res=>{$('ovc').innerHTML=html;const b=$('ovb');b.innerHTML=btn||'OK';b.hidden=!!hideBtn;$('ov').hidden=false;b.onclick=()=>{$('ov').hidden=true;$('ovc').onclick=null;res();};});}
+function banner(t){const b=$('banner');b.textContent=t;b.className='banner';void b.offsetWidth;b.className='banner show';}
+function addWin(a){coins+=a;winTarget+=a;if(a>best){best=a;}save();}
+function resetWin(){winTarget=0;winShown=0;}
+function payHTML(){
+ const lb=(fs.left>0?fs.bet:BETS[bi])/NL;
+ let h='<div class="big-e">'+CFG.emoji+'</div><h2>Pay Table</h2><p>Bet '+(lb*NL)+' = '+NL+' lines x '+lb+'. Wins pay left to right.</p><table>';
+ const top=id=>Math.max.apply(null,Object.keys(CFG.pay[id]).map(k=>CFG.pay[id][k]));
+ Object.keys(CFG.pay).sort((a,b)=>top(b)-top(a)).forEach(id=>{
+  h+='<tr><td class="e">'+SYM[id].e+'</td><td>'+Object.keys(CFG.pay[id]).map(k=>k+'x <b>'+Math.round(CFG.pay[id][k]*lb)+'</b>').join(' &nbsp; ')+'</td></tr>';});
+ h+='</table>';
+ if(CFG.wild)h+='<p>'+SYM[CFG.wild].e+' <b>WILD</b> '+CFG.wildText+'</p>';
+ h+='<p>'+SYM[CFG.scatter].e+' <b>SCATTER</b> '+CFG.scatterText+'</p><p>&#127881; '+CFG.featureText+'</p><p>Just for fun - no real money, no purchases.</p>';
+ return h;
+}
+function pickGame(bet){
+ return new Promise(res=>{
+  const board=[];for(let i=0;i<12;i++)board.push(drawPrize());
+  const got=[];let total=0,done=false;
+  function render(){
+   let h='<div class="big-e">'+CFG.emoji+'</div><h2>Bubble Bonus!</h2><p>'+(done?'All done!':'Pop '+(CFG.pick.picks-got.length)+' bubble'+(CFG.pick.picks-got.length>1?'s':''))+' &mdash; prize so far: <b style="color:#ffe44d">'+total+'</b></p><div class="grid">';
+   board.forEach((v,i)=>{const o=got.indexOf(i)>=0;h+='<button class="bub'+(o?' open':done?' rest':'')+'" data-i="'+i+'">'+(o||done?(v*bet):'')+'</button>';});
+   $('ovc').innerHTML=h+'</div>';
+  }
+  render();$('ovb').hidden=true;$('ov').hidden=false;
+  $('ovc').onclick=e=>{
+   const t=e.target.closest?e.target.closest('[data-i]'):null;if(!t||done)return;const i=parseInt(t.dataset.i,10);if(got.indexOf(i)>=0)return;
+   got.push(i);total+=board[i]*bet;sfx.pop();burst(8);if(got.length>=CFG.pick.picks){done=true;render();const b=$('ovb');b.textContent='Collect '+total;b.hidden=false;b.onclick=()=>{$('ov').hidden=true;$('ovc').onclick=null;res(total);};}else render();};
+ });
+}
+/* ---------- spin flow ---------- */
+async function doSpin(){
+ if(phase!=='idle')return;
+ const free=fs.left>0;
+ if(!free){
+  if(coins<BETS[0]){refill();return;}
+  while(BETS[bi]>coins)bi--;
+  coins-=BETS[bi];
+ }else fs.left--;
+ const bet=free?fs.bet:BETS[bi],mult=free?fs.mult:1;
+ phase='spin';quick=false;hl={};lineWins=[];resetWin();save();setMsg(free?'Free spin! x'+mult:'Good luck!');
+ const res=computeSpin(bet,mult);
+ reels.forEach((r,c)=>{r.mode='spin';r.cells=null;r.tg=res.stops[c];r.stopAt=gt+.45+c*.27;});
+ stopped=0;await new Promise(r=>{allDone=r;});
+ phase='busy';await sleep(150);
+ if(res.expand.length){
+  res.expand.forEach(c=>{reels[c].cells=reels[c].cells.map(cl=>({s:cl.s===CFG.scatter?cl.s:CFG.wild,sc:1,dy:0,v:0}));});
+  sfx.big();setMsg(SYM[CFG.wild].e+' Wild expands!');burst(10);await sleep(700);
+ }
+ let spinWin=0;
+ for(const st of res.steps){
+  hl={};st.wins.forEach(w=>w.cells.forEach(([c,r])=>{hl[c+','+r]=1;}));lineWins=st.wins;
+  spinWin+=st.amt;addWin(st.amt);sfx.win(Math.min(6,3+st.wins.length));burst(6+Math.min(24,st.amt/bet*3));
+  const bw=st.wins.slice().sort((a,b)=>b.mult-a.mult)[0];
+  setMsg((st.wins.length>1?st.wins.length+' lines! ':'')+SYM[bw.sym].e.repeat(bw.n)+' +'+st.amt+(st.sm>1?'  (cascade x'+st.sm+')':''));
+  await sleep(1150);
+  if(st.next){
+   const rem={};st.removed.forEach(k=>{rem[k]=1;});
+   reels.forEach((r,c)=>r.cells.forEach((cl,rw)=>{if(rem[c+','+rw])cl.pop=true;}));
+   hl={};lineWins=[];sfx.pop();await sleep(380);
+   reels.forEach((r,c)=>{
+    const sv=[];r.cells.forEach((cl,rw)=>{if(!rem[c+','+rw])sv.push({cl,rw});});const nn=ROWS-sv.length;const nc=[];
+    for(let i=0;i<nn;i++)nc.push({s:st.next[c][i],sc:1,dy:-nn*CH,v:0});
+    sv.forEach((o,j)=>nc.push({s:o.cl.s,sc:1,dy:(o.rw-(nn+j))*CH,v:0}));
+    r.cells=nc;});
+   await sleep(750);
+  }
+ }
+ if(res.scCount>=3){
+  hl={};reels.forEach((r,c)=>r.cells.forEach((cl,rw)=>{if(cl.s===CFG.scatter)hl[c+','+rw]=1;}));lineWins=[];
+  if(res.scWin){spinWin+=res.scWin;addWin(res.scWin);}
+  sfx.big();burst(20);setMsg(SYM[CFG.scatter].e+' '+res.scCount+' scatters!'+(res.scWin?' +'+res.scWin:''));await sleep(900);
+ }
+ if(res.fsAward>0&&(!free||CFG.fs.retrig)){
+  if(!free){fs={left:res.fsAward,mult:fsStart(),total:0,bet:bet,on:true};}else fs.left+=res.fsAward;
+  banner(res.fsAward+' FREE SPINS!');sfx.big();burst(30);await sleep(1300);
+ }
+ if(res.pick){const p=await pickGame(bet);spinWin+=p;addWin(p);burst(30);sfx.big();setMsg('Bubble bonus +'+p);await sleep(400);}
+ if(free){fs.total+=spinWin;fs.mult=fsNext(fs.mult,res.total>0);}
+ const ratio=spinWin/bet;
+ if(ratio>=25){banner('MEGA WIN!');sfx.big();burst(70);}else if(ratio>=10){banner('BIG WIN!');sfx.big();burst(45);}else if(ratio>=4){banner('NICE WIN!');burst(25);}
+ if(spinWin===0&&!res.fsAward)setMsg(free?'No win - spin again!':'Try again!');
+ else if(ratio>=4)await sleep(700);
+ if(free&&fs.left===0&&fs.on){
+  const st=fs.total/fs.bet,n=st>=40?3:st>=12?2:1,tot=fs.total;fs.on=false;fs.mult=1;fs.bet=0;
+  phase='idle';updHud();
+  await modal('<div class="big-e">'+CFG.emoji+'</div><h2>Free Spins Complete!</h2><div class="stars">'+'&#11088;'.repeat(n)+'</div><p>You won <b style="color:#ffe44d">'+tot+'</b> coins</p><p>Best win: '+best+'</p>','Keep Spinning');
+ }
+ phase='idle';save();
+ if(coins<BETS[0]&&fs.left===0)refill();
+}
+async function refill(){
+ phase='busy';
+ await modal('<div class="big-e">&#129689;</div><h2>Out of coins!</h2><p>No worries - it is all just for fun. Grab a free refill!</p>','&#129689; Free refill +1000');
+ coins+=1000;bi=0;save();phase='idle';setMsg('Refilled! Spin away!');
+}
+function quickStop(){quick=true;reels.forEach((r,c)=>{if(r.mode==='spin')r.stopAt=Math.min(r.stopAt,gt+c*.07);});}
+$('spin').onclick=()=>{if(phase==='idle')doSpin();else if(phase==='spin')quickStop();};
+$('bm').onclick=()=>{if(phase==='idle'&&fs.left===0){bi=Math.max(0,bi-1);save();}};
+$('bp').onclick=()=>{if(phase==='idle'&&fs.left===0){bi=Math.min(BETS.length-1,bi+1);while(BETS[bi]>coins&&bi>0)bi--;save();}};
+$('pay').onclick=async()=>{if(phase!=='idle')return;phase='busy';await modal(payHTML(),'Got it!');phase='idle';};
+$('snd').onclick=()=>{muted=!muted;$('snd').innerHTML=muted?'&#128263;':'&#128266;';};
+document.addEventListener('keydown',e=>{if((e.code==='Space'||e.key==='Enter')&&$('ov').hidden){e.preventDefault();$('spin').onclick();}});
+window.addEventListener('resize',fit);window.addEventListener('orientationchange',()=>setTimeout(fit,150));
+fit();requestAnimationFrame(frame);
+phase='busy';
+modal('<div class="big-e">'+CFG.emoji+'</div><h2>'+CFG.title+'</h2><p>'+CFG.intro+'</p><p>You start with 1000 free coins. Out of coins? Get a free refill!</p><p><b>Just for fun - no real money, no purchases.</b></p>'+(best?'<p>Best win: <b style="color:#ffe44d">'+best+'</b></p>':''),'&#9654; PLAY').then(()=>{phase='idle';beep(660,.1,'square',.05);});
+})();
+</script></body></html>

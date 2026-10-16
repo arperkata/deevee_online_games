@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Go Fish</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--cw:64px}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
+body{height:100dvh;display:flex;flex-direction:column;font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:radial-gradient(ellipse at 50% 35%,#22a65c,#0d5a30 75%);color:#fff;text-align:center;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+a.home{position:fixed;left:10px;top:10px;z-index:1000;background:#f08a12;color:#fff;border-radius:999px;padding:0 14px;min-height:40px;display:inline-flex;align-items:center;font-weight:700;font-size:17px;text-decoration:none;box-shadow:0 4px 0 #a9560b}
+#top{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 8px;padding:8px 8px 4px 96px;min-height:56px}
+@media(min-width:700px){#top{padding:8px 96px 4px}}
+h1{margin:0;font-size:clamp(20px,3.6vw,34px);text-shadow:0 3px 0 #0b3a78,2px 2px 0 #0b3a78,-2px -2px 0 #0b3a78,2px -2px 0 #0b3a78,-2px 2px 0 #0b3a78}
+@media(max-height:520px){h1{display:none}#top{padding-top:4px;min-height:48px}}
+.pill{background:#0b3a78;color:#fff;border-radius:999px;padding:3px 12px;font-weight:700;font-size:clamp(15px,2.6vw,20px);box-shadow:0 3px 0 #06244d;border:2px solid #ffe14a;white-space:nowrap}
+.pill b{color:#ffe14a}
+.btn,.mute{font:700 16px 'Fredoka','Trebuchet MS',sans-serif;min-height:44px;min-width:44px;padding:0 14px;border:0;border-radius:999px;color:#fff;background:linear-gradient(#4aa8ff,#1670d8);box-shadow:0 4px 0 #0b3a78;cursor:pointer;text-shadow:0 2px 0 #0b3a78}
+.btn:active,.mute:active{transform:translateY(3px);box-shadow:0 1px 0 #0b3a78}
+.btn.g{background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 4px 0 #1c701c;text-shadow:0 2px 0 #1c701c}
+.btn.r{background:linear-gradient(#ff6a5a,#d62a1c);box-shadow:0 4px 0 #8a1209;text-shadow:0 2px 0 #8a1209}
+.btn.o{background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 4px 0 #a9560b;text-shadow:0 2px 0 #a9560b}
+.btn[disabled]{background:#7d8aa0;box-shadow:0 4px 0 #4a5568;text-shadow:none;cursor:default}
+.mute{padding:0 10px;background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 4px 0 #a9560b}
+#stage{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;padding:4px 6px 8px}
+.card{width:var(--cw);height:calc(var(--cw)*1.4);font-size:calc(var(--cw)*.3);position:relative;border-radius:calc(var(--cw)*.1);background:#fff;border:2px solid #1b2a41;box-shadow:0 3px 6px rgba(0,0,0,.45);color:#14161c;font-weight:700;line-height:1;flex:none;font-family:Georgia,'Trebuchet MS',serif;overflow:hidden}
+.card.red{color:#d4101f}
+.card i{font-style:normal}
+.card .c1,.card .c2{position:absolute;text-align:center;line-height:.95;font-size:.9em}
+.card .c1{left:.14em;top:.1em}
+.card .c2{right:.14em;bottom:.1em;transform:rotate(180deg)}
+.card .mid{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.1em;padding-top:.05em}
+.card .mid.f{font-size:1.5em}
+.card.back{background:repeating-linear-gradient(45deg,#d4202f 0 .3em,#9c0f1c .3em .6em);border:calc(var(--cw)*.07) solid #fff;outline:2px solid #1b2a41;outline-offset:calc(var(--cw)*-.07)}
+.card.back *{display:none}
+.card.sel{box-shadow:0 0 0 4px #ffe14a,0 6px 10px rgba(0,0,0,.5);transform:translateY(-8px)}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:60}
+#msg{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(5,25,15,.85);z-index:50;padding:12px}
+#box{background:linear-gradient(#2f8cff,#0b4fb3);border:5px solid #ffe14a;border-radius:28px;padding:16px 26px 20px;box-shadow:0 8px 0 #06244d;max-width:94vw;max-height:96dvh;overflow:auto;animation:pop2 .5s}
+@keyframes pop2{0%{transform:scale(.5)}70%{transform:scale(1.08)}}
+#em{font-size:clamp(46px,12vmin,80px);line-height:1.1}
+#mt{font-size:clamp(26px,6vw,40px);font-weight:700;text-shadow:0 3px 0 #0b3a78}
+#stars{font-size:clamp(34px,9vmin,54px);color:#ffe14a;letter-spacing:4px;text-shadow:0 3px 0 #7a4a00}
+#ms{font-size:clamp(17px,3.4vw,24px);font-weight:700;margin:4px 0;line-height:1.5}
+#ms b{color:#ffe14a}
+#ms .btn{margin:4px}
+#ms .btn.on{background:linear-gradient(#ffd23a,#f0a000);color:#3a2500;text-shadow:none;box-shadow:0 4px 0 #8a5a00}
+button.go{font:700 clamp(20px,5vw,28px) 'Fredoka','Trebuchet MS',sans-serif;margin-top:10px;padding:.4em 1.5em;min-height:48px;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}
+button.go:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
+.fl{position:fixed;font-weight:700;font-size:clamp(22px,4vw,34px);pointer-events:none;z-index:70;text-shadow:0 2px 0 #0b3a78,1px 1px 0 #0b3a78,-1px -1px 0 #0b3a78;animation:fl 1s forwards;white-space:nowrap}
+@keyframes fl{to{transform:translateY(-70px);opacity:0}}
+@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.shake{animation:shake .35s}
+
+body{background:radial-gradient(ellipse at 50% 40%,#1f9fd6,#0b4f86 80%)}
+:root{--cw:clamp(40px,min(15vw,12dvh),80px)}
+#stage{flex-direction:column;justify-content:space-between;gap:4px;align-items:stretch}
+.zone{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+#ai .card{margin-left:calc(var(--cw)*-.62)}#ai .card:first-child{margin-left:0}
+#mid{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;gap:clamp(10px,4vw,30px)}
+#pond{position:relative;cursor:default;text-align:center}
+#pond small{display:block;background:#0b3a78;border-radius:999px;padding:1px 10px;font-weight:700;margin-top:4px}
+#log{background:#0b3a78;border:3px solid #ffe14a;border-radius:16px;padding:8px 14px;font-size:clamp(16px,3.4vw,22px);font-weight:700;min-width:min(60vw,320px);max-width:60vw;min-height:3.2em;box-shadow:0 4px 0 #06244d;display:flex;align-items:center;justify-content:center}
+.books{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;min-height:30px}
+.books span{background:#ffe14a;color:#1b2a41;font-weight:700;border-radius:8px;padding:2px 8px;font-size:16px;border:2px solid #fff}
+.lbl{background:#0b3a78;border:2px solid #fff;border-radius:999px;padding:2px 12px;font-weight:700;font-size:16px}
+#hand{display:flex;justify-content:center;align-items:flex-end;padding-top:14px;min-height:calc(var(--cw)*1.4 + 22px)}
+#hand .card{cursor:pointer;transition:transform .12s}
+#hand .card:active,#hand .card.sel{transform:translateY(-14px)}
+#hand .card.new{animation:dealin .4s}
+@keyframes dealin{from{transform:translateY(-120px) scale(.6)}to{transform:none}}
+#hint{font-size:15px;font-weight:700;text-shadow:0 2px 0 #06244d}
+.pulse{animation:pulse .5s}
+@keyframes pulse{50%{transform:scale(1.25)}}
+@media(max-height:520px){:root{--cw:clamp(34px,min(11vw,16dvh),64px)}#log{min-height:2.4em;padding:4px 10px}}
+</style></head><body>
+<a class="home" href="index.html">⌂ Home</a>
+<div id="top"><h1>Go Fish</h1><span class="pill">Your books <b id="mb">0</b></span><span class="pill">AI books <b id="ab">0</b></span><span class="pill">Best <b id="bs">0</b></span><button class="mute" id="mute">🔊</button></div>
+<div id="stage">
+<div class="zone"><span class="lbl">🤖 AI <b id="ac">7</b> cards</span><div id="ai" class="zone"></div><div class="books" id="abk"></div></div>
+<div id="mid"><div id="pond"><div id="pondc"></div><small>🐟 <span id="pc">0</span></small></div><div id="log">Tap one of your cards to ask for that rank!</div></div>
+<div class="zone"><div class="books" id="mbk"></div></div>
+<div id="hint">Your hand - tap a card to ask the AI for that rank</div>
+<div id="hand"></div>
+</div>
+<canvas id="fx"></canvas>
+<div id="msg"><div id="box"><div id="em"></div><div id="mt"></div><div id="stars"></div><div id="ms"></div><button class="go" id="again">Play</button></div></div>
+<script>
+const GAME="go-fish.html";
+const $=id=>document.getElementById(id);
+const RK=['','A','2','3','4','5','6','7','8','9','10','J','Q','K'],SU=['♠','♥','♦','♣'];
+const rnd=n=>Math.floor(Math.random()*n),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+function deck(){const d=[];let id=0;for(let s=0;s<4;s++)for(let r=1;r<=13;r++)d.push({r,s,id:id++});return d}
+const isRed=c=>c.s==1||c.s==2;
+function cardEl(c,up=true){const d=document.createElement('div');d.className='card'+(up?'':' back')+(up&&isRed(c)?' red':'');if(up){const t=RK[c.r]+'<br>'+SU[c.s];d.innerHTML='<i class="c1">'+t+'</i><i class="mid'+(c.r>10?' f':'')+'">'+(c.r>10?RK[c.r]+SU[c.s]:SU[c.s])+'</i><i class="c2">'+t+'</i>'}d.dataset.id=c?c.id:'';return d}
+let muted=false,ac;
+try{muted=localStorage.getItem('cardgames:muted')=='1'}catch(e){}
+function beep(f,d=.12,type='triangle',v=.15){if(muted)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type=type;g.gain.setValueAtTime(v,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+function jingle(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.18),i*120))}
+function sadTone(){[330,262,196].forEach((f,i)=>setTimeout(()=>beep(f,.22,'sawtooth',.1),i*160))}
+(function(){const m=$('mute');if(!m)return;m.textContent=muted?'🔇':'🔊';m.onclick=function(){muted=!muted;this.textContent=muted?'🔇':'🔊';try{localStorage.setItem('cardgames:muted',muted?'1':'0')}catch(e){}beep(600)}})();
+function getBest(k,def=0){try{const v=localStorage.getItem(GAME+':'+k);return v===null?def:+v}catch(e){return def}}
+function setBest(k,v){try{localStorage.setItem(GAME+':'+k,v)}catch(e){}}
+const fx=$('fx'),fc=fx.getContext('2d');let PARTS=[],raf=0,lt=0;
+function fxfit(){fx.width=innerWidth;fx.height=innerHeight}fxfit();addEventListener('resize',fxfit);addEventListener('orientationchange',fxfit);
+function confetti(x,y,n=40){const C=['#ff4a5a','#ffe14a','#4ade5a','#3aa0ff','#ff8bd0','#ff9a1f'];for(let i=0;i<n;i++){const a=Math.random()*6.283,s=150+Math.random()*350;PARTS.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-200,l:1.2+Math.random()*.6,c:C[i%6],r:Math.random()*6,s:5+Math.random()*6})}lt=performance.now();if(!raf)raf=requestAnimationFrame(tick)}
+function tick(t){const dt=Math.min(.05,(t-lt)/1000||0);lt=t;fc.clearRect(0,0,fx.width,fx.height);PARTS.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=700*dt;p.l-=dt;p.r+=dt*8;fc.save();fc.globalAlpha=Math.min(1,p.l*2);fc.fillStyle=p.c;fc.translate(p.x,p.y);fc.rotate(p.r);fc.fillRect(-p.s/2,-p.s/3,p.s,p.s*.6);fc.restore()});PARTS=PARTS.filter(p=>p.l>0&&p.y<fx.height+20);raf=PARTS.length?requestAnimationFrame(tick):0;if(!raf)fc.clearRect(0,0,fx.width,fx.height)}
+function bigConfetti(){for(let i=0;i<6;i++)setTimeout(()=>confetti(innerWidth*(.15+.14*i),innerHeight*.35,40),i*150)}
+function floatText(txt,x,y,color='#ffe14a'){const d=document.createElement('div');d.className='fl';d.textContent=txt;d.style.left=x+'px';d.style.top=y+'px';d.style.color=color;d.style.transform='translateX(-50%)';document.body.appendChild(d);setTimeout(()=>d.remove(),1000)}
+function floatAt(el,txt,color){const r=el.getBoundingClientRect();floatText(txt,r.left+r.width/2,r.top+r.height/2,color)}
+function overlay(o){$('em').textContent=o.em||'';$('mt').textContent=o.title||'';$('stars').textContent=o.stars?'★'.repeat(o.stars)+'☆'.repeat(3-o.stars):'';$('ms').innerHTML=o.html||'';const b=$('again');b.textContent=o.btn||'Play Again';b.onclick=()=>{beep(520);$('msg').style.display='none';o.cb()};$('msg').style.display='flex';if(o.win){jingle();bigConfetti()}else if(o.lose)sadTone()}
+
+let dk,H,AH,mb,ab,turn,busy,over,mem;
+const RN=r=>({1:'Aces',11:'Jacks',12:'Queens',13:'Kings'}[r]||r+'s');
+function log(t){$('log').textContent=t}
+function sortH(h){h.sort((a,b)=>a.r-b.r||a.s-b.s)}
+function render(newId){
+  $('mb').textContent=mb.length;$('ab').textContent=ab.length;$('ac').textContent=AH.length;$('pc').textContent=dk.length;
+  $('ai').innerHTML='';const cn=Math.min(AH.length,10);for(let i=0;i<cn;i++)$('ai').appendChild(cardEl(null,false));
+  $('pondc').innerHTML='';if(dk.length)$('pondc').appendChild(cardEl(null,false));
+  const hd=$('hand');hd.innerHTML='';sortH(H);const W=$('stage').clientWidth-12,w=cwpx()||60;
+  const step=H.length>1?Math.min(w*.8,(W-w)/(H.length-1)):0;
+  H.forEach((c,i)=>{const e=cardEl(c);if(i)e.style.marginLeft=(step-w)+'px';if(c.id===newId)e.classList.add('new');e.onclick=()=>ask(c.r);hd.appendChild(e)});
+  const bk=(a)=>a.map(r=>'<span>'+RK[r]+'</span>').join('');
+  $('mbk').innerHTML=mb.length?'<span class="lbl">Your books</span>'+bk(mb):'';$('abk').innerHTML=ab.length?bk(ab)+'<span class="lbl">AI books</span>':'';
+}
+function cwpx(){const e=document.createElement('div');e.className='card';e.style.visibility='hidden';document.body.appendChild(e);const v=e.offsetWidth;e.remove();return v}
+function checkBooks(hand,isMe){
+  const cnt={};hand.forEach(c=>cnt[c.r]=(cnt[c.r]||0)+1);let got=false;
+  for(const r in cnt)if(cnt[r]==4){const rr=+r;(isMe?mb:ab).push(rr);for(let i=hand.length-1;i>=0;i--)if(hand[i].r==rr)hand.splice(i,1);got=true;
+    if(isMe){confetti(innerWidth/2,innerHeight*.7,40);floatText('BOOK of '+RN(rr)+'!',innerWidth/2,innerHeight*.6)}else floatText('AI booked '+RN(rr),innerWidth/2,innerHeight*.25,'#fff');beep(880,.15);setTimeout(()=>beep(1175,.2),130)}
+  return got}
+function refill(hand){while(hand.length<1&&dk.length)hand.push(dk.pop())}
+function finished(){return mb.length+ab.length>=13||(!dk.length&&(!H.length||!AH.length))}
+async function ask(r){
+  if(busy||over||turn!=0||!H.some(c=>c.r==r))return;busy=true;mem[r]=1;
+  const got=AH.filter(c=>c.r==r);
+  log('You: "Got any '+RN(r)+'?"');beep(500,.08);await sleep(800);
+  if(got.length){AH=AH.filter(c=>c.r!=r);H.push(...got);beep(700,.1);log('Yes! You take '+got.length+' '+RN(r)+'. Go again!');checkBooks(H,true);refill(H);render();$('ac').classList.add('pulse');
+    if(finished())return end();await sleep(900);busy=false;if(!H.length&&!dk.length){return aiTurn()}return}
+  log('"Go Fish!" 🐟');await sleep(700);
+  if(dk.length){const c=dk.pop();H.push(c);beep(350,.1);checkBooks(H,true);if(c.r==r){log('You fished a '+RN(r).slice(0,-1)+'! Lucky - go again!');render(c.id);if(finished())return end();await sleep(900);busy=false;return}render(c.id)}
+  if(finished())return end();
+  await sleep(500);aiTurn()}
+async function aiTurn(){
+  turn=1;busy=true;
+  while(true){
+    if(finished())return end();
+    refill(AH);if(!AH.length){log('AI has no cards');await sleep(700);break}
+    render();log('🤖 AI is thinking...');await sleep(1100);
+    const known=AH.filter(c=>mem[c.r]);const pool=known.length&&Math.random()<.6?known:AH;const r=pool[rnd(pool.length)].r;
+    log('AI: "Got any '+RN(r)+'?"');beep(420,.08);await sleep(900);
+    const got=H.filter(c=>c.r==r);
+    if(got.length){H=H.filter(c=>c.r!=r);AH.push(...got);delete mem[r];log('AI takes your '+got.length+' '+RN(r)+'!');beep(250,.15,'square',.08);checkBooks(AH,false);refill(H);render();await sleep(1100);continue}
+    log('AI goes fishing...');await sleep(700);
+    if(dk.length){const c=AH.length?dk.pop():null;if(c){AH.push(c);checkBooks(AH,false);render();if(c.r==r){log('AI got lucky and goes again!');await sleep(1000);continue}}}
+    break}
+  turn=0;busy=false;if(!H.length&&dk.length){refill(H)}render();
+  if(finished())return end();log(H.length?'Your turn - tap a card to ask!':'You have no cards!');
+  if(!H.length)aiTurn()}
+function end(){
+  over=true;busy=true;render();const m=mb.length,a=ab.length,win=m>a,best=Math.max(getBest('best'),m);setBest('best',best);$('bs').textContent=best;
+  overlay({em:win?'🏆':m==a?'🤝':'🐟',title:win?'You win!':m==a?'It\'s a tie!':'AI wins!',stars:win?(m>=9?3:m>=7?2:1):1,win,lose:!win&&m!=a,html:'Your books <b>'+m+'</b> · AI books <b>'+a+'</b><br>Best <b>'+best+'</b>',cb:newGame})}
+function newGame(){dk=shuffle(deck());H=[];AH=[];for(let i=0;i<7;i++){H.push(dk.pop());AH.push(dk.pop())}mb=[];ab=[];mem={};turn=0;busy=false;over=false;
+  checkBooks(H,true);checkBooks(AH,false);$('bs').textContent=getBest('best');log('Tap one of your cards to ask for that rank!');render()}
+addEventListener('resize',()=>render());
+newGame();
+overlay({em:'🐟',title:'Go Fish',btn:'Play ▶',cb:()=>{},html:'Tap a card in your hand to ask the AI for that rank.<br>Collect <b>4 of a kind</b> to make a book.<br>Most books wins!'});
+</script></body></html>
