@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aim Trainer</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+html,body{margin:0;height:100%;overflow:hidden;touch-action:none;overscroll-behavior:none}
+body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:radial-gradient(circle at 50% 30%,#3fb6f5,#1f7fd6 60%,#154f9c) fixed;color:#fff;text-shadow:0 2px 0 #1b4f86}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+.home{position:fixed;left:10px;top:10px;z-index:100;background:#f08a12;color:#fff;text-decoration:none;font-weight:700;padding:12px 16px;min-height:46px;line-height:22px;border-radius:999px;box-shadow:0 3px 0 #b05f00;text-shadow:none;font-size:16px}
+#mute{position:fixed;right:10px;top:10px;z-index:100;width:46px;height:46px;border-radius:50%;border:3px solid #1b4f86;background:#fff;font-size:20px;box-shadow:0 3px 0 #1b4f86;cursor:pointer;text-shadow:none}
+.btn{font:inherit;font-size:26px;font-weight:700;color:#fff;text-shadow:0 2px 0 #1c701c;border:0;border-radius:18px;padding:12px 38px;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;min-height:48px;font-size:28px}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
+.ov{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;background:rgba(10,40,90,.88);padding:20px}
+.ov h1{margin:0;font-size:clamp(30px,8vw,54px);-webkit-text-stroke:2px #0c2c58;paint-order:stroke fill;text-shadow:0 4px 0 #0c2c58}.ov b{color:#ffe45c}.stars{font-size:clamp(34px,10vw,56px);text-shadow:none;letter-spacing:6px}.ov p{margin:0;font-size:clamp(16px,4vw,22px);max-width:480px}
+.hide{display:none!important}
+</style></head><body>
+<canvas id="cv"></canvas>
+<a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="mute">🔊</button>
+<div class="ov" id="ov"><h1>🎯 Aim Trainer</h1><p id="op">Targets pop up and shrink fast. Hit them before they vanish! 30 seconds. Bullseyes and combos score big.</p><button class="btn" id="go">Play</button></div>
+<script>
+const $=id=>document.getElementById(id);
+const K='aimTrainerBest',cv=$('cv'),ctx=cv.getContext('2d');
+let AC=null,muted=false;
+function ac(){try{if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){}return AC}
+function beep(f,d,type,v,delay){if(muted)return;const a=ac();if(!a)return;try{const o=a.createOscillator(),g=a.createGain(),s=a.currentTime+(delay||0);o.type=type||'sine';o.frequency.value=f;g.gain.setValueAtTime(v||.15,s);g.gain.exponentialRampToValueAtTime(.001,s+d);o.connect(g);g.connect(a.destination);o.start(s);o.stop(s+d+.02)}catch(e){}}
+$('mute').onclick=e=>{muted=!muted;e.target.textContent=muted?'🔇':'🔊';ac()};
+const getBest=()=>{try{return +localStorage.getItem(K)||0}catch(e){return 0}};
+const setBest=v=>{try{localStorage.setItem(K,v)}catch(e){}};
+let W=0,H=0,dpr=1;
+function resize(){dpr=Math.min(2,window.devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0)}
+addEventListener('resize',resize);addEventListener('orientationchange',()=>setTimeout(resize,150));resize();
+const DUR=30;
+let playing=false,tLeft=DUR,targets=[],parts=[],pops=[],hits=0,missClicks=0,expired=0,score=0,combo=0,bestCombo=0,shake=0,spawnT=0,last=0;
+const diff=()=>Math.min(1,(DUR-tLeft)/DUR);
+const baseR=()=>Math.max(26,Math.min(60,Math.min(W,H)*.09))*(1-.35*diff());
+function spawn(){
+  const r0=baseR();let x,y,ok;
+  for(let i=0;i<12;i++){x=r0+10+Math.random()*(W-2*r0-20);y=90+r0+Math.random()*Math.max(1,H-r0*2-110);ok=targets.every(t=>Math.hypot(t.x-x,t.y-y)>t.r0+r0+10);if(ok)break}
+  targets.push({x,y,r0,r:0,age:0,life:1.7-.9*diff()});
+}
+function burst(x,y,col,n){for(let i=0;i<n;i++){const a=Math.random()*6.28,s=80+Math.random()*260;parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.6+Math.random()*.4,max:1,c:col,s:3+Math.random()*5})}}
+function popText(x,y,t,c){pops.push({x,y,t,c,life:.9})}
+function hit(px,py){
+  if(!playing)return;
+  for(let i=targets.length-1;i>=0;i--){
+    const t=targets[i],d=Math.hypot(px-t.x,py-t.y);
+    if(d<=t.r+8){
+      hits++;combo++;bestCombo=Math.max(bestCombo,combo);
+      const bull=d<t.r*.3;let pts=10+Math.round(20*t.r/t.r0)+(bull?10:0);
+      const mult=1+Math.floor(combo/5)*.5;pts=Math.round(pts*mult);score+=pts;
+      burst(t.x,t.y,bull?'#ffd700':'#ff4d4d',bull?24:14);popText(t.x,t.y-t.r,(bull?'BULLSEYE! ':'')+'+'+pts,bull?'#ffd700':'#fff');
+      beep(400+Math.min(combo,20)*35,.1,'triangle',.2);if(bull)beep(1200,.12,'sine',.12,.05);
+      targets.splice(i,1);return;
+    }
+  }
+  missClicks++;combo=0;shake=6;beep(150,.15,'sawtooth',.12);popText(px,py,'miss','#ff9a9a');
+}
+function txt(s,x,y,size,al,col){ctx.font='700 '+size+'px Fredoka,"Trebuchet MS","Comic Sans MS",sans-serif';ctx.textAlign=al;ctx.save();ctx.globalAlpha=Math.max(ctx.globalAlpha,0);ctx.lineJoin='round';ctx.lineWidth=Math.max(4,size/4);ctx.strokeStyle='#0c2c58';ctx.strokeText(s,x,y);ctx.fillStyle=col||'#fff';ctx.fillText(s,x,y);ctx.restore()}
+function update(dt){
+  for(const p of parts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=500*dt;p.life-=dt}parts=parts.filter(p=>p.life>0);
+  for(const p of pops){p.y-=40*dt;p.life-=dt}pops=pops.filter(p=>p.life>0);
+  shake=Math.max(0,shake-dt*30);
+  if(!playing)return;
+  tLeft-=dt;if(tLeft<=0){tLeft=0;end();return}
+  for(let i=targets.length-1;i>=0;i--){
+    const t=targets[i];t.age+=dt;
+    t.r=t.r0*(1-.7*t.age/t.life)*Math.min(1,t.age/.12);
+    if(t.age>=t.life){expired++;combo=0;burst(t.x,t.y,'#ffffff',6);beep(180,.12,'square',.08);targets.splice(i,1)}
+  }
+  spawnT-=dt;const maxT=1+Math.floor(diff()*2.2);
+  if(targets.length<maxT&&spawnT<=0){spawn();spawnT=.3}
+}
+function draw(){
+  ctx.clearRect(0,0,W,H);ctx.save();ctx.globalAlpha=1;
+  if(shake)ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);
+  for(const t of targets){
+    const cols=['#ff2d3d','#ffffff','#ff2d3d','#ffffff','#ffd21f'],R=Math.max(0,t.r);
+    ctx.save();ctx.globalAlpha=1;ctx.fillStyle='rgba(8,30,70,.45)';ctx.beginPath();ctx.ellipse(t.x,t.y+R*.95,R*.95,R*.28,0,0,6.283);ctx.fill();
+    ctx.beginPath();ctx.arc(t.x,t.y,R+4,0,6.283);ctx.fillStyle='#0c2c58';ctx.fill();
+    for(let k=0;k<5;k++){ctx.beginPath();ctx.arc(t.x,t.y,Math.max(0,R*(1-k*.2)),0,6.283);ctx.fillStyle=cols[k];ctx.fill()}
+    ctx.beginPath();ctx.ellipse(t.x-R*.3,t.y-R*.5,R*.35,R*.15,-.6,0,6.283);ctx.fillStyle='rgba(255,255,255,.85)';ctx.fill();ctx.restore();
+  }
+  for(const p of parts){ctx.globalAlpha=Math.min(1,Math.max(0,p.life/.5));ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x,p.y,p.s*.8,0,6.283);ctx.fill()}ctx.globalAlpha=1;
+  for(const p of pops){ctx.globalAlpha=Math.min(1,p.life*2);txt(p.t,p.x,p.y,28,'center',p.c)}ctx.globalAlpha=1;
+  ctx.restore();
+  if(playing){
+    const s=Math.max(16,Math.min(26,W/18));
+    txt('⏱ '+Math.ceil(tLeft),W/2,38,s*1.3,'center');
+    txt('Score '+score,14,84,s,'left');
+    const tot=hits+missClicks+expired;txt('Acc '+(tot?Math.round(hits/tot*100):100)+'%',W-14,84,s,'right');
+    if(combo>1)txt('🔥 x'+combo,W/2,72,s,'center','#ffe45c');
+  }
+}
+function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;update(dt);draw();requestAnimationFrame(loop)}
+function start(){
+  ac();playing=true;tLeft=DUR;targets=[];parts=[];pops=[];hits=missClicks=expired=score=combo=bestCombo=0;spawnT=0;
+  $('ov').classList.add('hide');beep(600,.1,'square',.1);
+}
+function end(){
+  playing=false;const tot=hits+missClicks+expired,acc=tot?Math.round(hits/tot*100):0,b=getBest(),nb=score>b;if(nb)setBest(score);
+  const title=score>1500?'🏅 Sharpshooter!':score>900?'🎯 Great Aim!':score>400?'👍 Nice Shooting!':'🌱 Keep Practicing!';
+  $('ov').querySelector('h1').textContent=nb?'🏆 New Best!':title;
+  $('op').innerHTML='<span class=stars>'+(score>1500?'⭐⭐⭐':score>600?'⭐⭐☆':'⭐☆☆')+'</span><br>Score <b>'+score+'</b> · Best combo <b>'+bestCombo+'</b><br>Accuracy <b>'+acc+'%</b> · <b>'+(hits/DUR).toFixed(2)+'</b> hits/sec<br>Best score: <b>'+Math.max(b,score)+'</b>';
+  $('go').textContent='Play again';$('ov').classList.remove('hide');beep(500,.2,'triangle',.15);beep(380,.3,'triangle',.15,.2);
+}
+cv.addEventListener('pointerdown',e=>{e.preventDefault();ac();hit(e.clientX,e.clientY)});
+$('go').onclick=start;
+{const b=getBest();if(b)$('op').innerHTML+='<br>🏆 Best: <b>'+b+'</b>'}
+requestAnimationFrame(loop);
+</script></body></html>

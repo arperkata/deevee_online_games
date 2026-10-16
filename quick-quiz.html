@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quick Quiz</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
+body{background:linear-gradient(#27a2e8,#bdeafc) fixed;font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;color:#fff;text-shadow:0 2px 0 #1b4f86;user-select:none;-webkit-user-select:none;display:flex;flex-direction:column;align-items:center;touch-action:manipulation}
+.home{position:fixed;left:10px;top:10px;z-index:1000;background:#f08a12;color:#fff;text-decoration:none;padding:0 16px;min-height:44px;display:inline-flex;align-items:center;border-radius:999px;font-weight:700;box-shadow:0 3px 0 #b3600a;text-shadow:none}
+.btn{min-height:44px;border:0;cursor:pointer;font:inherit;font-weight:700;font-size:20px;color:#fff;text-shadow:0 2px 0 #1c701c;padding:10px 26px;border-radius:16px;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
+.btn.sm{min-width:44px;font-size:16px;padding:4px 12px;border-radius:12px;box-shadow:0 3px 0 #1c701c}
+#tb{height:100%;width:100%;background:linear-gradient(#5fd35f,#2ea32e)}
+#ans{display:grid;gap:10px}
+@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+#next{margin-top:12px}
+
+.pill{background:linear-gradient(#3b86e0,#1b4f86);border:2px solid #fff;border-radius:999px;padding:2px clamp(8px,2.6vw,14px);font-weight:bold;font-size:clamp(14px,4vw,20px);box-shadow:0 3px 0 #0f2f57;text-shadow:0 2px 0 #0f2f57;white-space:nowrap}
+.ov{position:fixed;inset:0;background:rgba(15,47,87,.85);display:flex;align-items:center;justify-content:center;z-index:100;padding:48px 12px 12px;touch-action:manipulation}
+.card{background:linear-gradient(#fff,#e3f3ff);color:#1b4f86;text-shadow:none;border:5px solid #ffd84a;border-radius:28px;box-shadow:0 10px 0 #0f2f57,0 20px 40px rgba(0,0,0,.35);padding:clamp(14px,4vmin,30px);display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2vmin,14px);text-align:center;width:min(94vw,520px);max-height:calc(100vh - 60px);overflow-y:auto;animation:cardin .4s cubic-bezier(.2,1.6,.4,1)}
+.card h1{margin:0;font-size:clamp(26px,7.5vmin,44px);color:#e8590c;text-shadow:0 3px 0 #ffd84a}
+.card p{margin:0;font-size:clamp(15px,3.6vmin,20px);line-height:1.35;font-weight:bold}
+.card .btn{width:100%}
+.stars{font-size:clamp(28px,8vmin,44px);letter-spacing:4px}.stars:empty{display:none}
+.btn{border:3px solid #fff}
+.btn.o{background:linear-gradient(#ffb347,#f08a12);box-shadow:0 5px 0 #a85d00;text-shadow:0 2px 0 #a85d00}.btn.o:active{box-shadow:0 1px 0 #a85d00}
+.btn.r{background:linear-gradient(#ff8a8a,#d63030);box-shadow:0 5px 0 #8f1c1c;text-shadow:0 2px 0 #8f1c1c}.btn.r:active{box-shadow:0 1px 0 #8f1c1c}
+.btn.p{background:linear-gradient(#c59cff,#7b3fe0);box-shadow:0 5px 0 #4a1fa0;text-shadow:0 2px 0 #4a1fa0}.btn.p:active{box-shadow:0 1px 0 #4a1fa0}
+.btn.b{background:linear-gradient(#5fb8ff,#2a7fe0);box-shadow:0 5px 0 #174f95;text-shadow:0 2px 0 #174f95}.btn.b:active{box-shadow:0 1px 0 #174f95}
+@keyframes cardin{0%{transform:scale(.6)}100%{transform:scale(1)}}
+.hide{display:none!important}
+@media (max-height:480px){.ov{padding:8px 12px}.card{flex-direction:row;flex-wrap:wrap;justify-content:center;max-height:calc(100vh - 16px);width:min(94vw,640px)}.card h1,.card p,.stars{flex:1 1 100%}.card .btn{width:auto;flex:1 1 auto;padding:8px 14px;font-size:16px}html,body{overflow-y:auto}}
+#bar{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap;width:100%;padding:8px 8px 0 108px;font-size:clamp(13px,3.6vw,17px);font-weight:700;min-height:54px}
+#bar span{background:linear-gradient(#3b86e0,#1b4f86);border:2px solid #fff;border-radius:999px;padding:2px 10px;box-shadow:0 3px 0 #0f2f57;white-space:nowrap}
+#bar b{font-size:1.2em}
+#app{width:min(100%,720px);padding:8px 12px;overflow-y:auto;flex:1}
+#tbw{height:18px;background:#0f2f57;border:3px solid #fff;border-radius:10px;overflow:hidden;box-shadow:0 3px 0 #0f2f57}
+#card{margin-top:12px;background:linear-gradient(#fff,#e3f3ff);color:#1b4f86;text-shadow:none;border:4px solid #fff;border-radius:24px;padding:14px;text-align:center;box-shadow:0 8px 0 #0f2f57}
+#cat{font-size:clamp(14px,3.8vw,17px);font-weight:700;color:#e8590c}
+#q{font-size:clamp(20px,5.5vw,30px);font-weight:700;margin:8px 0 14px;line-height:1.25;color:#1b4f86}
+.a{min-height:52px;border:3px solid #fff;border-radius:16px;font:inherit;font-weight:700;font-size:clamp(17px,4.5vw,23px);color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.35);background:linear-gradient(#5fb8ff,#2a7fe0);box-shadow:0 5px 0 #174f95;cursor:pointer;padding:8px 12px}
+.a:nth-child(2){background:linear-gradient(#ffb347,#f08a12);box-shadow:0 5px 0 #a85d00}
+.a:nth-child(3){background:linear-gradient(#c59cff,#7b3fe0);box-shadow:0 5px 0 #4a1fa0}
+.a:nth-child(4){background:linear-gradient(#ff9ad5,#e0409a);box-shadow:0 5px 0 #922866}
+.a:active{transform:translateY(3px)}
+.a.ok{background:linear-gradient(#7be07b,#2ea32e);color:#fff;box-shadow:0 5px 0 #1c701c}
+.a.bad{background:linear-gradient(#ff8a8a,#d63030);color:#fff;box-shadow:0 5px 0 #8f1c1c;animation:sh .35s}
+#fact{margin-top:12px;background:#fff3c4;border:3px solid #ffd84a;color:#1b4f86;text-shadow:none;border-radius:14px;padding:10px;font-size:clamp(15px,4vw,18px);font-weight:700;animation:pop .25s}
+#pts{height:28px;font-size:22px;font-weight:700;color:#e8590c;text-shadow:none}
+#cf{position:fixed;inset:0;pointer-events:none;z-index:200}
+.card p{white-space:pre-line}
+@media (max-width:560px){#bar{padding:52px 8px 0}.a{min-height:48px}#ans{gap:8px}}
+@media (max-height:480px){#bar{padding:6px 8px 0 108px;min-height:44px}#ans{grid-template-columns:1fr 1fr!important;gap:8px}.a{min-height:40px;padding:4px 8px}#card{padding:8px;margin-top:8px}#q{margin:4px 0 8px;font-size:clamp(16px,4vh,22px)}#pts{height:20px;font-size:18px}}
+</style></head><body>
+<a class="home" href="index.html">⌂ Home</a>
+<div id="bar"><span>Q <b id="qn">0</b>/10</span><span>Score <b id="sc">0</b></span><span>Streak 🔥<b id="st">0</b></span><span>Best <b id="bs">0</b></span><button id="mute" class="btn sm">🔊</button></div>
+<div id="app"><div id="tbw"><div id="tb"></div></div><div id="card"><div id="cat"></div><div id="q"></div><div id="ans"></div><div id="pts"></div><div id="fact" hidden></div><button class="btn" id="next" hidden>Next ➜</button></div></div>
+<canvas id="cf"></canvas>
+<div class="ov" id="ov"><div class="card"><h1 id="t">🧠 Quick Quiz</h1><div class="stars" id="ovS"></div><p id="m">10 questions. Answer fast for more points and build a streak! Learn a fun fact each time.</p><button class="btn" id="go">▶ Play</button></div></div>
+<script>
+const $=id=>document.getElementById(id);
+let AC,muted=false;
+function beep(f,d=.1,t='sine',v=.15){if(muted)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state=='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
+function best(v){try{if(v!==undefined)localStorage.setItem('qqbest',v);return +localStorage.getItem('qqbest')||0}catch(e){return 0}}
+addEventListener('pointerdown',()=>{try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume()}catch(e){}},{once:true});
+$('mute').onclick=function(){muted=!muted;this.textContent=muted?'🔇':'🔊'};
+// [category, question, options (first is correct) | true/false answer, fun fact]
+const A='🐾 Animals',S='🚀 Space',G='🌍 Geography',C='🔬 Science';
+const Q=[
+[A,'Which animal is the tallest in the world?',['Giraffe','Elephant','Ostrich','Camel'],'A giraffe can grow up to 5.5 m (18 ft) tall.'],
+[A,'Octopuses have three hearts.',true,'Two pump blood to the gills and one to the rest of the body.'],
+[A,'How many legs does a spider have?',['8','6','10','12'],'Spiders are arachnids, not insects.'],
+[A,'Bats are blind.',false,'Bats can see, and many also use echolocation to find food in the dark.'],
+[A,'What is a baby kangaroo called?',['Joey','Cub','Pup','Kit'],'A joey lives in its mother\'s pouch for months.'],
+[A,'Which is the fastest land animal?',['Cheetah','Lion','Horse','Greyhound'],'A cheetah can hit about 100 km/h (62 mph) in short bursts.'],
+[A,'Penguins can fly.',false,'Their wings are flippers. They "fly" through the water instead!'],
+[A,'Which animal can sleep standing up?',['Horse','Dog','Cat','Rabbit'],'Horses lock their legs with special tendons so they can doze on their feet.'],
+[A,'A group of crows is called a "murder".',true,'Crows are super smart and can even recognize human faces.'],
+[A,'What do giant pandas mostly eat?',['Bamboo','Fish','Honey','Berries'],'A panda can eat over 10 kg of bamboo every day.'],
+[A,'Goldfish only remember things for 3 seconds.',false,'Goldfish can remember things for months.'],
+[A,'Which is the largest animal on Earth?',['Blue whale','African elephant','Giraffe','Great white shark'],'A blue whale\'s tongue can weigh as much as an elephant.'],
+[A,'Which bird lays the largest egg?',['Ostrich','Eagle','Penguin','Swan'],'One ostrich egg equals about 24 chicken eggs.'],
+[A,'Dolphins are fish.',false,'Dolphins are mammals. They breathe air and feed their babies milk.'],
+[A,'What color is a polar bear\'s skin?',['Black','White','Pink','Grey'],'The fur is see-through. The black skin soaks up the Sun\'s heat.'],
+[S,'Which planet is closest to the Sun?',['Mercury','Venus','Earth','Mars'],'A year on Mercury lasts only 88 Earth days.'],
+[S,'The Sun is a star.',true,'About 1.3 million Earths could fit inside the Sun.'],
+[S,'Which planet is called the Red Planet?',['Mars','Jupiter','Venus','Saturn'],'Mars looks red because its dust is full of iron rust.'],
+[S,'Which planet is famous for its rings?',['Saturn','Mars','Earth','Mercury'],'Saturn\'s rings are made of chunks of ice and rock.'],
+[S,'There is no sound in space.',true,'Sound needs air to travel, and space is almost empty.'],
+[S,'What is the name of our galaxy?',['Milky Way','Andromeda','Sombrero','Whirlpool'],'The Milky Way holds more than 100 billion stars.'],
+[S,'Who was the first person to walk on the Moon?',['Neil Armstrong','Buzz Aldrin','Yuri Gagarin','John Glenn'],'Apollo 11 landed on July 20, 1969.'],
+[S,'A day on Venus is longer than its year.',true,'Venus spins in 243 Earth days but orbits the Sun in 225.'],
+[S,'Which is the biggest planet in our Solar System?',['Jupiter','Saturn','Neptune','Earth'],'Jupiter\'s Great Red Spot is a storm bigger than Earth.'],
+[S,'How long does sunlight take to reach Earth?',['About 8 minutes','About 8 seconds','About 8 hours','About 1 day'],'Light travels about 300,000 km every second.'],
+[S,'Earth is the only planet in our Solar System with a moon.',false,'Jupiter and Saturn each have dozens of moons.'],
+[S,'Which planet spins on its side?',['Uranus','Mars','Earth','Venus'],'Uranus is tilted about 98 degrees, like a rolling ball.'],
+[S,'What is a "shooting star" really?',['A space rock burning up','A tiny star','A comet\'s tail','A satellite'],'Most meteors are no bigger than a grain of sand!'],
+[S,'Pluto is classified as a dwarf planet.',true,'Pluto was reclassified in 2006.'],
+[S,'Which animal was the first to orbit Earth?',['Laika the dog','A monkey','A cat','A mouse'],'Laika flew aboard Sputnik 2 in 1957.'],
+[G,'What is the largest ocean on Earth?',['Pacific','Atlantic','Indian','Arctic'],'The Pacific covers about a third of the planet.'],
+[G,'What is the capital of France?',['Paris','Rome','Madrid','Berlin'],'The Eiffel Tower in Paris opened in 1889.'],
+[G,'Mount Everest is the highest mountain above sea level.',true,'Everest is about 8,849 m tall.'],
+[G,'On which continent is the Sahara Desert?',['Africa','Asia','Australia','South America'],'The Sahara is almost as big as the whole United States.'],
+[G,'Which river flows through Egypt?',['Nile','Amazon','Thames','Danube'],'The Nile is about 6,650 km long, one of the longest rivers on Earth.'],
+[G,'Australia is both a country and a continent.',true,'It is the only country that covers a whole continent.'],
+[G,'What is the capital of Japan?',['Tokyo','Kyoto','Osaka','Seoul'],'Greater Tokyo is home to about 37 million people.'],
+[G,'How many continents are there?',['7','5','6','8'],'Africa, Antarctica, Asia, Australia, Europe, North and South America.'],
+[G,'Canada has the longest coastline of any country.',true,'Canada\'s coastline is over 200,000 km long.'],
+[G,'Which country is shaped like a boot?',['Italy','Spain','Greece','Chile'],'The island of Sicily looks like a ball about to be kicked.'],
+[G,'What is the smallest country in the world?',['Vatican City','Monaco','Malta','Iceland'],'Vatican City is smaller than a typical golf resort.'],
+[G,'Most of the Amazon rainforest is in Brazil.',true,'It is home to millions of species of plants and animals.'],
+[G,'What is the capital of Australia?',['Canberra','Sydney','Melbourne','Perth'],'Canberra was built as a compromise between Sydney and Melbourne.'],
+[G,'Which is the largest country by area?',['Russia','Canada','China','USA'],'Russia spans 11 time zones.'],
+[G,'Antarctica is the coldest continent.',true,'The lowest recorded temperature there was about -89 C.'],
+[C,'Which gas do plants take in from the air?',['Carbon dioxide','Oxygen','Helium','Nitrogen'],'Plants release oxygen when they make food using sunlight.'],
+[C,'Water boils at 100 C at sea level.',true,'Up on tall mountains, water boils at a lower temperature.'],
+[C,'How many bones does an adult human have?',['206','106','306','412'],'Babies are born with around 300 bones that fuse together.'],
+[C,'What force pulls things toward the Earth?',['Gravity','Magnetism','Friction','Wind'],'Gravity is also why the Moon orbits the Earth.'],
+[C,'Lightning never strikes the same place twice.',false,'The Empire State Building is hit about 20 times a year.'],
+[C,'What is the hardest natural material?',['Diamond','Gold','Iron','Quartz'],'Diamonds are made of pure carbon.'],
+[C,'What is H2O better known as?',['Water','Salt','Air','Sugar'],'Each molecule has two hydrogen atoms and one oxygen atom.'],
+[C,'Sound travels faster than light.',false,'That is why you see lightning before you hear thunder.'],
+[C,'Which organ pumps blood around your body?',['Heart','Lungs','Brain','Liver'],'Your heart beats about 100,000 times every day.'],
+[C,'What is the center of an atom called?',['Nucleus','Cell','Orbit','Core'],'The nucleus holds protons and neutrons.'],
+[C,'Humans only use 10% of their brains.',false,'Brain scans show we use virtually all of our brain.'],
+[C,'How many colors are in a rainbow?',['7','5','6','9'],'Red, orange, yellow, green, blue, indigo and violet.'],
+[C,'At what temperature does water freeze (in Celsius)?',['0','32','10','-10'],'0 C is the same as 32 F.'],
+[C,'Glass is made mostly from sand.',true,'Sand is melted at very high temperatures to make glass.'],
+[C,'Which metal is liquid at room temperature?',['Mercury','Iron','Copper','Silver'],'Mercury is used in some old thermometers.']];
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+let deck=[],qs=[],idx=0,score=0,streak=0,correct=0,roundNo=0,opts=[],locked=true,tlen=14,t0=0,raf=0,bestS=best();
+function ui(){$('qn').textContent=Math.min(idx+1,10);$('sc').textContent=score;$('st').textContent=streak;$('bs').textContent=bestS}
+function startRound(){if(deck.length<10)deck=shuf(Q.map((_,i)=>i));qs=deck.splice(0,10);idx=0;score=0;streak=0;correct=0;roundNo++;$('ov').classList.add('hide');show()}
+$('go').onclick=startRound;
+function show(){const q=Q[qs[idx]];locked=false;$('cat').textContent=q[0]+'  ·  '+(typeof q[2]=='boolean'?'True or False?':'Pick one');$('q').textContent=q[1];$('pts').textContent='';$('fact').hidden=true;$('next').hidden=true;
+opts=typeof q[2]=='boolean'?[{t:'✅ True',ok:q[2]},{t:'❌ False',ok:!q[2]}]:shuf(q[2].map((t,i)=>({t,ok:i==0})));
+const a=$('ans');a.innerHTML='';a.style.gridTemplateColumns=opts.length==2?'1fr 1fr':'1fr';
+opts.forEach((o,i)=>{const b=document.createElement('button');b.className='a';b.textContent=(opts.length>2?(i+1)+'. ':'')+o.t;b.onclick=()=>answer(i);a.appendChild(b)});
+tlen=Math.max(8,15-roundNo);t0=performance.now();ui();cancelAnimationFrame(raf);tick()}
+function tick(){const e=(performance.now()-t0)/1000,f=Math.max(0,1-e/tlen);$('tb').style.width=f*100+'%';$('tb').style.background=f>.5?'linear-gradient(#5fd35f,#2ea32e)':f>.25?'linear-gradient(#ffd23f,#f08a12)':'linear-gradient(#ff8a8a,#d63030)';
+if(locked)return;if(f<=0)answer(-1);else raf=requestAnimationFrame(tick)}
+function answer(i){if(locked)return;locked=true;cancelAnimationFrame(raf);const left=Math.max(0,1-(performance.now()-t0)/1000/tlen),ok=i>=0&&opts[i].ok,bs=$('ans').children;
+opts.forEach((o,k)=>{if(o.ok)bs[k].classList.add('ok');else if(k==i)bs[k].classList.add('bad');bs[k].disabled=true});
+if(ok){streak++;correct++;const p=100+Math.round(50*left)+Math.min(streak-1,10)*25;score+=p;$('pts').textContent='+'+p+(streak>1?'  🔥 streak x'+streak:'');beep(660,.12,'triangle',.2);setTimeout(()=>beep(880,.15,'triangle',.2),110);confetti(streak)}
+else{streak=0;$('pts').textContent=i<0?'⏰ Time\'s up!':'Oops!';beep(180,.3,'sawtooth',.1)}
+const q=Q[qs[idx]];$('fact').textContent='💡 '+q[3];$('fact').hidden=false;$('next').textContent=idx>=9?'See results 🏆':'Next ➜';$('next').hidden=false;ui()}
+$('next').onclick=()=>{if(!locked||$('next').hidden)return;if(idx>=9)finish();else{idx++;show()}};
+addEventListener('keydown',e=>{if(!$('ov').classList.contains('hide'))return;if(e.key=='Enter'||e.key==' '){if(!$('next').hidden){e.preventDefault();$('next').click()}}else if(/^[1-4]$/.test(e.key)&&!locked&&+e.key<=opts.length)answer(+e.key-1);else if(!locked&&opts.length==2){if(e.key=='t')answer(0);if(e.key=='f')answer(1)}});
+function finish(){const nb=score>bestS;if(nb){bestS=score;best(bestS)}ui();const st=correct>=9?'🌟🌟🌟':correct>=6?'🌟🌟':correct>=3?'🌟':'💪';
+$('ovS').textContent=st;$('t').textContent='Round done!';$('m').textContent=correct+'/10 correct · Score '+score+'\nBest '+bestS+(nb?' · 🏆 New best!':'');$('go').textContent='▶ Play Again';$('ov').classList.remove('hide');if(correct>=6){confetti(10);[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.2),i*110))}}
+const cf=$('cf'),cx=cf.getContext('2d');let ps=[],run=false;
+function sz(){cf.width=innerWidth;cf.height=innerHeight}sz();addEventListener('resize',sz);
+function confetti(n){for(let i=0;i<20+Math.min(n,10)*8;i++)ps.push({x:innerWidth/2,y:innerHeight/2.5,vx:(Math.random()-.5)*14,vy:-Math.random()*12,l:70,c:['#ffd23f','#ff6b6b','#5fd35f','#fff','#6bc4ff'][i%5]});if(!run){run=true;cl()}}
+function cl(){cx.clearRect(0,0,cf.width,cf.height);ps=ps.filter(p=>p.l>0);for(const p of ps){p.x+=p.vx;p.y+=p.vy;p.vy+=.5;p.l--;cx.globalAlpha=Math.min(1,p.l/20);cx.fillStyle=p.c;cx.fillRect(p.x,p.y,8,8)}cx.globalAlpha=1;if(ps.length)requestAnimationFrame(cl);else run=false}
+ui();
+</script></body></html>

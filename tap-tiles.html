@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tap Tiles</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+html,body{margin:0;height:100%;overflow:hidden;touch-action:none;overscroll-behavior:none}
+body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:radial-gradient(circle at 50% 0,#3fb6f5,#1f7fd6 60%,#154f9c) fixed;color:#fff;text-shadow:0 2px 0 #1b4f86}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.home{position:fixed;left:10px;top:10px;z-index:100;background:#f08a12;color:#fff;text-decoration:none;font-weight:700;padding:12px 16px;min-height:46px;line-height:22px;border-radius:999px;box-shadow:0 3px 0 #b05f00;text-shadow:none;font-size:16px}
+#mute{position:fixed;right:10px;top:10px;z-index:100;width:46px;height:46px;border-radius:50%;border:3px solid #1b4f86;background:#fff;font-size:20px;box-shadow:0 3px 0 #1b4f86;cursor:pointer;text-shadow:none}
+.btn{font:inherit;font-size:26px;font-weight:700;color:#fff;text-shadow:0 2px 0 #1c701c;border:0;border-radius:18px;padding:12px 38px;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;min-height:48px;font-size:28px}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
+.ov{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;background:rgba(10,40,90,.88);padding:20px}
+.ov h1{margin:0;font-size:clamp(30px,8vw,54px);-webkit-text-stroke:2px #0c2c58;paint-order:stroke fill;text-shadow:0 4px 0 #0c2c58}.ov b{color:#ffe45c}.stars{font-size:clamp(34px,10vw,56px);text-shadow:none;letter-spacing:6px}.ov p{margin:0;font-size:clamp(16px,4vw,22px);max-width:480px}
+.hide{display:none!important}
+</style></head><body>
+<canvas id="cv"></canvas>
+<a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="mute">🔊</button>
+<div class="ov" id="ov"><h1>🎹 Tap Tiles</h1><p id="op">Tap only the glowing blue tiles as they fall. Don't miss one, don't touch a white tile! Every tap plays a note. Keys: D F J K.</p><button class="btn" id="go">Play</button></div>
+<script>
+const $=id=>document.getElementById(id);
+const K='tapTilesBest',cv=$('cv'),ctx=cv.getContext('2d');
+let AC=null,muted=false;
+function ac(){try{if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){}return AC}
+function beep(f,d,type,v,delay){if(muted)return;const a=ac();if(!a)return;try{const o=a.createOscillator(),g=a.createGain(),s=a.currentTime+(delay||0);o.type=type||'sine';o.frequency.value=f;g.gain.setValueAtTime(v||.15,s);g.gain.exponentialRampToValueAtTime(.001,s+d);o.connect(g);g.connect(a.destination);o.start(s);o.stop(s+d+.02)}catch(e){}}
+$('mute').onclick=e=>{muted=!muted;e.target.textContent=muted?'🔇':'🔊';ac()};
+const getBest=()=>{try{return +localStorage.getItem(K)||0}catch(e){return 0}};
+const setBest=v=>{try{localStorage.setItem(K,v)}catch(e){}};
+let W=0,H=0,dpr=1;
+function resize(){dpr=Math.min(2,window.devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0)}
+addEventListener('resize',resize);addEventListener('orientationchange',()=>setTimeout(resize,150));resize();
+const SCALE=[261.63,293.66,329.63,349.23,392,440,493.88,523.25,587.33,659.25,698.46,783.99,880];
+const KEYS=['d','f','j','k'];
+let state='idle',rows=[],score=0,started=false,shake=0,flash=0,parts=[],pops=[],last=0,deadT=0,wrong=null,milestone=0;
+const geo=()=>{const pw=Math.min(W,480);return{pw,cw:pw/4,x0:(W-pw)/2,rh:H/4.2}};
+function newRow(y){return{col:Math.random()*4|0,y,done:false,ripple:0,bad:false}}
+function fill(){const g=geo();if(!rows.length)rows.push(newRow(H-2*g.rh));while(rows[rows.length-1].y>-g.rh){let r=newRow(rows[rows.length-1].y-g.rh),p=rows[rows.length-1];if(r.col===p.col&&Math.random()<.4)r.col=(r.col+1+(Math.random()*3|0))%4;rows.push(r)}}
+function burst(x,y,n,c){for(let i=0;i<n;i++){const a=Math.random()*6.28,s=60+Math.random()*220;parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-60,life:.5+Math.random()*.4,c,s:3+Math.random()*5})}}
+function note(i){const m=i%24,idx=m<=12?m:24-m,f=SCALE[idx];beep(f,.4,'triangle',.22);beep(f*2,.25,'sine',.06)}
+function txt(s,x,y,size,al,col){ctx.font='700 '+size+'px Fredoka,"Trebuchet MS","Comic Sans MS",sans-serif';ctx.textAlign=al;ctx.save();ctx.lineJoin='round';ctx.lineWidth=Math.max(4,size/4);ctx.strokeStyle='#0c2c58';ctx.strokeText(s,x,y);ctx.fillStyle=col||'#fff';ctx.fillText(s,x,y);ctx.restore()}
+function tap(px,py,colOverride){
+  if(state!=='play')return;const g=geo();
+  const col=colOverride!==undefined?colOverride:Math.floor((px-g.x0)/g.cw);if(col<0||col>3)return;
+  let row=null;
+  if(colOverride!==undefined){row=rows.find(r=>!r.done&&r.y+g.rh>0&&r.y<H)}
+  else row=rows.find(r=>py>=r.y&&py<r.y+g.rh);
+  if(!row||row.done)return;
+  if(col===row.col){
+    if(row!==rows.find(r=>!r.done))return;
+    row.done=true;row.ripple=1;started=true;note(score);score++;
+    burst(g.x0+g.cw*(col+.5),row.y+g.rh/2,10,'#ffe45c');
+    if(score%25===0){pops.push({t:'🔥 '+score+'!',life:1.2,y:H/2});flash=.6;[0,.07,.14].forEach((d,i)=>beep(660+i*220,.15,'square',.08,d))}
+  }else{row.bad=true;wrong={row,col};die()}
+}
+function die(){state='dead';deadT=.7;shake=22;beep(110,.5,'sawtooth',.25);beep(70,.6,'square',.15,.05)}
+function update(dt){
+  for(const p of parts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=500*dt;p.life-=dt}parts=parts.filter(p=>p.life>0);
+  for(const p of pops)p.life-=dt;pops=pops.filter(p=>p.life>0);
+  shake=Math.max(0,shake-dt*40);flash=Math.max(0,flash-dt*2);for(const r of rows)r.ripple=Math.max(0,r.ripple-dt*3);
+  if(state==='dead'){deadT-=dt;if(deadT<=0)over();return}
+  if(state!=='play')return;
+  const g=geo();
+  if(started){const v=g.rh*Math.min(6,2.2+score*.05);for(const r of rows)r.y+=v*dt}
+  fill();
+  const r0=rows[0];
+  if(r0.y>=H){if(!r0.done){r0.bad=true;die();return}rows.shift()}
+}
+function draw(){
+  ctx.clearRect(0,0,W,H);const g=geo();ctx.save();if(shake)ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);
+  ctx.globalAlpha=1;ctx.fillStyle='#fff';ctx.fillRect(g.x0,0,g.pw,H);ctx.fillStyle='#0c2c58';ctx.fillRect(g.x0-5,0,5,H);ctx.fillRect(g.x0+g.pw,0,5,H);
+  ctx.strokeStyle='#9cc4ea';ctx.lineWidth=2;
+  for(let c=1;c<4;c++){ctx.beginPath();ctx.moveTo(g.x0+c*g.cw,0);ctx.lineTo(g.x0+c*g.cw,H);ctx.stroke()}
+  for(const r of rows){
+    ctx.beginPath();ctx.moveTo(g.x0,r.y);ctx.lineTo(g.x0+g.pw,r.y);ctx.stroke();
+    const x=g.x0+r.col*g.cw;
+    if(r.done){ctx.fillStyle=r.ripple>.05?'#7fe0ff':'#bfe6fa';ctx.beginPath();ctx.roundRect(x+3,r.y+3,g.cw-6,g.rh-6,12);ctx.fill()}
+    else{const gr=ctx.createLinearGradient(0,r.y,0,r.y+g.rh);gr.addColorStop(0,r.bad?'#ff5a50':'#6a5cff');gr.addColorStop(1,r.bad?'#b3201a':'#1c1a8f');ctx.fillStyle=gr;ctx.beginPath();ctx.roundRect(x+3,r.y+3,g.cw-6,g.rh-6,12);ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#0c2c58';ctx.stroke();ctx.fillStyle='#fff';ctx.beginPath();ctx.roundRect(x+12,r.y+10,g.cw-24,Math.min(10,g.rh*.1),5);ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#9cc4ea';
+      if(!started&&state==='play'&&r===rows[0])txt('TAP',x+g.cw/2,r.y+g.rh/2+10,Math.min(30,g.cw/3),'center')}
+  }
+  if(wrong){const x=g.x0+wrong.col*g.cw;ctx.fillStyle='#ff3b30';ctx.beginPath();ctx.roundRect(x+3,wrong.row.y+3,g.cw-6,g.rh-6,12);ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#0c2c58';ctx.stroke();txt('✖',x+g.cw/2,wrong.row.y+g.rh/2+12,Math.min(40,g.cw/2),'center')}
+  for(const p of parts){ctx.globalAlpha=Math.max(0,Math.min(1,p.life*2));ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x,p.y,p.s+1,0,6.283);ctx.fill()}ctx.globalAlpha=1;
+  ctx.restore();
+  if(flash>0){ctx.fillStyle='rgba(255,230,100,'+flash*.5+')';ctx.fillRect(0,0,W,H)}
+  if(state==='play'||state==='dead'){
+    txt(String(score),W/2,Math.max(64,H*.1),Math.min(80,W/5),'center');
+    txt('Speed x'+(Math.min(6,2.2+score*.05)/2.2).toFixed(1),W/2,Math.max(64,H*.1)+28,Math.min(20,W/20),'center');
+    for(const p of pops){ctx.globalAlpha=Math.min(1,p.life);txt(p.t,W/2,p.y-(1.2-p.life)*60,Math.min(60,W/7),'center','#ffe45c')}ctx.globalAlpha=1;
+  }
+}
+function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;update(dt);draw();requestAnimationFrame(loop)}
+function start(){ac();rows=[];score=0;started=false;wrong=null;parts=[];pops=[];shake=flash=0;fill();state='play';$('ov').classList.add('hide');beep(600,.08,'square',.08)}
+function over(){
+  state='over';const b=getBest(),nb=score>b;if(nb)setBest(score);
+  const t=score>=100?'👑 Piano Legend!':score>=50?'🎹 Pro Pianist!':score>=25?'🎵 Nice Tunes!':'🐣 Keep Tapping!';
+  $('ov').querySelector('h1').textContent=nb?'🏆 New Best!':t;
+  $('op').innerHTML='<span class=stars>'+(score>=50?'⭐⭐⭐':score>=25?'⭐⭐☆':'⭐☆☆')+'</span><br>Tiles tapped: <b>'+score+'</b><br>Best: <b>'+Math.max(b,score)+'</b>';
+  $('go').textContent='Play again';$('ov').classList.remove('hide');
+}
+cv.addEventListener('pointerdown',e=>{e.preventDefault();ac();tap(e.clientX,e.clientY)});
+addEventListener('keydown',e=>{if(e.repeat)return;const l=KEYS.indexOf(e.key.toLowerCase());if(l>=0){ac();tap(0,0,l)}});
+$('go').onclick=start;
+{const b=getBest();if(b)$('op').innerHTML+='<br>🏆 Best: <b>'+b+'</b>'}
+fill();requestAnimationFrame(loop);
+</script></body></html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Balloon Pop</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+html,body{margin:0;height:100%;overflow:hidden;touch-action:none;overscroll-behavior:none}
+body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:linear-gradient(#1a8fe0,#5fcbff 70%,#bdeafc) fixed;color:#fff;text-shadow:0 2px 0 #1b4f86}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.home{position:fixed;left:10px;top:10px;z-index:100;background:#f08a12;color:#fff;text-decoration:none;font-weight:700;padding:12px 16px;min-height:46px;line-height:22px;border-radius:999px;box-shadow:0 3px 0 #b05f00;text-shadow:none;font-size:16px}
+#mute{position:fixed;right:10px;top:10px;z-index:100;width:46px;height:46px;border-radius:50%;border:3px solid #1b4f86;background:#fff;font-size:20px;box-shadow:0 3px 0 #1b4f86;cursor:pointer;text-shadow:none}
+.btn{font:inherit;font-size:26px;font-weight:700;color:#fff;text-shadow:0 2px 0 #1c701c;border:0;border-radius:18px;padding:12px 38px;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;min-height:48px;font-size:28px}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
+.ov{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;background:rgba(10,40,90,.88);padding:20px}
+.ov h1{margin:0;font-size:clamp(30px,8vw,54px);-webkit-text-stroke:2px #0c2c58;paint-order:stroke fill;text-shadow:0 4px 0 #0c2c58}.ov b{color:#ffe45c}.stars{font-size:clamp(34px,10vw,56px);text-shadow:none;letter-spacing:6px}.ov p{margin:0;font-size:clamp(16px,4vw,22px);max-width:480px}
+.hide{display:none!important}
+</style></head><body>
+<canvas id="cv"></canvas>
+<a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="mute">🔊</button>
+<div class="ov" id="ov"><h1>🎈 Balloon Pop</h1><p id="op">Pop the balloons! ⭐ Gold = bonus + extra time. 💣 Bombs = oops, avoid them! 45 seconds.</p><button class="btn" id="go">Play</button></div>
+<script>
+const $=id=>document.getElementById(id);
+const K='balloonPopBest',cv=$('cv'),ctx=cv.getContext('2d');
+let AC=null,muted=false;
+function ac(){try{if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){}return AC}
+function beep(f,d,type,v,delay){if(muted)return;const a=ac();if(!a)return;try{const o=a.createOscillator(),g=a.createGain(),s=a.currentTime+(delay||0);o.type=type||'sine';o.frequency.value=f;g.gain.setValueAtTime(v||.15,s);g.gain.exponentialRampToValueAtTime(.001,s+d);if(type==='sweep'){}o.connect(g);g.connect(a.destination);o.start(s);o.stop(s+d+.02)}catch(e){}}
+function sweep(f1,f2,d,v){if(muted)return;const a=ac();if(!a)return;try{const o=a.createOscillator(),g=a.createGain(),s=a.currentTime;o.type='triangle';o.frequency.setValueAtTime(f1,s);o.frequency.exponentialRampToValueAtTime(f2,s+d);g.gain.setValueAtTime(v,s);g.gain.exponentialRampToValueAtTime(.001,s+d);o.connect(g);g.connect(a.destination);o.start(s);o.stop(s+d+.02)}catch(e){}}
+$('mute').onclick=e=>{muted=!muted;e.target.textContent=muted?'🔇':'🔊';ac()};
+const getBest=()=>{try{return +localStorage.getItem(K)||0}catch(e){return 0}};
+const setBest=v=>{try{localStorage.setItem(K,v)}catch(e){}};
+let W=0,H=0,dpr=1;
+function resize(){dpr=Math.min(2,window.devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0)}
+addEventListener('resize',resize);addEventListener('orientationchange',()=>setTimeout(resize,150));resize();
+const DUR=45,COLORS=['#ff4d6d','#4dabf7','#51cf66','#ffa94d','#b197fc','#ff8fd0','#ffd43b'];
+let playing=false,tLeft=DUR,elapsed=0,bal=[],parts=[],pops=[],score=0,popped=0,combo=0,bestCombo=0,shake=0,flash=0,spawnT=0,last=0;
+const clouds=Array.from({length:5},(_,i)=>({x:Math.random()*900,y:60+i*110,s:.6+Math.random()*.8,v:8+Math.random()*14}));
+const diff=()=>Math.min(1,elapsed/40);
+function spawn(anywhere){
+  const base=Math.max(30,Math.min(52,Math.min(W,H)*.08)),r=base*(.8+Math.random()*.5)*(1-.2*diff());
+  let type='n';const q=Math.random();
+  if(elapsed>3){if(q<.07)type='g';else if(q<.15+.07*diff())type='b'}
+  if(anywhere)type='n';
+  bal.push({x:r+Math.random()*(W-2*r),y:anywhere?H*(.35+Math.random()*.6):H+r*1.4,r,vy:(H*.12+H*.2*diff())*(.8+Math.random()*.5)*(type==='g'?1.3:1),ph:Math.random()*6.28,amp:10+Math.random()*20,col:type==='g'?'#ffc800':type==='b'?'#333b4d':COLORS[Math.random()*COLORS.length|0],type,age:0});
+}
+function burst(x,y,c,n,star){for(let i=0;i<n;i++){const a=Math.random()*6.28,s=60+Math.random()*280;parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-60,life:.7+Math.random()*.4,c,s:4+Math.random()*6,star})}}
+function popText(x,y,t,c){pops.push({x,y,t,c,life:1})}
+function tap(px,py){
+  if(!playing)return;
+  for(let i=bal.length-1;i>=0;i--){
+    const b=bal[i],dx=px-(b.dx!==undefined?b.dx:b.x),dy=py-(b.y);
+    if((dx*dx)/((b.r*.9+8)**2)+(dy*dy)/((b.r*1.1+8)**2)<=1){
+      bal.splice(i,1);
+      if(b.type==='b'){score=Math.max(0,score-10);tLeft=Math.max(0,tLeft-3);combo=0;shake=22;flash=1;burst(b.x,b.y,'#ff7a00',40);burst(b.x,b.y,'#444',20);popText(b.x,b.y,'💥 -3s','#ff6b6b');sweep(220,40,.5,.3);}
+      else{
+        popped++;combo++;bestCombo=Math.max(bestCombo,combo);const mult=Math.min(5,1+Math.floor(combo/5));
+        if(b.type==='g'){score+=50*mult;tLeft+=3;burst(b.x,b.y,'#ffd700',34,true);popText(b.x,b.y,'⭐ +'+50*mult+'  +3s','#ffe45c');beep(784,.12,'triangle',.18);beep(1047,.12,'triangle',.18,.08);beep(1319,.2,'triangle',.18,.16)}
+        else{score+=10*mult;burst(b.x,b.y,b.col,16);popText(b.x,b.y,'+'+10*mult,'#fff');sweep(500+Math.min(combo,20)*30,120,.12,.2)}
+      }
+      return;
+    }
+  }
+}
+function txt(s,x,y,size,al,col){ctx.font='700 '+size+'px Fredoka,"Trebuchet MS","Comic Sans MS",sans-serif';ctx.textAlign=al;ctx.save();ctx.lineJoin='round';ctx.lineWidth=Math.max(4,size/4);ctx.strokeStyle='#0c2c58';ctx.strokeText(s,x,y);ctx.fillStyle=col||'#fff';ctx.fillText(s,x,y);ctx.restore()}
+function update(dt){
+  for(const c of clouds){c.x+=c.v*dt;if(c.x>W+150)c.x=-150}
+  for(const p of parts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=600*dt;p.life-=dt}parts=parts.filter(p=>p.life>0);
+  for(const p of pops){p.y-=50*dt;p.life-=dt}pops=pops.filter(p=>p.life>0);
+  shake=Math.max(0,shake-dt*50);flash=Math.max(0,flash-dt*3);
+  for(const b of bal){b.age+=dt;b.y-=b.vy*dt}
+  if(!playing){bal=bal.filter(b=>b.y>-b.r*3);return}
+  elapsed+=dt;tLeft-=dt;if(tLeft<=0){tLeft=0;end();return}
+  for(let i=bal.length-1;i>=0;i--){const b=bal[i];if(b.y<-b.r*2.5){if(b.type==='n'){combo=0}bal.splice(i,1)}}
+  spawnT-=dt;if(spawnT<=0){spawn();spawnT=(.85-.55*diff())*(.6+Math.random()*.8)}
+}
+function drawBalloon(b){
+  const x=b.x+Math.sin(b.age*1.6+b.ph)*b.amp,y=b.y,r=b.r;b.dx=x;
+  ctx.save();ctx.globalAlpha=1;
+  ctx.strokeStyle='#ffffff';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(x,y+r*1.1);
+  for(let k=1;k<=4;k++)ctx.lineTo(x+Math.sin(b.age*3+k*1.5)*6,y+r*1.1+k*r*.35);ctx.stroke();
+  const g=ctx.createRadialGradient(x-r*.35,y-r*.45,r*.05,x,y,r*1.2);g.addColorStop(0,'#fff');g.addColorStop(.22,b.col);g.addColorStop(1,b.type==='b'?'#05070b':shade(b.col));
+  ctx.lineWidth=4;ctx.strokeStyle='#0c2c58';ctx.lineJoin='round';
+  ctx.beginPath();ctx.moveTo(x,y+r*1.05);ctx.lineTo(x-7,y+r*1.3);ctx.lineTo(x+7,y+r*1.3);ctx.closePath();ctx.fillStyle=b.col;ctx.stroke();ctx.fill();
+  ctx.beginPath();ctx.ellipse(x,y,r*.9,r*1.1,0,0,6.283);ctx.fillStyle=g;ctx.fill();ctx.stroke();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(x-r*.38,y-r*.5,r*.14,r*.26,.5,0,6.283);ctx.fill();
+  if(b.type!=='n'){ctx.font=Math.round(r*.95)+'px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.globalAlpha=1;ctx.fillStyle='#000';ctx.fillText(b.type==='g'?'⭐':'💣',x,y)}
+  ctx.restore();
+}
+function shade(c){const n=parseInt(c.slice(1),16);return 'rgb('+((n>>16)*.6|0)+','+(((n>>8)&255)*.6|0)+','+((n&255)*.6|0)+')'}
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#ffffff';for(const c of clouds){ctx.beginPath();ctx.ellipse(c.x,c.y,70*c.s,28*c.s,0,0,6.283);ctx.ellipse(c.x+40*c.s,c.y-12*c.s,45*c.s,26*c.s,0,0,6.283);ctx.ellipse(c.x-40*c.s,c.y-6*c.s,40*c.s,22*c.s,0,0,6.283);ctx.fill()}
+  ctx.save();if(shake)ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);
+  for(const b of bal)drawBalloon(b);
+  for(const p of parts){ctx.save();ctx.globalAlpha=Math.max(0,Math.min(1,p.life*1.5));if(p.star){ctx.font=p.s*3+'px "Segoe UI Emoji","Apple Color Emoji",serif';ctx.textAlign='center';ctx.fillStyle='#000';ctx.fillText('✨',p.x,p.y)}else{ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x,p.y,p.s,0,6.283);ctx.fill()}ctx.restore()}ctx.globalAlpha=1;
+  for(const p of pops){ctx.globalAlpha=Math.min(1,p.life*2);txt(p.t,p.x,p.y,30,'center',p.c)}ctx.globalAlpha=1;
+  ctx.restore();
+  if(flash>0){ctx.fillStyle='rgba(255,60,40,'+flash*.5+')';ctx.fillRect(0,0,W,H)}
+  if(playing){const s=Math.max(16,Math.min(26,W/18));
+    txt('⏱ '+Math.ceil(tLeft),W/2,38,s*1.3,'center');txt('Score '+score,14,84,s,'left');
+    txt('🎈 '+popped,W-14,84,s,'right');if(combo>1)txt('🔥 x'+combo+(combo>=5?'  (x'+Math.min(5,1+Math.floor(combo/5))+' pts)':''),W/2,76,s,'center','#ffe45c')}
+}
+function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;update(dt);draw();requestAnimationFrame(loop)}
+function start(){
+  ac();playing=true;tLeft=DUR;elapsed=0;bal=[];parts=[];pops=[];score=popped=combo=bestCombo=0;spawnT=.2;shake=flash=0;
+  for(let i=0;i<5;i++)spawn(true);$('ov').classList.add('hide');beep(700,.1,'square',.1);
+}
+function end(){
+  playing=false;const b=getBest(),nb=score>b;if(nb)setBest(score);
+  $('ov').querySelector('h1').textContent=nb?'🏆 New Best!':'🎉 Time\'s up!';
+  $('op').innerHTML='<span class=stars>'+(score>=600?'⭐⭐⭐':score>=250?'⭐⭐☆':'⭐☆☆')+'</span><br>Score <b>'+score+'</b> · Popped <b>'+popped+'</b> 🎈<br>Best combo <b>'+bestCombo+'</b> · Best score <b>'+Math.max(b,score)+'</b>';
+  $('go').textContent='Play again';$('ov').classList.remove('hide');[523,659,784].forEach((f,i)=>beep(f,.2,'triangle',.15,i*.12));
+}
+cv.addEventListener('pointerdown',e=>{e.preventDefault();ac();tap(e.clientX,e.clientY)});
+$('go').onclick=start;
+{const b=getBest();if(b)$('op').innerHTML+='<br>🏆 Best: <b>'+b+'</b>'}
+for(let i=0;i<5;i++)spawn(true);
+requestAnimationFrame(loop);
+</script></body></html>

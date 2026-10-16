@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Catch the Right One</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden}
+body{height:100dvh;font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:#1e90e6;user-select:none;-webkit-user-select:none;touch-action:none;overscroll-behavior:none}
+canvas{display:block;position:fixed;left:0;top:0;width:100vw;height:100dvh}
+a.home,#mute{position:fixed;top:8px;z-index:2;background:linear-gradient(#ffb21f,#f07a0a);color:#fff;height:40px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;text-decoration:none;font:700 17px inherit;font-family:inherit;border:0;box-shadow:0 4px 0 #a9560b;cursor:pointer}
+a.home{left:8px;padding:0 14px}
+#mute{right:8px;width:44px;padding:0}
+#msg{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(6,30,70,.82);z-index:5;padding:16px}
+#msg.hide{display:none}
+#box{background:linear-gradient(#2f8cff,#0b4fb3);border:5px solid #ffe14a;border-radius:28px;padding:18px 26px;box-shadow:0 8px 0 #06244d;max-width:94vw;max-height:94dvh;color:#fff;text-align:center;animation:pop2 .5s}
+@keyframes pop2{0%{transform:scale(.5)}70%{transform:scale(1.08)}}
+#mt{font-size:clamp(22px,5.5vw,34px);font-weight:700;text-shadow:0 3px 0 #0b3a78}
+#mt small{font-size:.6em;font-weight:500;display:block;margin-top:6px;line-height:1.4}
+#mt .st{font-size:clamp(34px,9vw,54px);display:block;margin:2px 0}
+#mt .y{color:#ffe14a}
+button#go{font:700 clamp(20px,5vw,28px) inherit;font-family:inherit;margin-top:12px;padding:.4em 1.5em;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fe35f,#25a025);box-shadow:0 6px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}
+button#go:active{transform:translateY(4px);box-shadow:0 2px 0 #1c701c}
+@media (max-height:420px){#box{padding:10px 20px}#mt small{margin-top:2px}}
+</style></head><body>
+<canvas id="c"></canvas>
+<a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Sound">🔊</button>
+<div id="msg"><div id="box"><div id="mt">🧺 Catch the Right One!<small>Move the basket (mouse, finger or ← →).<br>Catch only the <b class="y">target</b> shown at the top.<br>Wrong catches cost a heart!</small></div><button id="go">Play</button></div></div>
+<script>
+const cv=document.getElementById('c'),g=cv.getContext('2d');let W,H,sc=1,dpr=1;
+const FONT='"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",serif';
+function rs(){dpr=Math.min(2,window.devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);cv.style.width=W+'px';cv.style.height=H+'px';sc=Math.max(.7,Math.min(1.5,Math.min(W,H*.8)/520));if(bx!==undefined)bx=Math.max(50*sc,Math.min(W-50*sc,bx))}
+const ALL=["🍎","🍌","🍓","🍇","🍊","🐟","⭐","🍕","🍪","🍉"];
+let ac,muted=false;function beep(f,d=.12,t='triangle'){if(muted)return;try{ac=ac||new AudioContext();if(ac.state==='suspended')ac.resume();const o=ac.createOscillator(),gn=ac.createGain();o.frequency.value=f;o.type=t;gn.gain.setValueAtTime(.15,ac.currentTime);gn.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.connect(gn).connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+document.getElementById('mute').onclick=function(){muted=!muted;this.textContent=muted?'🔇':'🔊'};
+let run=false,bx,items,target,hearts=5,score=0,streak=0,spawn,ptc,floats,keys={},last=0,t=0,tgtTimer,best=0,shake=0;
+try{best=+localStorage.getItem('catchbest')||0}catch(e){}
+rs();addEventListener('resize',rs);addEventListener('orientationchange',()=>setTimeout(rs,200));
+function reset(){bx=W/2;items=[];hearts=5;score=0;streak=0;spawn=0;ptc=[];floats=[];pickTarget();}
+function pickTarget(){let n;do{n=ALL[Math.random()*ALL.length|0]}while(n===target);target=n;tgtTimer=0;beep(880,.2)}
+function move(x){bx=Math.max(50*sc,Math.min(W-50*sc,x))}
+addEventListener('mousemove',e=>move(e.clientX));
+addEventListener('touchmove',e=>move(e.touches[0].clientX),{passive:true});
+addEventListener('touchstart',e=>move(e.touches[0].clientX),{passive:true});
+addEventListener('keydown',e=>{keys[e.key]=1;if(e.key.startsWith('Arrow'))e.preventDefault()});addEventListener('keyup',e=>keys[e.key]=0);
+const $m=document.getElementById('msg');
+document.getElementById('go').onclick=()=>{reset();run=true;$m.classList.add('hide')};
+function burst(x,y,n,cols){for(let k=0;k<n;k++)ptc.push({x,y,vx:(Math.random()-.5)*420,vy:-Math.random()*380,l:.8,m:.8,c:cols[k%cols.length],s:4+Math.random()*5})}
+const GOOD=['#ffe14a','#4ade5a','#3aa0ff','#ff8bd0','#ff9a1f'];
+function over(){run=false;shake=.3;
+  const nb=score>best;if(nb){best=score;try{localStorage.setItem('catchbest',best)}catch(e){}}
+  document.getElementById('mt').innerHTML='Game over!<span class="st">'+(score>=40?'⭐⭐⭐':score>=20?'⭐⭐':'⭐')+'</span>You caught <b class="y">'+score+'</b> '+target+'<small>'+(nb?'🏆 New best!':'Best: '+best)+'</small>';
+  document.getElementById('go').textContent='Play again';$m.classList.remove('hide')}
+function pill(x,y,w,h){g.fillStyle='#0b3a78';g.strokeStyle='#ffe14a';g.lineWidth=3;g.beginPath();g.roundRect(x,y,w,h,h/2);g.fill();g.stroke()}
+function txt(s,x,y,size,al){g.font='700 '+size+'px Fredoka,"Trebuchet MS",sans-serif';g.textAlign=al||'center';g.lineWidth=Math.max(4,size/5);g.lineJoin='round';g.strokeStyle='#0b3a78';g.fillStyle='#fff';g.strokeText(s,x,y);g.fillText(s,x,y)}
+function loop(ts){
+  const dt=Math.min(.05,(ts-last)/1000||0);last=ts;t+=dt;shake=Math.max(0,shake-dt);
+  g.setTransform(dpr,0,0,dpr,0,0);g.globalAlpha=1;
+  if(shake>0)g.translate((Math.random()-.5)*8,(Math.random()-.5)*8);
+  const sky=g.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#1478d8');sky.addColorStop(.6,'#3fb4f5');sky.addColorStop(1,'#a8e6ff');g.fillStyle=sky;g.fillRect(-10,-10,W+20,H+20);
+  for(let i=0;i<5;i++){const x=((i*300*sc+t*15*(1+i%2))%(W+300))-150,cy=H*.18+i*H*.14;g.fillStyle='#fff';g.beginPath();g.arc(x,cy,30*sc,0,7);g.arc(x+35*sc,cy-15*sc,38*sc,0,7);g.arc(x+75*sc,cy,28*sc,0,7);g.fill()}
+  // ground strip
+  const gy=H-26*sc;const gg=g.createLinearGradient(0,gy,0,H);gg.addColorStop(0,'#5fd35f');gg.addColorStop(1,'#2a9a2a');g.fillStyle=gg;g.fillRect(-10,gy,W+20,H-gy+10);
+  const by=H-70*sc;
+  if(run){
+    if(keys.ArrowLeft)move(bx-650*dt);if(keys.ArrowRight)move(bx+650*dt);
+    const lvl=Math.floor(score/10);spawn-=dt;tgtTimer+=dt;
+    if(spawn<=0){spawn=Math.max(.35,.9-lvl*.06);const isT=Math.random()<.4;
+      let e=isT?target:ALL[Math.random()*ALL.length|0];items.push({x:(34+Math.random()*(W-68))|0,y:-40*sc,e,v:(140+lvl*18+Math.random()*60)*Math.max(.8,sc),r:Math.random()*6})}
+    items.forEach(i=>{i.y+=i.v*dt;i.r+=dt*2});
+    items=items.filter(i=>{
+      if(i.y>by-30*sc&&i.y<by+25*sc&&Math.abs(i.x-bx)<58*sc){
+        if(i.e===target){score++;streak++;beep(600+Math.min(streak,10)*50);burst(i.x,i.y,16,GOOD);floats.push({x:i.x,y:i.y-30*sc,t:0,s:'+1',c:'#ffe14a'});
+          if(score%10===0){burst(W/2,H*.4,60,GOOD);floats.push({x:W/2,y:H*.4,t:0,s:'LEVEL UP!',c:'#7dff6a',big:1});pickTarget()}}
+        else{hearts--;streak=0;shake=.25;beep(150,.3,'sawtooth');burst(i.x,i.y,10,['#ff3b3b','#ff8a7a']);floats.push({x:i.x,y:i.y-30*sc,t:0,s:'Oops!',c:'#ff6a5a'});if(hearts<=0)over()}
+        return false}
+      return i.y<H+40});
+    ptc.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=700*dt;p.l-=dt});ptc=ptc.filter(p=>p.l>0);
+    floats.forEach(f=>f.t+=dt);floats=floats.filter(f=>f.t<1);
+  }
+  g.textBaseline='middle';
+  // items: solid glossy bubble + emoji
+  items&&items.forEach(i=>{g.save();g.translate(i.x,i.y);g.rotate(Math.sin(i.r)*.3);const R=31*sc;
+    const bg=g.createRadialGradient(-R*.3,-R*.35,R*.1,0,0,R);bg.addColorStop(0,'#ffffff');bg.addColorStop(1,'#bfe6ff');
+    g.globalAlpha=1;g.fillStyle=bg;g.beginPath();g.arc(0,0,R,0,7);g.fill();g.strokeStyle='#fff';g.lineWidth=3;g.stroke();g.strokeStyle='#0b3a78';g.lineWidth=2;g.beginPath();g.arc(0,0,R+2,0,7);g.stroke();
+    g.globalAlpha=1;g.fillStyle='#000';g.font=Math.round(40*sc)+'px '+FONT;g.textAlign='center';g.fillText(i.e,0,2*sc);g.restore()});
+  // basket
+  if(bx!==undefined){g.save();g.fillStyle='rgba(0,0,0,.25)';g.beginPath();g.ellipse(bx,by+38*sc,46*sc,9*sc,0,0,7);g.fill();g.restore();
+    g.save();g.globalAlpha=1;g.fillStyle='#000';g.textAlign='center';g.font=Math.round(76*sc)+'px '+FONT;g.fillText('🧺',bx,by);g.restore()}
+  ptc&&ptc.forEach(p=>{g.save();g.globalAlpha=Math.min(1,p.l/p.m*1.5);g.fillStyle=p.c;g.fillRect(p.x-p.s/2,p.y-p.s/2,p.s,p.s);g.restore()});
+  floats&&floats.forEach(f=>{g.save();g.globalAlpha=Math.min(1,(1-f.t)*2);txt(f.s,f.x,f.y-f.t*50,(f.big?44:26)*sc);g.fillStyle=f.c;g.fillText(f.s,f.x,f.y-f.t*50);g.restore()});
+  // HUD
+  const one=W>=640,k=one?(W>=900?1:.8):1,ph=40;
+  let sx,sy,sw,tx,ty,tw,hx,hy,hw;
+  if(one){sw=130*k;tw=230*k;hw=140*k;const tot=sw+tw+hw+20,x0=W/2-tot/2;sx=x0;tx=x0+sw+10;hx=tx+tw+10;sy=ty=hy=8}
+  else{sw=Math.min(130,W-190);sx=W/2-sw/2;sy=8;tw=170;tx=10;ty=56;hw=Math.min(150,W-tw-28);hx=tx+tw+8;hy=56}
+  g.save();g.globalAlpha=1;
+  pill(sx,sy,sw,ph);txt('⭐ '+score,sx+sw/2,sy+ph/2+1,22*Math.min(1,k+.1));
+  if(target){pill(tx,ty,tw,ph+8);txt('Catch',tx+tw*.3,ty+(ph+8)/2+1,20*Math.min(1,k+.1));
+    g.globalAlpha=1;g.fillStyle='#000';g.font='34px '+FONT;g.textAlign='center';g.fillText(target,tx+tw*.74,ty+(ph+8)/2+2)}
+  pill(hx,hy,hw,ph);
+  g.globalAlpha=1;g.fillStyle='#000';g.font='19px '+FONT;g.textAlign='center';
+  const hs=hw/5.4;for(let h=0;h<5;h++)g.fillText(h<hearts?'❤️':'🖤',hx+hw/2+(h-2)*hs,hy+ph/2+2);
+  g.restore();
+  if(streak>=3&&run){g.save();g.globalAlpha=1;txt('🔥 x'+streak,W/2,H-100*sc-6*sc,22*sc);g.restore()}
+  requestAnimationFrame(loop);
+}
+reset();requestAnimationFrame(loop);
+</script></body></html>

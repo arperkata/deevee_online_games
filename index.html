@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Brain Games Arcade</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100vh;font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:linear-gradient(#1e90e6 0,#5cc4ff 55%,#a8e6ff) fixed;color:#fff;text-align:center}
+header{position:sticky;top:0;z-index:20;padding:10px 12px 8px;background:linear-gradient(#0b3a78,#1257b8);border-bottom:4px solid #ffe14a;box-shadow:0 6px 16px rgba(0,0,0,.3)}
+h1{font-size:clamp(26px,6vw,52px);margin:0;line-height:1.1;color:#fff;text-shadow:0 4px 0 #06244d,0 0 18px rgba(255,225,74,.5)}
+.sub{display:none;font-size:clamp(14px,1.8vw,19px);margin:2px 0 6px;color:#cfeaff}
+.sub b{color:#ffe14a}
+#q{font:inherit;font-weight:500;font-size:18px;padding:9px 20px;margin-top:8px;border-radius:999px;border:4px solid #ffe14a;width:min(94vw,420px);outline:none;color:#0b3a78;background:#fff}
+#q:focus{box-shadow:0 0 0 4px rgba(255,225,74,.55)}
+#tabs{display:flex;flex-wrap:nowrap;gap:8px;justify-content:flex-start;margin:10px auto 2px;max-width:1000px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:none}
+#tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;font:700 16px inherit;font-family:inherit;padding:8px 18px;min-height:44px;border:3px solid #fff;border-radius:999px;background:#0a2a63;color:#fff;cursor:pointer;transition:transform .15s}
+.tab:hover{transform:translateY(-2px)}
+.tab:active{transform:scale(.94)}
+.tab.on{background:linear-gradient(#ffb21f,#f07a0a);border-color:#fff;box-shadow:0 4px 0 #a9560b;transform:translateY(-1px)}
+main{padding:20px 14px 28px}
+.g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;max-width:1500px;margin:0 auto}
+a.c{--a:#7b4dff;--b:#3a8dff;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-decoration:none;color:#fff;background:linear-gradient(155deg,var(--a),var(--b));border:4px solid #fff;border-radius:26px;padding:14px 8px 14px;box-shadow:0 7px 0 rgba(6,36,77,.55),0 12px 20px rgba(0,0,0,.2);transition:transform .18s cubic-bezier(.3,1.8,.5,1),box-shadow .18s;position:relative;overflow:hidden;animation:in .45s both}
+a.c::before{content:"";position:absolute;left:-20%;top:-35%;width:140%;height:60%;background:rgba(255,255,255,.18);border-radius:50%;pointer-events:none}
+a.c:hover,a.c:focus-visible{transform:translateY(-8px) scale(1.05) rotate(-1deg);box-shadow:0 14px 0 rgba(6,36,77,.45),0 20px 26px rgba(0,0,0,.25);outline:none;z-index:2}
+a.c:active{transform:translateY(2px) scale(.95);box-shadow:0 3px 0 rgba(6,36,77,.55)}
+a.c:hover .e,a.c:focus-visible .e{animation:bounce .6s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0) scale(1)}40%{transform:translateY(-10px) scale(1.15)}}
+@keyframes in{from{opacity:0;transform:translateY(16px) scale(.9)}to{opacity:1}}
+.e{font-size:clamp(52px,12vw,76px);line-height:1.1;margin-bottom:2px;filter:drop-shadow(0 4px 0 rgba(0,0,0,.25));position:relative}
+.t{font-size:clamp(17px,4.4vw,22px);font-weight:700;margin:2px 0;line-height:1.15;text-shadow:0 2px 0 rgba(6,36,77,.6);position:relative}
+.d{font-size:clamp(13px,3.3vw,15px);color:#fff;min-height:2.6em;line-height:1.3;text-shadow:0 1px 0 rgba(6,36,77,.6);position:relative;margin-bottom:6px}
+.s{display:inline-block;margin-top:auto;background:#0b3a78;color:#ffe14a;border-radius:999px;padding:3px 12px;font-size:13px;font-weight:700;position:relative;border:2px solid rgba(255,255,255,.8)}
+.k-arcade{--a:#ff7a1a;--b:#ff2e63}
+.k-puzzle{--a:#8a4dff;--b:#2f7bff}
+.k-words{--a:#16c784;--b:#0a8fb8}
+.k-focus{--a:#ff4fb0;--b:#b13bff}
+.k-strategy{--a:#ffb400;--b:#ff6a00}
+#cnt{margin-top:18px;font-size:22px;font-weight:700;text-shadow:0 2px 0 #0b3a78}
+@media (min-width:520px){.g{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:760px){.g{grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}.sub{display:block}#tabs{justify-content:center;flex-wrap:wrap;overflow:visible}main{padding:26px 22px 36px}}
+@media (min-width:1100px){.g{grid-template-columns:repeat(5,minmax(0,1fr));gap:22px}}
+@media (min-width:1500px){.g{grid-template-columns:repeat(6,minmax(0,1fr))}}
+@media (max-height:520px){header{position:static}}
+@media (prefers-reduced-motion:reduce){a.c,a.c .e{animation:none!important;transition:none}}
+</style></head><body>
+<header>
+<h1>🎮 Brain Games Arcade</h1>
+<p class="sub"><b id="total">35</b> quick games for kids and grown-ups · works on phone, tablet and PC</p>
+<input id="q" type="search" placeholder="🔍 Search games..." aria-label="Search games">
+<div id="tabs"></div>
+</header>
+<main><div class="g" id="g"></div>
+<p id="cnt"></p></main>
+<script>
+const G=[
+["sky-hop.html","Sky Hop Words","🤖","Type words to hop up the logs","Typing","words"],
+["memory-match.html","Memory Match","🃏","Flip cards, find the pairs","Memory","puzzle"],
+["odd-one-out.html","Spot the Odd One","🔍","Find the one that's different","Visual attention","focus"],
+["catch-the-right-one.html","Catch the Right One","🧺","Catch only the target","Self-control","focus"],
+["color-echo.html","Color Echo","🎵","Watch the pattern, repeat it","Memory","focus"],
+["merge-tiles.html","Merge Tiles","🔢","Swipe and merge up to 2048","Strategy","puzzle"],
+["mini-sudoku.html","Mini Sudoku","🧩","4x4 then 6x6 puzzles with hints","Logic","puzzle"],
+["slide-puzzle.html","Slide Puzzle","🍎","Slide tiles back into order","Spatial","puzzle"],
+["lights-out.html","Lights Out","💡","Flip neighbors to turn all off","Logic","puzzle"],
+["mine-sweeper.html","Mine Sweeper","💣","Beginner-friendly mine clearing","Deduction","puzzle"],
+["tic-tac-toe.html","Tic-Tac-Toe","❌","Beat the computer, build streaks","Strategy","strategy"],
+["snake.html","Snake","🐍","Eat fruit, chain combos","Reflex","arcade"],
+["flappy-bird.html","Flappy Bird","🐤","Tap to flap through pipes","Timing","arcade"],
+["brick-breaker.html","Brick Breaker","🧱","Smash bricks, catch power-ups","Aim","arcade"],
+["whack-a-mole.html","Whack-a-Mole","🔨","Whack moles, dodge bombs","Reflex","arcade"],
+["dino-runner.html","Cat Runner","🐱","Jump and duck day and night","Reflex","arcade"],
+["space-shooter.html","Space Shooter","🚀","Dodge, auto-fire, beat bosses","Survival","arcade"],
+["word-scramble.html","Word Scramble","🔤","Unscramble before time runs out","Words","words"],
+["hangman.html","Happy Hangman","🎈","Guess words to save the buddy","Spelling","words"],
+["math-blitz.html","Math Blitz","⚡","60-second mental math sprint","Math","words"],
+["bubble-pop-math.html","Bubble Pop Math","🫧","Pop bubbles that sum to target","Math","words"],
+["word-guess.html","Word Guess","🔠","Guess the secret 5-letter word","Words","words"],
+["typing-rain.html","Typing Rain","🌧️","Type falling words to zap them","Typing","words"],
+["reaction-test.html","Reaction Test","⚡","Tap on green, beat five tries","Reflex","focus"],
+["color-clash.html","Color Clash","🎨","Tap the ink color, not the word","Focus","focus"],
+["aim-trainer.html","Aim Trainer","🎯","Hit shrinking targets","Precision","focus"],
+["balloon-pop.html","Balloon Pop","🎈","Pop balloons, grab gold, dodge bombs","Reflex","arcade"],
+["rhythm-tap.html","Rhythm Tap","🥁","Hit falling notes to a beat","Rhythm","arcade"],
+["tap-tiles.html","Tap Tiles","🎹","Tap dark tiles, play piano","Speed","arcade"],
+["connect-four.html","Connect Four","🔴","Beat the computer, four in a row","Strategy","strategy"],
+["bubble-shooter.html","Bubble Shooter","🫧","Aim, match colors, drop clusters","Aim","strategy"],
+["stack-tower.html","Stack Tower","🏗️","Tap to stack blocks sky-high","Timing","arcade"],
+["maze-runner.html","Maze Runner","🌟","Race mazes, grab stars","Navigation","puzzle"],
+["candy-match.html","Candy Match","🍬","Swap sweets, chain combos","Puzzle","puzzle"],
+["quick-quiz.html","Quick Quiz","🧠","Fast trivia with fun facts","Trivia","words"]
+];
+const CATS=[["all","⭐ All"],["arcade","🕹️ Arcade"],["puzzle","🧩 Puzzle"],["words","🔤 Words & Math"],["focus","🎯 Focus & Reflex"],["strategy","♟️ Strategy"]];
+let cat='all';const $=id=>document.getElementById(id);
+$('total').textContent=G.length;
+$('tabs').innerHTML=CATS.map(([k,l])=>`<button class="tab" data-k="${k}">${l}</button>`).join('');
+function render(){
+  const q=$('q').value.toLowerCase().trim();
+  const list=G.filter(x=>(cat==='all'||x[5]===cat)&&(!q||(x[1]+x[3]+x[4]).toLowerCase().includes(q)));
+  $('g').innerHTML=list.map((x,i)=>`<a class="c k-${x[5]}" style="animation-delay:${Math.min(i,12)*30}ms" href="${x[0]}"><div class="e">${x[2]}</div><div class="t">${x[1]}</div><div class="d">${x[3]}</div><span class="s">${x[4]}</span></a>`).join('');
+  $('cnt').textContent=list.length?'':'No games found 🙈';
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.k===cat));
+}
+$('tabs').onclick=e=>{if(e.target.dataset.k){cat=e.target.dataset.k;render()}};
+$('q').oninput=render;render();
+</script></body></html>

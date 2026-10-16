@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Memory Match</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden}
+body{height:100dvh;display:flex;flex-direction:column;font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:linear-gradient(#1e90e6,#8fdcff);color:#fff;text-align:center;user-select:none;-webkit-user-select:none}
+#top{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 10px;padding:8px 10px 4px}
+a.home,.mute{background:linear-gradient(#ffb21f,#f07a0a);color:#fff;padding:0 14px;min-height:40px;display:inline-flex;align-items:center;border-radius:999px;text-decoration:none;font:700 17px inherit;font-family:inherit;border:0;box-shadow:0 4px 0 #a9560b;cursor:pointer}
+.mute{padding:0 12px}
+h1{margin:0;font-size:clamp(22px,4.5vw,40px);color:#fff;text-shadow:0 3px 0 #0b3a78,2px 2px 0 #0b3a78,-2px -2px 0 #0b3a78,2px -2px 0 #0b3a78,-2px 2px 0 #0b3a78}
+.pill{background:#0b3a78;color:#fff;border-radius:999px;padding:4px 14px;font-weight:700;font-size:clamp(16px,3vw,22px);box-shadow:0 3px 0 #06244d;border:2px solid #ffe14a;white-space:nowrap}
+.pill b{color:#ffe14a}
+#stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:6px 10px 10px}
+#grid{display:grid;gap:clamp(6px,1.6vmin,12px);padding:clamp(8px,2vmin,16px);background:linear-gradient(#103d86,#0a2a63);border-radius:22px;box-shadow:0 8px 0 #06204a,0 12px 24px rgba(0,0,0,.35);border:4px solid #3aa0ff}
+.card{perspective:700px;cursor:pointer;min-width:0;min-height:0;transition:transform .12s}
+.card:active{transform:scale(.94)}
+.in{position:relative;width:100%;height:100%;transition:transform .4s;transform-style:preserve-3d}
+.card.up .in{transform:rotateY(180deg)}
+.f,.b{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 rgba(0,0,0,.35)}
+.b{background:radial-gradient(circle at 30% 25%,#ffe27a,#ffb21f 45%,#f07a0a);border:3px solid #fff;color:#fff;font-weight:700;font-size:var(--fs);text-shadow:0 2px 0 #a9560b}
+.f{background:linear-gradient(#fff,#d9efff);border:3px solid #fff;transform:rotateY(180deg);font-size:var(--fs);line-height:1}
+.card.ok .f{background:linear-gradient(#d4ffc8,#6fe05a);border-color:#ffe14a;animation:pop .45s}
+@keyframes pop{50%{transform:rotateY(180deg) scale(1.18)}}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:60}
+#msg{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(6,30,70,.82);z-index:50;padding:16px}
+#box{background:linear-gradient(#2f8cff,#0b4fb3);border:5px solid #ffe14a;border-radius:28px;padding:20px 28px;box-shadow:0 8px 0 #06244d;max-width:92vw;animation:pop2 .5s}
+@keyframes pop2{0%{transform:scale(.5)}70%{transform:scale(1.08)}}
+#mt{font-size:clamp(26px,6vw,40px);font-weight:700;text-shadow:0 3px 0 #0b3a78}
+#mt .st{font-size:clamp(34px,9vw,56px);letter-spacing:4px;display:block;margin:4px 0}
+#mt small{font-size:.6em;color:#ffe14a}
+button.go{font:700 clamp(20px,5vw,28px) inherit;font-family:inherit;margin-top:14px;padding:.4em 1.5em;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fe35f,#25a025);box-shadow:0 6px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}
+button.go:active{transform:translateY(4px);box-shadow:0 2px 0 #1c701c}
+@media (max-height:500px){h1{display:none}#top{padding:4px 8px 0}}
+</style></head><body>
+<div id="top"><a class="home" href="index.html">⌂ Home</a><h1>Memory Match</h1><span class="pill">Level <b id="lv">1</b></span><span class="pill">Moves <b id="mv">0</b></span><span class="pill">Best <b id="bs">0</b></span><button class="mute" id="mute" aria-label="Sound">🔊</button></div>
+<div id="stage"><div id="grid"></div></div>
+<canvas id="fx"></canvas>
+<div id="msg"><div id="box"><div id="mt"></div><button class="go" id="nx">Next level ▶</button></div></div>
+<script>
+const EM=Array.from("🐶🐱🐸🦊🐼🐵🦁🐯🐰🐻🐧🐙🦋🐢🐳🦄🍎🍓");
+const LEVELS=[[2,2],[3,2],[4,3],[4,4],[5,4],[6,4]];
+let level=0,moves=0,open=[],left=0,lock=false,ac,muted=false,bestLv=0,cols=2,rows=2;
+const $=id=>document.getElementById(id);
+try{bestLv=+localStorage.getItem('mmbest')||0}catch(e){}
+$('bs').textContent=bestLv;
+$('mute').onclick=function(){muted=!muted;this.textContent=muted?'🔇':'🔊'};
+function beep(f,d=.12){if(muted)return;try{ac=ac||new AudioContext();if(ac.state==='suspended')ac.resume();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type='triangle';g.gain.setValueAtTime(.15,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+/* confetti */
+const fx=$('fx'),fc=fx.getContext('2d');let P=[],raf=0,lt=0;
+function fxfit(){fx.width=innerWidth;fx.height=innerHeight}fxfit();
+function confetti(x,y,n=40){const C=['#ff4a5a','#ffe14a','#4ade5a','#3aa0ff','#ff8bd0','#ff9a1f'];for(let i=0;i<n;i++){const a=Math.random()*6.283,s=150+Math.random()*350;P.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-200,l:1.2+Math.random()*.6,c:C[i%6],r:Math.random()*6,s:5+Math.random()*6})}lt=performance.now();if(!raf)raf=requestAnimationFrame(tick)}
+function tick(t){const dt=Math.min(.05,(t-lt)/1000||0);lt=t;fc.clearRect(0,0,fx.width,fx.height);P.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=700*dt;p.l-=dt;p.r+=dt*8;fc.save();fc.globalAlpha=Math.min(1,p.l*2);fc.fillStyle=p.c;fc.translate(p.x,p.y);fc.rotate(p.r);fc.fillRect(-p.s/2,-p.s/3,p.s,p.s*.6);fc.restore()});P=P.filter(p=>p.l>0&&p.y<fx.height+20);raf=P.length?requestAnimationFrame(tick):0;if(!raf)fc.clearRect(0,0,fx.width,fx.height)}
+function fit(){
+  const st=$('stage'),gr=$('grid'),cs=getComputedStyle(gr);
+  const gap=parseFloat(cs.columnGap)||8,pad=parseFloat(cs.paddingLeft)||8,bd=4;
+  const aw=st.clientWidth-20-2*(pad+bd),ah=st.clientHeight-16-2*(pad+bd);
+  let cell=Math.min((aw-gap*(cols-1))/cols,(ah-gap*(rows-1))/rows,150);
+  cell=Math.max(30,Math.floor(cell));
+  gr.style.gridTemplateColumns='repeat('+cols+','+cell+'px)';gr.style.gridAutoRows=cell+'px';
+  gr.style.setProperty('--fs',Math.floor(cell*.6)+'px');
+}
+addEventListener('resize',()=>{fxfit();fit()});addEventListener('orientationchange',()=>setTimeout(()=>{fxfit();fit()},200));
+function build(){
+  [cols,rows]=LEVELS[Math.min(level,LEVELS.length-1)];const n=cols*rows/2;
+  const set=[...EM].sort(()=>Math.random()-.5).slice(0,n);
+  const deck=[...set,...set].sort(()=>Math.random()-.5);
+  const gr=$('grid');gr.innerHTML='';
+  deck.forEach(e=>{const d=document.createElement('div');d.className='card';d.dataset.e=e;
+    d.innerHTML='<div class="in"><div class="b">?</div><div class="f">'+e+'</div></div>';d.onclick=()=>flip(d);gr.appendChild(d)});
+  left=n;moves=0;open=[];lock=false;$('lv').textContent=level+1;$('mv').textContent=0;$('msg').style.display='none';
+  fit();
+}
+function flip(d){
+  if(lock||d.classList.contains('up'))return;
+  d.classList.add('up');beep(500);open.push(d);
+  if(open.length<2)return;
+  moves++;$('mv').textContent=moves;lock=true;
+  const [a,b]=open;
+  if(a.dataset.e===b.dataset.e){
+    setTimeout(()=>{a.classList.add('ok');b.classList.add('ok');beep(780);beep(990,.2);
+      [a,b].forEach(c=>{const r=c.getBoundingClientRect();confetti(r.left+r.width/2,r.top+r.height/2,14)});open=[];lock=false;
+      if(--left===0)setTimeout(win,600)},400);
+  }else setTimeout(()=>{a.classList.remove('up');b.classList.remove('up');beep(200,.2);open=[];lock=false},900);
+}
+function win(){
+  const pairs=cols*rows/2;
+  const stars=moves<=pairs*1.5?'⭐⭐⭐':moves<=pairs*2.5?'⭐⭐':'⭐';
+  if(level+1>bestLv){bestLv=level+1;$('bs').textContent=bestLv;try{localStorage.setItem('mmbest',bestLv)}catch(e){}}
+  $('mt').innerHTML='🎉 Great job! 🎉<span class="st">'+stars+'</span><small>'+moves+' moves</small>';$('msg').style.display='flex';
+  confetti(innerWidth/2,innerHeight/3,90);
+  [523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.2),i*120));
+}
+$('nx').onclick=()=>{level++;build()};
+build();
+</script></body></html>
