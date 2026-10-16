@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://arperkata.github.io/deevee_online_games/sitemap.xml

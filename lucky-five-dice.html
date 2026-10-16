@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="description" content="Lucky Five Dice - Five-dice scorecard vs CPU or friend. Free online game, plays on phone, tablet and PC. No sign-up.">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Lucky Five Dice</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
+body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;color:#fff;text-shadow:0 2px 0 #1b4f86;user-select:none;-webkit-user-select:none;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;height:100dvh}
+.home{position:fixed;left:10px;top:10px;z-index:1000;background:#f08a12;color:#fff;border-radius:999px;padding:6px 14px;text-decoration:none;font-weight:bold;box-shadow:0 3px 0 #a85d00;text-shadow:none}
+#mute{position:fixed;right:10px;top:8px;z-index:1000;font-size:22px;background:#fff;border:0;border-radius:50%;width:44px;height:44px;box-shadow:0 3px 0 #1b4f86;cursor:pointer;padding:0;text-shadow:none}
+.btn{font:inherit;font-size:20px;font-weight:bold;color:#fff;text-shadow:0 2px 0 #1c701c;background:linear-gradient(#5fd35f,#2ea32e);border:3px solid #fff;border-radius:16px;padding:8px 22px;min-height:44px;box-shadow:0 5px 0 #1c701c;cursor:pointer}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
+.btn[disabled]{background:linear-gradient(#b8c4cf,#8a98a6);box-shadow:0 5px 0 #5d6a77;text-shadow:0 2px 0 #5d6a77;cursor:default}
+.btn[disabled]:active{transform:none;box-shadow:0 5px 0 #5d6a77}
+.btn.o{background:linear-gradient(#ffb347,#f08a12);box-shadow:0 5px 0 #a85d00;text-shadow:0 2px 0 #a85d00}.btn.o:active{box-shadow:0 1px 0 #a85d00}
+.btn.r{background:linear-gradient(#ff8a8a,#d63030);box-shadow:0 5px 0 #8f1c1c;text-shadow:0 2px 0 #8f1c1c}.btn.r:active{box-shadow:0 1px 0 #8f1c1c}
+.btn.p{background:linear-gradient(#c59cff,#7b3fe0);box-shadow:0 5px 0 #4a1fa0;text-shadow:0 2px 0 #4a1fa0}.btn.p:active{box-shadow:0 1px 0 #4a1fa0}
+.btn.b{background:linear-gradient(#5fb8ff,#2a7fe0);box-shadow:0 5px 0 #174f95;text-shadow:0 2px 0 #174f95}.btn.b:active{box-shadow:0 1px 0 #174f95}
+#top{padding:52px 8px 0;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;flex:none}
+.pill{background:linear-gradient(#3b86e0,#1b4f86);border:2px solid #fff;border-radius:999px;padding:2px clamp(8px,2.6vw,14px);font-weight:bold;font-size:clamp(13px,3.8vw,19px);box-shadow:0 3px 0 #0f2f57;text-shadow:0 2px 0 #0f2f57;white-space:nowrap}
+.ov{position:fixed;inset:0;background:rgba(15,47,87,.88);display:flex;align-items:center;justify-content:center;z-index:100;padding:48px 12px 12px}
+.card{background:linear-gradient(#fff,#e3f3ff);color:#1b4f86;text-shadow:none;border:5px solid #ffd84a;border-radius:28px;box-shadow:0 10px 0 #0f2f57,0 20px 40px rgba(0,0,0,.35);padding:clamp(14px,4vmin,28px);display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2vmin,12px);text-align:center;width:min(94vw,520px);max-height:calc(100dvh - 60px);overflow-y:auto;animation:cardin .4s cubic-bezier(.2,1.6,.4,1)}
+.card h1{margin:0;font-size:clamp(26px,7.5vmin,42px);color:#e8590c;text-shadow:0 3px 0 #ffd84a}
+.card p{margin:0;font-size:clamp(15px,3.6vmin,19px);line-height:1.35;font-weight:bold}
+.card .btn{width:100%}
+.stars{font-size:clamp(28px,8vmin,44px);letter-spacing:4px}.stars:empty{display:none}
+@keyframes cardin{0%{transform:scale(.6)}100%{transform:scale(1)}}
+.hide{display:none!important}
+@media (max-height:480px){#top{padding-top:6px}.ov{padding:8px 12px}.card{flex-direction:row;flex-wrap:wrap;justify-content:center;max-height:calc(100dvh - 16px);width:min(94vw,640px)}.card h1,.card p,.stars{flex:1 1 100%}.card .btn{width:auto;flex:1 1 auto;padding:6px 14px;font-size:16px}}
+.shake{animation:shk .4s}@keyframes shk{20%{transform:translateX(-9px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+.flt{position:fixed;pointer-events:none;z-index:150;font-weight:bold;font-size:26px;text-shadow:0 2px 0 #0f2f57,0 0 6px #0f2f57;white-space:nowrap}
+/* 3D dice */
+.die{--ds:64px;width:var(--ds);height:var(--ds);perspective:calc(var(--ds)*5);position:relative;flex:none;cursor:pointer;text-shadow:none}
+.tilt{width:100%;height:100%;transform-style:preserve-3d;transform:rotateX(-20deg) rotateY(24deg)}
+.cube{width:100%;height:100%;position:relative;transform-style:preserve-3d}
+.face{position:absolute;inset:0;background:linear-gradient(145deg,#fff,#d9e4f3);border:2px solid #8aa4cc;border-radius:16%;display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);padding:13%;box-shadow:inset 0 0 8px rgba(40,70,120,.35)}
+.f1{transform:translateZ(calc(var(--ds)/2))}.f6{transform:rotateY(180deg) translateZ(calc(var(--ds)/2))}
+.f2{transform:rotateY(90deg) translateZ(calc(var(--ds)/2))}.f5{transform:rotateY(-90deg) translateZ(calc(var(--ds)/2))}
+.f3{transform:rotateX(90deg) translateZ(calc(var(--ds)/2))}.f4{transform:rotateX(-90deg) translateZ(calc(var(--ds)/2))}
+.pip{border-radius:50%;margin:14%;background:radial-gradient(circle at 35% 30%,#4a4a4a,#0b0b0b)}
+.f1 .pip{background:radial-gradient(circle at 35% 30%,#ff7b7b,#c41414)}
+.die.red .face{background:linear-gradient(145deg,#ff7a7a,#c91c1c);border-color:#7a0f0f}.die.red .pip{background:radial-gradient(circle at 35% 30%,#fff,#e8e8e8)}
+.die.gold .face{background:linear-gradient(145deg,#ffe58a,#f0a810);border-color:#a56d00}
+.die.hop{animation:hop .9s}
+@keyframes hop{0%{transform:translateY(0)}30%{transform:translateY(-34%) scale(1.08)}60%{transform:translateY(0)}78%{transform:translateY(-9%)}100%{transform:translateY(0)}}
+.die::after{content:'';position:absolute;left:12%;right:12%;bottom:-9%;height:12%;border-radius:50%;background:rgba(10,30,60,.35);z-index:-1}
+
+body{background:radial-gradient(ellipse at 50% 30%,#1fa05f,#0b4a2c 80%) fixed}
+#main{flex:1;min-height:0;width:100%;max-width:980px;display:flex;flex-direction:column;gap:8px;padding:6px 8px 8px}
+#left{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;--dsz:min(13.5vw,10.5vh,72px)}
+#msg{background:#fff;color:#1b4f86;text-shadow:none;font-weight:bold;border:3px solid #ffd84a;border-radius:14px;padding:3px 14px;font-size:clamp(14px,3.8vw,19px);min-height:34px;display:flex;align-items:center;justify-content:center;text-align:center;box-shadow:0 4px 0 #0a3a22;max-width:100%}
+#tray{display:flex;gap:clamp(4px,1.4vw,10px);justify-content:center;background:radial-gradient(#2fbf74,#16784a);border:4px solid #0a3a22;border-radius:22px;padding:14px 10px 10px;box-shadow:inset 0 4px 12px rgba(0,0,0,.4)}
+.dw{position:relative;padding:5px;border-radius:14px;transition:transform .2s,background .2s;cursor:pointer;display:flex;flex-direction:column;align-items:center}
+.dw .die{--ds:var(--dsz)}
+.dw.held{transform:translateY(-10px);background:#ffd84a;box-shadow:0 6px 0 #a56d00}
+.dw.held::after{content:'🔒';position:absolute;bottom:-12px;font-size:14px}
+#roll{width:min(320px,90vw);font-size:clamp(18px,5vw,24px)}
+#cardw{flex:1;min-height:0;display:flex;gap:8px}
+.blk{flex:1;min-width:0;background:#fff;color:#1b4f86;text-shadow:none;border:3px solid #ffd84a;border-radius:16px;box-shadow:0 6px 0 #0a3a22;padding:4px 4px 6px;display:flex;flex-direction:column;justify-content:space-between;align-self:flex-start;width:100%}
+.row{display:grid;grid-template-columns:1fr repeat(var(--n),minmax(34px,auto));gap:3px;align-items:center;font-weight:bold;font-size:clamp(12px,3.3vw,16px);padding:0 2px;min-height:clamp(26px,5.6vh,34px);border-radius:8px;cursor:default}
+.row>span:first-child{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0}
+.row.hd{background:#1b4f86;color:#fff;font-size:clamp(11px,3vw,14px);min-height:26px}
+.row .v{text-align:center;border-radius:8px;padding:2px 2px;min-width:34px;background:#eef4fb}
+.row .v.cur{background:#d4e8ff;outline:2px solid #3b86e0}
+.row .v.pot{background:#ffe58a;color:#7a4a00;outline:2px dashed #e08a00;cursor:pointer;animation:pl 1s infinite}
+.row .v.pot.zero{background:#ffd0d0;color:#8f1c1c;outline-color:#d63030}
+.row .v.done{background:#d7f5d0;color:#14661b}
+.row.tot{background:#fff3c4;font-size:clamp(13px,3.6vw,18px)}
+.row.bon{color:#7b3fe0}
+@keyframes pl{50%{filter:brightness(1.12)}}
+@media (min-aspect-ratio:5/4) and (max-height:700px){#main{flex-direction:row;align-items:center;gap:12px}#left{--dsz:min(6.6vw,12vh,60px);flex:none;width:min(50vw,420px)}#tray{flex-wrap:wrap}#cardw{align-self:stretch;align-items:flex-start;max-height:100%}.row{min-height:clamp(22px,7vh,30px)}#msg{min-height:30px}}
+</style></head><body>
+<a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
+<div id="top"><div class="pill" id="pTurn">🎲 Lucky Five</div><div class="pill">🏆 Wins <b id="bw">0</b></div><div class="pill">⭐ Best <b id="bs">0</b></div></div>
+<div id="main"><div id="left"><div id="msg"></div><div id="tray"></div><button class="btn" id="roll">🎲 Roll!</button></div>
+<div id="cardw"><div class="blk" id="b1"></div><div class="blk" id="b2"></div></div></div>
+<div class="ov" id="ov"><div class="card"><h1 id="ovT">🎲 Lucky Five Dice</h1><div class="stars" id="ovS"></div><p id="ovP">Roll five dice up to 3 times, hold the keepers, then fill a box on your scorecard. 13 turns - highest total wins!</p><div id="ovB" style="display:contents"></div></div></div>
+<script>
+/* ===== DUO helper v1 (shared, pasted inline into each game as its own <script> BEFORE the game script) ===== */
+const Duo=(()=>{
+const KEY='duo_names',S={mode:null,names:['Player 1','Player 2'],scores:[null,null],turn:0,hw:true,cpuR:[0,100],lvl:'easy',start:null,game:'',unit:''};
+let pill=null,ac=null;
+function css(){if(document.getElementById('duoCss'))return;const s=document.createElement('style');s.id='duoCss';s.textContent=
+'.duoOv{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(6,30,70,.88);padding:14px;font-family:"Fredoka","Trebuchet MS","Comic Sans MS",sans-serif}'+
+'.duoCard{background:linear-gradient(#2f8cff,#0b4fb3);border:5px solid #ffe14a;border-radius:26px;padding:18px 20px;max-width:min(92vw,420px);width:100%;color:#fff;text-align:center;box-shadow:0 8px 0 #06244d;animation:duoPop .35s}'+
+'@keyframes duoPop{0%{transform:scale(.6)}70%{transform:scale(1.05)}}'+
+'.duoCard h2{margin:0 0 8px;font-size:clamp(22px,6vw,32px);text-shadow:0 3px 0 #0b3a78}.duoCard p{margin:6px 0;font-size:clamp(15px,4vw,19px);font-weight:600}'+
+'.duoCard .big{font-size:clamp(34px,10vw,52px);line-height:1.1}'+
+'.duoCard input{width:100%;box-sizing:border-box;font:600 20px inherit;font-family:inherit;padding:10px 14px;border-radius:14px;border:3px solid #fff;margin:6px 0;color:#0b3a78;text-align:center}'+
+'.duoCard label{display:block;text-align:left;font-weight:700;margin-top:6px;font-size:15px}'+
+'.duoB{font:700 clamp(18px,5vw,24px) inherit;font-family:inherit;margin:8px 4px 0;padding:.45em 1.3em;min-height:46px;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}'+
+'.duoB.o{background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9560b;text-shadow:0 2px 0 #a9560b}.duoB.g{background:linear-gradient(#8a9bb5,#5d6f8a);box-shadow:0 5px 0 #3b4a63;text-shadow:none}'+
+'.duoB:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.3)}'+
+'.duoMenu{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 0}.duoMenu .duoB{margin:0}'+
+'.duoPill{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:8000;background:#0b3a78;color:#fff;border:3px solid #ffe14a;border-radius:999px;padding:3px 14px;font:700 clamp(13px,3.6vw,17px) "Fredoka","Trebuchet MS",sans-serif;box-shadow:0 3px 0 #06244d;pointer-events:none;white-space:nowrap;max-width:62vw;overflow:hidden;text-overflow:ellipsis}';
+document.head.appendChild(s)}
+function beep(f,d){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type='triangle';g.gain.setValueAtTime(.12,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+(d||.15));o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+(d||.15))}catch(e){}}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function modal(html,buttons){css();return new Promise(res=>{const ov=document.createElement('div');ov.className='duoOv';ov.innerHTML='<div class="duoCard">'+html+'<div class="duoMenu"></div></div>';const m=ov.querySelector('.duoMenu');
+ buttons.forEach(([label,cls,val])=>{const b=document.createElement('button');b.className='duoB '+(cls||'');b.innerHTML=label;b.onclick=()=>{const out=typeof val==='function'?val(ov):val;ov.remove();res(out)};m.appendChild(b)});
+ document.body.appendChild(ov);const i=ov.querySelector('input');if(i){i.focus();i.select()}})}
+function saved(){try{const a=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(a))return a}catch(e){}return null}
+function save(a){try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}}
+function clean(v,d){v=(v||'').trim().slice(0,14);return v||d}
+const api={
+ /* Ask both player names. Resolves to [n1,n2] or null if cancelled. opts.cpu=true asks only P1 name (P2 is "Computer"). opts.t1/t2 = labels */
+ askNames(opts){opts=opts||{};const sv=saved()||['',''];
+  const html='<div class="big">'+(opts.cpu?'🤖':'👥')+'</div><h2>'+(opts.cpu?'Your name':'Who is playing?')+'</h2>'+
+   '<label>'+esc(opts.t1||'Player 1')+'</label><input id="duoN1" maxlength="14" placeholder="Player 1" value="'+esc(sv[0]||'')+'">'+
+   (opts.cpu?'':'<label>'+esc(opts.t2||'Player 2')+'</label><input id="duoN2" maxlength="14" placeholder="Player 2" value="'+esc(sv[1]||'')+'">');
+  return modal(html,[['▶ Start','',ov=>{const a=clean(ov.querySelector('#duoN1').value,'Player 1');const b=opts.cpu?'🤖 Computer':clean(ov.querySelector('#duoN2')&&ov.querySelector('#duoN2').value,'Player 2');if(!opts.cpu)save([a,b]);else save([a,sv[1]||'']);return [a,b]}],['Cancel','g',null]])},
+ /* "Pass the device" screen for hot-seat turns / hidden information. Resolves when tapped. */
+ cover(name,msg){beep(660,.12);return modal('<div class="big">🔄</div><h2>Pass to '+esc(name)+'</h2><p>'+esc(msg||'Tap when you are ready')+'</p>',[['I am '+esc(name),'',true]])},
+ /* Add "2 Players" and "vs Computer" buttons into an element (start menu/overlay).
+    o={game:'snake', start:fn(), hw:true(higher wins)|false(lower wins, e.g. time), cpu:[lo,hi] typical score range for the computer (e.g. [40,160]), unit:' pts', noTwo:false, noCpu:false} */
+ addButtons(el,o){css();const wrap=document.createElement('div');wrap.className='duoMenu';
+  if(!o.noTwo){const b=document.createElement('button');b.className='duoB o';b.innerHTML='👥 2 Players';b.onclick=async()=>{const n=await api.askNames();if(n)api.begin(Object.assign({},o,{mode:'two',names:n}))};wrap.appendChild(b)}
+  if(!o.noCpu&&o.cpu){const b=document.createElement('button');b.className='duoB o';b.innerHTML='🤖 vs Computer';b.onclick=async()=>{const lv=await modal('<div class="big">🤖</div><h2>Computer level</h2>',[['😊 Easy','',  'easy'],['🧠 Hard','o','hard'],['Cancel','g',null]]);if(!lv)return;const n=await api.askNames({cpu:true});if(n)api.begin(Object.assign({},o,{mode:'cpu',names:n,lvl:lv}))};wrap.appendChild(b)}
+  el.appendChild(wrap);return wrap},
+ begin(o){S.mode=o.mode;S.names=o.names.slice();S.scores=[null,null];S.turn=0;S.hw=o.hw!==false;S.cpuR=o.cpu||[0,100];S.lvl=o.lvl||'easy';S.start=o.start;S.game=o.game||'';S.unit=o.unit||'';S.fmt=o.fmt||null;
+  api.pill();if(o.start)o.start()},
+ active(){return !!S.mode},
+ mode(){return S.mode},
+ player(){return S.names[S.turn]},
+ names(){return S.names.slice()},
+ pill(){css();if(!S.mode){if(pill){pill.remove();pill=null}return}if(!pill){pill=document.createElement('div');pill.className='duoPill';document.body.appendChild(pill)}
+  pill.textContent=S.mode==='two'?'👤 '+S.names[S.turn]+'  ('+(S.turn+1)+'/2)':'👤 '+S.names[0]+'  vs  🤖'},
+ fmt(v){return S.fmt?S.fmt(v):(Math.round(v*100)/100)+S.unit},
+ cpuScore(){const [lo,hi]=S.cpuR,mid=(lo+hi)/2,r=Math.random();let v;
+  if(S.hw)v=S.lvl==='easy'?lo+r*(mid-lo):mid+r*(hi-mid);else v=S.lvl==='easy'?mid+r*(hi-mid):lo+r*(mid-lo);return (hi-lo)>20?Math.round(v):Math.round(v*100)/100},
+ /* Call when a round ends with the player's score. Returns true if Duo took over (the game must NOT show its own game-over overlay). */
+ finish(score){if(!S.mode)return false;const sc=Number(score)||0;
+  if(S.mode==='two'){S.scores[S.turn]=sc;
+   if(S.turn===0){S.turn=1;api.pill();setTimeout(()=>{modal('<div class="big">✅</div><h2>'+esc(S.names[0])+' scored '+esc(api.fmt(sc))+'</h2><p>Now it is <b>'+esc(S.names[1])+'</b>\'s turn. Beat that!</p>',[['▶ '+esc(S.names[1])+': Go!','',true]]).then(()=>{if(S.start)S.start()})},700);return true}
+   const [a,b]=S.scores,aw=S.hw?a>b:a<b,bw=S.hw?b>a:b<a;const win=aw?0:bw?1:-1;
+   setTimeout(()=>{beep(880,.2);modal('<div class="big">'+(win<0?'🤝':'🏆')+'</div><h2>'+(win<0?'It is a tie!':esc(S.names[win])+' wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(a))+'</b></p><p>'+esc(S.names[1])+': <b>'+esc(api.fmt(b))+'</b></p>',[['🔁 Rematch','',1],['🏠 Menu','o',0]]).then(r=>{if(r){S.scores=[null,null];S.turn=0;api.pill();if(S.start)S.start()}else api.end(true)})},700);return true}
+  /* vs computer */
+  const c=api.cpuScore(),win=S.hw?(sc>c?0:sc<c?1:-1):(sc<c?0:sc>c?1:-1);
+  setTimeout(()=>{beep(win===0?880:300,.25);modal('<div class="big">'+(win===0?'🏆':win<0?'🤝':'🤖')+'</div><h2>'+(win===0?esc(S.names[0])+' wins!':win<0?'Tie!':'Computer wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(sc))+'</b></p><p>🤖 Computer: <b>'+esc(api.fmt(c))+'</b></p>',[['🔁 Play again','',1],['🏠 Menu','o',0]]).then(r=>{if(r){api.pill();if(S.start)S.start()}else api.end(true)})},700);return true},
+ /* Leave duo mode. If reload, the page reloads to the game's normal start menu. */
+ end(reload){S.mode=null;api.pill();if(reload)location.reload()}
+};
+return api})();
+/* ===== end DUO ===== */
+</script>
+<script>
+const KEY='dice-yahtzee';
+const $=s=>document.querySelector(s),R=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let muted=false;try{muted=localStorage.getItem(KEY+'_mute')==='1'}catch(e){}
+let AC;function beep(f,d=.1,t='sine',v=.12){if(muted)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
+function jingle(a,t='triangle'){a.forEach((f,i)=>setTimeout(()=>beep(f,.14,t),i*90))}
+function load(k){try{return +localStorage.getItem(KEY+'_'+k)||0}catch(e){return 0}}
+function save(k,v){try{localStorage.setItem(KEY+'_'+k,v)}catch(e){}}
+function burst(x,y,list,n=12){for(let i=0;i<n;i++){const s=document.createElement('div');s.textContent=list[i%list.length];s.style.cssText=`position:fixed;left:${x}px;top:${y}px;font-size:${14+Math.random()*16}px;pointer-events:none;z-index:150;text-shadow:none`;document.body.appendChild(s);const a=Math.random()*6.28,d=40+Math.random()*90;s.animate([{transform:'translate(-50%,-50%) scale(1)',opacity:1},{transform:`translate(calc(-50% + ${Math.cos(a)*d}px),calc(-50% + ${Math.sin(a)*d+30}px)) scale(.3)`,opacity:0}],{duration:600+Math.random()*400,easing:'ease-out'}).onfinish=()=>s.remove()}}
+function burstEl(el,list,n){const r=el.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,list,n)}
+function floatText(x,y,txt,col='#ffd84a'){const s=document.createElement('div');s.className='flt';s.textContent=txt;s.style.cssText+=`left:${x}px;top:${y}px;color:${col}`;document.body.appendChild(s);s.animate([{transform:'translate(-50%,0) scale(.6)',opacity:1},{transform:'translate(-50%,-60px) scale(1.15)',opacity:1,offset:.7},{transform:'translate(-50%,-80px) scale(1)',opacity:0}],{duration:1000,easing:'ease-out'}).onfinish=()=>s.remove()}
+function floatEl(el,txt,col){const r=el.getBoundingClientRect();floatText(r.left+r.width/2,r.top+r.height/3,txt,col)}
+function shake(el){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake')}
+(function(){const m=$('#mute');m.textContent=muted?'🔇':'🔊';m.onclick=()=>{muted=!muted;save('mute',muted?1:0);try{localStorage.setItem(KEY+'_mute',muted?'1':'0')}catch(e){}m.textContent=muted?'🔇':'🔊';beep(600,.08)}})();
+document.addEventListener('pointerdown',()=>{try{if(AC&&AC.state==='suspended')AC.resume()}catch(e){}});
+function ov(title,stars,html,btns){$('#ovT').textContent=title;$('#ovS').textContent=stars||'';$('#ovP').innerHTML=html||'';const b=$('#ovB');b.innerHTML='';btns.forEach(([l,c,f])=>{const e=document.createElement('button');e.className='btn '+(c||'');e.innerHTML=l;e.onclick=()=>{beep(520,.06);f()};b.appendChild(e)});$('#ov').classList.remove('hide')}
+function ovHide(){$('#ov').classList.add('hide')}
+const PIPS=[null,[4],[0,8],[0,4,8],[0,2,6,8],[0,2,4,6,8],[0,2,3,5,6,8]];
+const ROT=[null,[0,0],[0,-90],[-90,0],[90,0],[0,90],[0,180]];
+function mkDie(parent,size,cls){const el=document.createElement('div');el.className='die'+(cls?' '+cls:'');el.style.setProperty('--ds',size);let h='<div class="tilt"><div class="cube">';for(let f=1;f<=6;f++){h+='<div class="face f'+f+'">';for(let i=0;i<9;i++)h+=PIPS[f].includes(i)?'<span class="pip" style="grid-area:'+(Math.floor(i/3)+1)+'/'+(i%3+1)+'"></span>':'';h+='</div>'}el.innerHTML=h+'</div></div>';parent.appendChild(el);const cube=el.querySelector('.cube');
+const d={el,v:1,kx:0,ky:0,show(v,dur=900){d.v=v;const r=ROT[v];if(dur){d.kx+=R(1,2);d.ky+=R(1,3)}cube.style.transition=dur?'transform '+dur+'ms cubic-bezier(.2,.75,.3,1)':'none';cube.style.transform='rotateX('+(r[0]+d.kx*360)+'deg) rotateY('+(r[1]+d.ky*360)+'deg)';if(dur){el.classList.remove('hop');void el.offsetWidth;el.classList.add('hop');for(let i=1;i<5;i++)setTimeout(()=>beep(220+R(0,200),.04,'square',.05),i*dur/6)}return dur?sleep(dur):Promise.resolve()}};d.show(1,0);return d}
+function fitBoard(cv,main,sideLand,sideBot){const W=innerWidth,H=innerHeight,tp=$('#top').offsetHeight,land=W/H>1.15;let s=land?Math.min(H-tp-14,W-sideLand-24):Math.min(W-14,H-tp-sideBot-14);s=Math.max(160,Math.floor(s||0));cv.style.width=cv.style.height=s+'px';main.style.flexDirection=land?'row':'column';return s}
+const CANCEL='cancel';
+
+const CATS=[['a1','⚀ Ones'],['a2','⚁ Twos'],['a3','⚂ Threes'],['a4','⚃ Fours'],['a5','⚄ Fives'],['a6','⚅ Sixes'],['k3','3 Alike'],['k4','4 Alike'],['fh','Full House'],['ss','Small Run'],['ls','Long Run'],['lf','⭐ LUCKY 5'],['ch','Chance']];
+const PAR={a1:3,a2:6,a3:9,a4:12,a5:15,a6:18,k3:19,k4:13,fh:20,ss:22,ls:22,lf:12,ch:22};
+function score(c,d){const n=[0,0,0,0,0,0,0];let sum=0;d.forEach(v=>{n[v]++;sum+=v});const mx=Math.max(...n),has=(a)=>a.every(v=>n[v]>0);
+if(c[0]==='a')return n[+c[1]]*(+c[1]);
+switch(c){case 'k3':return mx>=3?sum:0;case 'k4':return mx>=4?sum:0;case 'fh':return n.includes(3)&&n.includes(2)?25:0;
+case 'ss':return has([1,2,3,4])||has([2,3,4,5])||has([3,4,5,6])?30:0;case 'ls':return has([1,2,3,4,5])||has([2,3,4,5,6])?40:0;case 'lf':return mx===5?50:0;default:return sum}}
+function upper(p){return ['a1','a2','a3','a4','a5','a6'].reduce((s,c)=>s+(p.s[c]||0),0)}
+function total(p){const u=upper(p);return Object.values(p.s).reduce((a,b)=>a+b,0)+(u>=63?35:0)}
+let pn=['You','🤖 Computer'];let P=[],cur=0,dice=[1,1,1,1,1],held=[0,0,0,0,0],rolls=0,busy=false,mode='cpu',over=true,D=[],W=[],best=0,wins=0;
+const tray=$('#tray');
+for(let i=0;i<5;i++){const w=document.createElement('div');w.className='dw';tray.appendChild(w);D.push(mkDie(w,'var(--dsz)'));W.push(w);w.onclick=()=>toggle(i)}
+function msg(t){$('#msg').textContent=t}
+function openCats(p){return CATS.map(c=>c[0]).filter(c=>p.s[c]===undefined)}
+function render(){const n=P.length,pl=P[cur];['#b1','#b2'].forEach((id,bi)=>{const el=$(id);el.style.setProperty('--n',n);
+let h='<div class="row hd" style="--n:'+n+'"><span>'+(bi?'Combos':'Numbers')+'</span>'+P.map((p,i)=>'<span style="text-align:center">'+p.n+'</span>').join('')+'</div>';
+const list=bi?CATS.slice(6):CATS.slice(0,6);
+list.forEach(([c,nm])=>{h+='<div class="row" style="--n:'+n+'" data-c="'+c+'"><span>'+nm+'</span>'+P.map((p,i)=>{let cl='v'+(i===cur&&!over?' cur':''),t='';if(p.s[c]!==undefined){cl+=' done';t=p.s[c]}else if(i===cur&&!p.ai&&rolls>0&&!busy&&!over){const sv=score(c,dice);t=sv;cl+=' pot'+(sv?'':' zero')}return '<span class="'+cl+'">'+t+'</span>'}).join('')+'</div>'});
+if(!bi)h+='<div class="row bon" style="--n:'+n+'"><span>🎁 Bonus +35</span>'+P.map(p=>'<span class="v">'+(upper(p)>=63?35:upper(p)+'/63')+'</span>').join('')+'</div>';
+else h+='<div class="row tot" style="--n:'+n+'"><span>🏁 TOTAL</span>'+P.map(p=>'<span class="v">'+total(p)+'</span>').join('')+'</div>';
+el.innerHTML=h});
+$('#roll').disabled=over||busy||pl.ai||rolls>=3;$('#roll').textContent=rolls===0?'🎲 Roll!':rolls<3?'🎲 Re-roll ('+(3-rolls)+' left)':'👆 Pick a box';
+$('#pTurn').textContent=over?'🎲 Lucky Five':(pl.ai?'':'🧑 ')+pl.n+' · Turn '+Math.min(13,Object.keys(pl.s).length+1)+'/13';
+$('#bs').textContent=best;$('#bw').textContent=wins}
+function drawDice(){D.forEach((d,i)=>W[i].classList.toggle('held',!!held[i]))}
+async function doRoll(){const hs=held.slice();const ps=[];for(let i=0;i<5;i++)if(!hs[i]){dice[i]=R(1,6);ps.push(D[i].show(dice[i],650+i*70))}await Promise.all(ps);rolls++;
+if(new Set(dice).size===1){jingle([523,659,784,1047,1319]);burstEl(tray,['🌟','🎉','✨'],18);msg('🌟 LUCKY FIVE!')}else beep(300,.05)}
+async function roll(){if(busy||over||P[cur].ai||rolls>=3)return;busy=true;render();await doRoll();busy=false;render();if(rolls>=3)msg('Pick a box on your scorecard 👆');else msg('Tap dice to HOLD 🔒, then re-roll'+(new Set(dice).size===1?'':''))}
+function toggle(i){if(busy||over||P[cur].ai||rolls===0||rolls>=3)return;held[i]^=1;beep(held[i]?700:500,.05);drawDice()}
+async function commit(c){const v=score(c,dice);P[cur].s[c]=v;const col=P.length>1?cur:0;busy=true;render();
+const el=document.querySelector('[data-c="'+c+'"] .v:nth-child('+(cur+2)+')');if(el){floatEl(el,v?'+'+v:'Scratch!',v?'#ffd84a':'#ff9a9a');if(v)burstEl(el,['⭐','✨'],6)}
+v?jingle(v>=30?[523,659,784,1047]:[523,659]):beep(180,.2,'sawtooth');await sleep(750);next()}
+function choose(c){const p=P[cur];if(busy||over||p.ai||rolls===0||p.s[c]!==undefined)return;commit(c)}
+$('#cardw').addEventListener('click',e=>{const r=e.target.closest('.row[data-c]');if(r)choose(r.dataset.c)});
+function next(){busy=false;if(P.every(p=>Object.keys(p.s).length>=13))return finish();cur=(cur+1)%P.length;rolls=0;held.fill(0);drawDice();render();
+if(P[cur].ai){msg(P[cur].n+' is rolling...');aiTurn()}else msg(P.length>1&&mode==='pp'?'📱 '+P[cur].n+' - pass the device, then Roll!':(mode==='solo'?'Your turn':P[cur].n+', your turn')+' - hit Roll!')}
+function valOf(d,cats){let b=-999;cats.forEach(c=>{const v=score(c,d)-PAR[c]+(c[0]==='a'&&score(c,d)>=3*(+c[1])?(score(c,d)-3*(+c[1]))*.4:0);if(v>b)b=v});return b}
+function aiHold(cats){let curV=valOf(dice,cats),bestM=-1,bestV=curV;
+for(let m=0;m<31;m++){let s=0;for(let k=0;k<24;k++){const d=dice.map((v,i)=>m>>i&1?v:R(1,6));s+=valOf(d,cats)}s/=24;if(s>bestV+.5){bestV=s;bestM=m}}
+return bestM<0?null:[0,1,2,3,4].map(i=>bestM>>i&1)}
+async function aiTurn(){busy=true;render();await sleep(800);await doRoll();const p=P[cur],cats=openCats(p);
+while(rolls<3){const h=aiHold(cats);if(!h)break;held=h;drawDice();msg(p.n+' holds '+h.filter(x=>x).length+' dice');await sleep(900);await doRoll()}
+let bc=cats[0],bv=-999;cats.forEach(c=>{const s=score(c,dice),v=s-PAR[c]+(c==='lf'&&s?30:0)+(c[0]==='a'?(s-3*(+c[1]))*.4:0);if(v>bv){bv=v;bc=c}});
+msg(p.n+' scores '+CATS.find(c=>c[0]===bc)[1]);await sleep(900);commit(bc)}
+function start(m,nm){if(nm)pn=nm;mode=m;over=false;cur=0;rolls=0;held.fill(0);dice=[1,1,1,1,1];D.forEach(d=>d.show(1,0));drawDice();
+P=m==='cpu'?[{n:pn[0],s:{}},{n:'🤖 Computer',ai:true,s:{}}]:m==='pp'?[{n:pn[0],s:{}},{n:pn[1],s:{}}]:[{n:'You',s:{}}];
+best=load('best');wins=load('wins');busy=false;ovHide();render();msg('Roll the dice to begin! 🎲')}
+function finish(){over=true;busy=false;render();const t=P.map(total),me=t[0];let title,html,stars;
+if(mode==='solo'){title=me>=200?'🏆 Superb!':'🎲 Game over';stars=me>=200?'⭐⭐⭐':me>=150?'⭐⭐':'⭐';html='Final score <b>'+me+'</b>'}
+else{const mx=Math.max(...t),w=t.indexOf(mx),tie=t.filter(x=>x===mx).length>1;
+if(mode==='cpu'){const win=!tie&&w===0;title=tie?'🤝 Tie game!':win?'🏆 '+P[0].n+' wins!':'🤖 Computer wins';stars=win?(me>=200?'⭐⭐⭐':'⭐⭐'):tie?'⭐⭐':'⭐';if(win){wins++;save('wins',wins)}}
+else{title=tie?'🤝 Tie game!':'🏆 '+P[w].n+' wins!';stars='⭐⭐⭐'}
+html=P.map((p,i)=>p.n+': <b>'+t[i]+'</b>').join(' &nbsp;vs&nbsp; ')}
+if(mode!=='pp'&&me>best){best=me;save('best',best);html+='<br>🌟 New best!'}else if(mode!=='pp')html+='<br>Best: '+best;
+render();jingle([392,523,659,784,1047]);burst(innerWidth/2,innerHeight/3,['⭐','🎉','🎲','✨'],24);
+ov(title,stars,html,[['▶ Play Again','',()=>start(mode)],['🏠 Menu','o',menu]])}
+function menu(){ov('🎲 Lucky Five Dice','','Roll five dice up to 3 times, hold the keepers, fill a box. 13 turns - highest total wins!<br>Run (4-5 in a row), Full House, 4 Alike, and the 50-pt LUCKY 5!',[['🤖 vs Computer','',async()=>{const n=await Duo.askNames({cpu:true});if(n)start('cpu',n)}],['👥 2 Players','b',async()=>{const n=await Duo.askNames();if(n)start('pp',n)}],['🎯 Solo Score Chase','p',()=>start('solo')]])}
+$('#roll').onclick=roll;
+addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();roll()}else if(e.key>='1'&&e.key<='5')toggle(+e.key-1)});
+best=load('best');wins=load('wins');P=[{n:'You',s:{}}];render();menu();
+</script><script src="mascot.js" defer></script>
+</body></html>

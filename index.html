@@ -1,6 +1,9 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Brain Games Arcade</title>
+<title>Brain Games Arcade - 158 free brain games for kids and adults</title>
+<meta name="description" content="Play 158 free brain games online: memory, puzzles, math, typing, strategy, 2-player and vs-computer. Works on phone, tablet and PC. No sign-up.">
+<meta name="theme-color" content="#0b3a78"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
+<meta property="og:title" content="Brain Games Arcade"><meta property="og:description" content="158 free brain games for kids and adults. No sign-up."><meta property="og:type" content="website"><meta property="og:image" content="icon-512.png">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;min-height:100vh;font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:linear-gradient(#1e90e6 0,#5cc4ff 55%,#a8e6ff) fixed;color:#fff;text-align:center}
@@ -55,7 +58,9 @@ a.c:hover .e,a.c:focus-visible .e{animation:bounce .6s infinite}
 <div id="tabs"></div>
 </header>
 <main><div class="g" id="g"></div>
-<p id="cnt"></p></main>
+<p id="cnt"></p>
+<div id="adSlot" hidden style="max-width:728px;margin:18px auto 0;min-height:90px"></div>
+<footer style="margin:26px auto 8px;text-align:center;font-size:14px;color:#cfeaff">Free brain games for kids and grown-ups &middot; No accounts &middot; No personal data &middot; <a href="privacy.html" style="color:#ffe14a">Privacy policy</a></footer></main>
 <script>
 const G=[
 ["sky-hop.html","Sky Hop Words","🤖","Type words to hop up the logs","Typing","words"],
@@ -69,13 +74,13 @@ const G=[
 ["merge-tiles.html","Merge Tiles","🔢","Swipe and merge up to 2048","Strategy","puzzle"],
 ["mini-sudoku.html","Mini Sudoku","🧩","4x4 then 6x6 puzzles with hints","Logic","puzzle"],
 ["slide-puzzle.html","Slide Puzzle","🍎","Slide tiles back into order","Spatial","puzzle"],
-["lights-out.html","Lights Out","💡","Flip neighbors to turn all off","Logic","puzzle"],
-["mine-sweeper.html","Mine Sweeper","💣","Beginner-friendly mine clearing","Deduction","puzzle"],
+["light-switch.html","Light Switch","💡","Flip neighbors to turn all off","Logic","puzzle"],
+["mine-finder.html","Mine Finder","💣","Beginner-friendly mine clearing","Deduction","puzzle"],
 ["tic-tac-toe.html","Tic-Tac-Toe","❌","Beat the computer, build streaks","Strategy","strategy"],
 ["snake.html","Snake","🐍","Eat fruit, chain combos","Reflex","arcade"],
-["flappy-bird.html","Flappy Bird","🐤","Tap to flap through pipes","Timing","arcade"],
+["flap-and-fly.html","Flap and Fly","🐤","Tap to flap through pipes","Timing","arcade"],
 ["brick-breaker.html","Brick Breaker","🧱","Smash bricks, catch power-ups","Aim","arcade"],
-["whack-a-mole.html","Whack-a-Mole","🔨","Whack moles, dodge bombs","Reflex","arcade"],
+["mole-mash.html","Mole Mash","🔨","Whack moles, dodge bombs","Reflex","arcade"],
 ["dino-runner.html","Cat Runner","🐱","Jump and duck day and night","Reflex","arcade"],
 ["space-shooter.html","Space Shooter","🚀","Dodge, auto-fire, beat bosses","Survival","arcade"],
 ["word-scramble.html","Word Scramble","🔤","Unscramble before time runs out","Words","words"],
@@ -90,31 +95,31 @@ const G=[
 ["balloon-pop.html","Balloon Pop","🎈","Pop balloons, grab gold, dodge bombs","Reflex","arcade"],
 ["rhythm-tap.html","Rhythm Tap","🥁","Hit falling notes to a beat","Rhythm","arcade"],
 ["tap-tiles.html","Tap Tiles","🎹","Tap dark tiles, play piano","Speed","arcade"],
-["connect-four.html","Connect Four","🔴","Beat the computer, four in a row","Strategy","strategy"],
+["four-in-a-row.html","Four in a Row","🔴","Beat the computer, four in a row","Strategy","strategy"],
 ["bubble-shooter.html","Bubble Shooter","🫧","Aim, match colors, drop clusters","Aim","strategy"],
 ["stack-tower.html","Stack Tower","🏗️","Tap to stack blocks sky-high","Timing","arcade"],
-["maze-runner.html","Maze Runner","🌟","Race mazes, grab stars","Navigation","puzzle"],
+["star-maze.html","Star Maze","🌟","Race mazes, grab stars","Navigation","puzzle"],
 ["candy-match.html","Candy Match","🍬","Swap sweets, chain combos","Puzzle","puzzle"],
 ["quick-quiz.html","Quick Quiz","🧠","Fast trivia with fun facts","Trivia","words"],
 ["flow-connect.html","Flow Connect","🌈","Connect dot pairs, fill every square","Logic","puzzle"],
-["sokoban-push.html","Sokoban Push","📦","Push boxes onto targets, 12 levels","Planning","puzzle"],
+["box-pusher.html","Box Pusher","📦","Push boxes onto targets, 12 levels","Planning","puzzle"],
 ["tower-of-hanoi.html","Tower of Hanoi","🗼","Move the disc stack, beat optimal","Planning","puzzle"],
-["nonogram-picross.html","Nonogram Picross","🖼️","Number clues reveal hidden pictures","Logic","puzzle"],
-["rush-hour-cars.html","Rush Hour Cars","🚗","Slide cars to free the red car","Spatial","puzzle"],
+["nonogram.html","Nonogram","🖼️","Number clues reveal hidden pictures","Logic","puzzle"],
+["car-jam.html","Car Jam","🚗","Slide cars to free the red car","Spatial","puzzle"],
 ["peg-solitaire.html","Peg Solitaire","📍","Jump pegs until only one remains","Strategy","strategy"],
 ["checkers.html","Checkers","🔴","Jump, crown kings, outsmart the computer","Tactics","strategy"],
-["reversi-othello.html","Reversi","⚫","Flip discs, grab corners, win","Tactics","strategy"],
+["reversi.html","Reversi","⚫","Flip discs, grab corners, win","Tactics","strategy"],
 ["gomoku.html","Gomoku","⚪","Line up five stones on 13x13","Planning","strategy"],
 ["dots-and-boxes.html","Dots & Boxes","🔲","Draw lines, claim boxes, chain combos","Planning","strategy"],
 ["mancala.html","Mancala","🪨","Sow stones, capture, bonus turns","Counting","strategy"],
 ["nine-mens-morris.html","Nine Men's Morris","⭕","Form mills, capture, trap foes","Tactics","strategy"],
-["battleship.html","Battleship","🚢","Place your fleet, sink the enemy","Strategy","strategy"],
+["fleet-battle.html","Fleet Battle","🚢","Place your fleet, sink the enemy","Strategy","strategy"],
 ["hex-game.html","Hex","⬡","Connect your sides on an 11x11 board","Strategy","strategy"],
 ["ultimate-tic-tac-toe.html","Ultimate Tic-Tac-Toe","🔳","Win three small boards in a row","Strategy","strategy"],
 ["fox-and-geese.html","Fox & Geese","🦊","Trap the fox or catch the geese","Strategy","strategy"],
 ["breakthrough.html","Breakthrough","♟️","Race a pawn across the 8x8 board","Strategy","strategy"],
 ["mini-chess.html","Mini Chess","♞","Tiny 5x5 chess, capture the king","Strategy","strategy"],
-["chimp-test.html","Chimp Test","🐒","Memorize numbers, tap them in order","Working memory","memory"],
+["monkey-numbers.html","Monkey Numbers","🐒","Memorize numbers, tap them in order","Working memory","memory"],
 ["number-memory.html","Number Memory","🔢","Flash a number, type it back","Digit span","memory"],
 ["visual-memory-grid.html","Visual Memory Grid","🟦","Remember lit squares on a growing grid","Spatial memory","memory"],
 ["n-back.html","N-Back Shapes","🧠","Spot repeats one or two shapes back","Working memory","memory"],
@@ -128,13 +133,13 @@ const G=[
 ["hidden-emoji-scene.html","Hidden Emoji Scene","🔍","Find listed emoji in busy scenes","Visual search","focus"],
 ["sudoku-classic.html","Sudoku Classic","🧩","9x9 puzzles, notes, hints","Logic","puzzle"],
 ["make-24.html","Make 24","✨","Combine four numbers to reach 24","Arithmetic","puzzle"],
-["kenken-mini.html","KenKen Mini","🧮","Cage arithmetic Latin square","Logic","puzzle"],
+["cage-math.html","Cage Math","🧮","Cage arithmetic Latin square","Logic","puzzle"],
 ["number-pyramid.html","Number Pyramid","🔺","Each block equals the sum below","Addition","puzzle"],
 ["equation-builder.html","Equation Builder","➗","Make the equation true","Arithmetic","puzzle"],
 ["countdown-numbers.html","Countdown Numbers","🎯","Hit the target with six numbers","Arithmetic","puzzle"],
 ["word-search.html","Word Search","🔎","Find themed hidden words","Words","words"],
 ["word-ladder.html","Word Ladder","🪜","Change one letter at a time","Words","words"],
-["boggle-grid.html","Boggle Grid","🔠","Trace touching letters, 2 minutes","Words","words"],
+["letter-grid.html","Letter Grid","🔠","Trace touching letters, 2 minutes","Words","words"],
 ["spelling-hive.html","Spelling Hive","🐝","Make words from seven letters","Words","words"],
 ["mini-crossword.html","Mini Crossword","📰","Solve hand-made 5x5 crosswords","Words","puzzle"],
 ["missing-vowels.html","Missing Vowels","🔤","Restore vowels to themed words","Words","words"],
@@ -145,8 +150,8 @@ const G=[
 ["tangram-lite.html","Tangram Lite","🔷","Fit colored pieces into a silhouette","Spatial","puzzle"],
 ["jigsaw-puzzle.html","Jigsaw Puzzle","🖼️","Swap pieces to rebuild the picture","Visual","puzzle"],
 ["tower-defense.html","Tower Defense","🏰","Build towers, survive 20 waves","Strategy","strategy"],
-["lemonade-tycoon.html","Lemonade Tycoon","🍋","Set price, recipe, ads, beat the weather","Economy","strategy"],
-["cookie-clicker-idle.html","Cookie Clicker Idle","🍪","Tap the cookie, buy bakers","Idle","strategy"],
+["lemonade-shop.html","Lemonade Shop","🍋","Set price, recipe, ads, beat the weather","Economy","strategy"],
+["bakery-idle.html","Cookie Bakery Idle","🍪","Tap the cookie, buy bakers","Idle","strategy"],
 ["merge-pets.html","Merge Pets","🐾","Merge matching animals into evolved pets","Merging","puzzle"],
 ["farm-grow.html","Farm Grow","🌾","Plant, harvest, sell, expand","Management","strategy"],
 ["space-miner-idle.html","Space Miner Idle","🚀","Mine ore, upgrade, unlock planets","Idle","strategy"],
@@ -156,20 +161,20 @@ const G=[
 ["color-flood.html","Color Flood","🌊","Flood the board in limited moves","Strategy","puzzle"],
 ["fruit-merge.html","Fruit Merge","🍉","Drop and merge fruits, stay under the line","Physics","puzzle"],
 ["tile-match-triple.html","Tile Match Triple","🀄","Tap tiles into the tray, match three","Matching","puzzle"],
-["tetris.html","Tetris","🟪","Classic falling blocks with ghost and hold","Reflex","arcade"],
-["block-blast.html","Block Blast","🟦","Drag shapes onto the grid, blast lines","Spatial","puzzle"],
+["block-drop.html","Block Drop","🟪","Classic falling blocks with ghost and hold","Reflex","arcade"],
+["block-burst.html","Block Burst","🟦","Drag shapes onto the grid, blast lines","Spatial","puzzle"],
 ["ten-by-ten.html","Ten by Ten","🔟","Tap or drag shapes into a 10x10 grid","Spatial","puzzle"],
 ["jewel-columns.html","Jewel Columns","💎","Drop gem triples, match three","Matching","puzzle"],
 ["pentomino-fit.html","Pentomino Fit","🧱","Fill rectangles with pentominoes","Spatial","puzzle"],
 ["number-drop.html","Number Drop","🔢","Drop numbers, merge equals in chains","Number sense","puzzle"],
-["pong.html","Pong Rally","🏓","Beat the learning AI, first to seven","Reflex","arcade"],
-["space-invaders.html","Space Invaders","👾","Zap cute aliens behind shields","Reflex","arcade"],
-["asteroids.html","Asteroids","☄️","Rotate, thrust, shoot splitting rocks","Reflex","arcade"],
-["pac-maze.html","Pac Maze","🫧","Munch dots, dodge four bugbots","Reflex","arcade"],
-["frogger.html","Frogger","🐸","Cross traffic and logs into five homes","Reflex","arcade"],
-["doodle-hop.html","Doodle Hop","🐰","Endless bouncing up platforms","Reflex","arcade"],
+["paddle-rally.html","Paddle Rally","🏓","Beat the learning AI, first to seven","Reflex","arcade"],
+["alien-blasters.html","Alien Blasters","👾","Zap cute aliens behind shields","Reflex","arcade"],
+["rock-blaster.html","Rock Blaster","☄️","Rotate, thrust, shoot splitting rocks","Reflex","arcade"],
+["dot-maze.html","Dot Maze","🫧","Munch dots, dodge four bugbots","Reflex","arcade"],
+["frog-crossing.html","Frog Crossing","🐸","Cross traffic and logs into five homes","Reflex","arcade"],
+["sky-bounce.html","Sky Bounce","🐰","Endless bouncing up platforms","Reflex","arcade"],
 ["fruit-slicer.html","Fruit Slicer","🍉","Swipe fruit, dodge bombs, chain combos","Reflexes","arcade"],
-["color-switch.html","Color Switch","🌀","Tap to hop through matching rings","Timing","arcade"],
+["ring-hopper.html","Ring Hopper","🌀","Tap to hop through matching rings","Timing","arcade"],
 ["helix-drop.html","Helix Drop","⏬","Spin the tower, drop through gaps","Coordination","arcade"],
 ["bounce-keepy.html","Bounce Keepy","🏀","Keep the ball bouncing, hit stars","Hand-eye","arcade"],
 ["laser-dodge.html","Laser Dodge","⚡","Drag to dodge lasers, grab gems","Reflexes","arcade"],
@@ -180,13 +185,13 @@ const G=[
 ["card-war.html","Card War","⚔️","Flip cards, highest wins","Luck","cards"],
 ["higher-or-lower.html","Higher or Lower","🔼","Guess the next card, build a streak","Probability","cards"],
 ["go-fish.html","Go Fish","🐟","Ask for ranks, collect books","Memory","cards"],
-["dice-yahtzee.html","Lucky Five Dice","🎲","Five-dice scorecard vs CPU or friend","Strategy","cards"],
+["lucky-five-dice.html","Lucky Five Dice","🎲","Five-dice scorecard vs CPU or friend","Strategy","cards"],
 ["ludo-race.html","Ludo Race","🏁","Race four tokens home, capture rivals","Strategy","strategy"],
 ["snakes-and-ladders.html","Snakes & Ladders","🐍","Dice race to 100","Luck","kids"],
 ["pig-dice.html","Pig Dice","🐷","Push your luck, first to 100","Risk","strategy"],
 ["farkle-dice.html","Farkle Dice","🔥","Six-dice combos, bank or bust","Risk","strategy"],
 ["tycoon-dash.html","Tycoon Dash","🏙️","Buy squares, collect rent, richest wins","Strategy","strategy"],
-["rps-lizard-spock.html","Rock Paper Scissors Lizard Spock","🖖","Beat a bot that learns your habits","Prediction","strategy"],
+["rps-wizard.html","Rock Paper Scissors Lizard Wizard","🧙","Beat a bot that learns your habits","Prediction","strategy"],
 ["plant-defense.html","Garden Guards","🌻","Plant shooters, stop bugs in five lanes","Defense","strategy"],
 ["territory-grab.html","Territory Grab","🔵","Enclose areas to out-claim the bot","Planning","strategy"],
 ["city-builder.html","City Builder","🏙️","Balance food, money, happiness","Planning","strategy"],
@@ -212,24 +217,26 @@ const G=[
 ["egypt-slots.html","Pharaoh Gold Slots","🏺","Scatter temples trigger free spins","Play coins","slots"],
 ["lucky-wheel.html","Lucky Wheel","🎡","Spin the prize wheel, daily streak","Play coins","slots"],
 ["scratch-cards.html","Scratch Cards","🎟️","Scratch to match three prizes","Play coins","slots"],
-["plinko.html","Plinko","🔴","Drop balls into multiplier slots","Play coins","slots"],
+["peg-drop.html","Peg Drop","🔴","Drop balls into multiplier slots","Play coins","slots"],
 ["coin-pusher.html","Coin Pusher","🪙","Drop coins, push prizes off the shelf","Play coins","slots"],
 ["mega-777-slots.html","Mega 777 Slots","7️⃣","Classic reels with hold and jackpot","Play coins","slots"],
 ["treasure-chest-picker.html","Treasure Chest Picker","🧰","Open chests, dodge skulls, cash out","Play coins","slots"]
 ];
-const D2=new Set(["dragon-keys.html","sky-hop-math.html","aim-trainer.html","alphabet-sky.html","asteroids.html","ball-sort.html","ball-tracker.html","balloon-pop.html","battleship.html","block-blast.html","boggle-grid.html","bounce-keepy.html","breakthrough.html","brick-breaker.html","bubble-pop-math.html","bubble-shooter.html","candy-match.html","card-battle-arena.html","card-war.html","catch-the-right-one.html","checkers.html","chimp-test.html","clock-time.html","coin-counter.html","color-cards.html","color-clash.html","color-echo.html","color-flood.html","color-mixer.html","color-switch.html","connect-four.html","count-animals.html","countdown-numbers.html","dice-yahtzee.html","dino-runner.html","doodle-hop.html","dots-and-boxes.html","equation-builder.html","farkle-dice.html","fidget-spinner.html","flanker-arrows.html","flappy-bird.html","flow-connect.html","fox-and-geese.html","frogger.html","fruit-merge.html","fruit-slicer.html","go-fish.html","gomoku.html","gravity-flip.html","hangman.html","helix-drop.html","hex-game.html","hidden-emoji-scene.html","higher-or-lower.html","jewel-columns.html","jigsaw-puzzle.html","kenken-mini.html","klondike-solitaire.html","laser-dodge.html","lights-out.html","ludo-race.html","make-24.html","mancala.html","math-blitz.html","maze-runner.html","memory-match.html","merge-tiles.html","mine-sweeper.html","mini-chess.html","mini-crossword.html","mini-sudoku.html","mirror-draw.html","missing-vowels.html","n-back.html","nine-mens-morris.html","nonogram-picross.html","number-drop.html","number-memory.html","number-pyramid.html","number-sequence.html","odd-one-out.html","pac-maze.html","pattern-matrix.html","peg-solitaire.html","pentomino-fit.html","pig-dice.html","pipe-connect.html","plant-defense.html","pong.html","quick-count.html","quick-quiz.html","reaction-test.html","reversi-othello.html","rhythm-tap.html","rps-lizard-spock.html","rush-hour-cars.html","schulte-table.html","sequence-echo-grid.html","shade-finder.html","shape-rotation.html","shape-sorter.html","sky-hop.html","slide-puzzle.html","snake.html","snakes-and-ladders.html","sokoban-push.html","space-invaders.html","space-shooter.html","spelling-hive.html","stack-tower.html","sudoku-classic.html","tangram-lite.html","tap-tiles.html","ten-by-ten.html","territory-grab.html","tetris.html","tic-tac-toe.html","tile-match-triple.html","tower-of-hanoi.html","twenty-one.html","tycoon-dash.html","typing-rain.html","ultimate-tic-tac-toe.html","visual-memory-grid.html","water-sort.html","whack-a-mole.html","whats-missing.html","word-guess.html","word-ladder.html","word-scramble.html","word-search.html"]);
-const CATS=[["all","⭐ All"],["duo","👥 2 Players / vs CPU"],["arcade","🕹️ Arcade"],["puzzle","🧩 Puzzle"],["strategy","♟️ Strategy"],["memory","🧠 Memory"],["focus","🎯 Focus & Reflex"],["words","🔤 Words & Math"],["cards","🃏 Cards & Dice"],["kids","🧸 Kids Learn"],["creative","🎨 Creative"],["slots","🎰 Slots (play coins)"]];
+const D2=new Set(["dragon-keys.html","sky-hop-math.html","aim-trainer.html","alphabet-sky.html","rock-blaster.html","ball-sort.html","ball-tracker.html","balloon-pop.html","fleet-battle.html","block-burst.html","letter-grid.html","bounce-keepy.html","breakthrough.html","brick-breaker.html","bubble-pop-math.html","bubble-shooter.html","candy-match.html","card-battle-arena.html","card-war.html","catch-the-right-one.html","checkers.html","monkey-numbers.html","clock-time.html","coin-counter.html","color-cards.html","color-clash.html","color-echo.html","color-flood.html","color-mixer.html","ring-hopper.html","four-in-a-row.html","count-animals.html","countdown-numbers.html","lucky-five-dice.html","dino-runner.html","sky-bounce.html","dots-and-boxes.html","equation-builder.html","farkle-dice.html","fidget-spinner.html","flanker-arrows.html","flap-and-fly.html","flow-connect.html","fox-and-geese.html","frog-crossing.html","fruit-merge.html","fruit-slicer.html","go-fish.html","gomoku.html","gravity-flip.html","hangman.html","helix-drop.html","hex-game.html","hidden-emoji-scene.html","higher-or-lower.html","jewel-columns.html","jigsaw-puzzle.html","cage-math.html","klondike-solitaire.html","laser-dodge.html","light-switch.html","ludo-race.html","make-24.html","mancala.html","math-blitz.html","star-maze.html","memory-match.html","merge-tiles.html","mine-finder.html","mini-chess.html","mini-crossword.html","mini-sudoku.html","mirror-draw.html","missing-vowels.html","n-back.html","nine-mens-morris.html","nonogram.html","number-drop.html","number-memory.html","number-pyramid.html","number-sequence.html","odd-one-out.html","dot-maze.html","pattern-matrix.html","peg-solitaire.html","pentomino-fit.html","pig-dice.html","pipe-connect.html","plant-defense.html","paddle-rally.html","quick-count.html","quick-quiz.html","reaction-test.html","reversi.html","rhythm-tap.html","rps-wizard.html","car-jam.html","schulte-table.html","sequence-echo-grid.html","shade-finder.html","shape-rotation.html","shape-sorter.html","sky-hop.html","slide-puzzle.html","snake.html","snakes-and-ladders.html","box-pusher.html","alien-blasters.html","space-shooter.html","spelling-hive.html","stack-tower.html","sudoku-classic.html","tangram-lite.html","tap-tiles.html","ten-by-ten.html","territory-grab.html","block-drop.html","tic-tac-toe.html","tile-match-triple.html","tower-of-hanoi.html","twenty-one.html","tycoon-dash.html","typing-rain.html","ultimate-tic-tac-toe.html","visual-memory-grid.html","water-sort.html","mole-mash.html","whats-missing.html","word-guess.html","word-ladder.html","word-scramble.html","word-search.html"]);
+const CATS=[["all","⭐ All"],["duo","👥 2 Players / vs CPU"],["arcade","🕹️ Arcade"],["puzzle","🧩 Puzzle"],["strategy","♟️ Strategy"],["memory","🧠 Memory"],["focus","🎯 Focus & Reflex"],["words","🔤 Words & Math"],["cards","🃏 Cards & Dice"],["kids","🧸 Kids Learn"],["creative","🎨 Creative"],["slots","🎰 Play-money games (13+)"]];
 let cat='all';const $=id=>document.getElementById(id);
 $('total').textContent=G.length;
 $('tabs').innerHTML=CATS.map(([k,l])=>`<button class="tab" data-k="${k}">${l}</button>`).join('');
 function render(){
   const q=$('q').value.toLowerCase().trim();
-  const list=G.filter(x=>(cat==='all'||(cat==='duo'?D2.has(x[0]):x[5]===cat))&&(!q||(x[1]+x[3]+x[4]).toLowerCase().includes(q)));
+  const list=G.filter(x=>(cat==='all'?x[5]!=='slots':(cat==='duo'?D2.has(x[0]):x[5]===cat))&&(!q||(x[1]+x[3]+x[4]).toLowerCase().includes(q)));
   $('g').innerHTML=list.map((x,i)=>`<a class="c k-${x[5]}" style="animation-delay:${Math.min(i,12)*30}ms" href="${x[0]}"><div class="e">${x[2]}</div><div class="t">${x[1]}</div><div class="d">${x[3]}</div><span class="s">${x[4]}</span>${D2.has(x[0])?'<span class="m">👥 2P · 🤖 CPU</span>':''}</a>`).join('');
   $('cnt').textContent=list.length?'':'No games found 🙈';
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.k===cat));
 }
-$('tabs').onclick=e=>{if(e.target.dataset.k){cat=e.target.dataset.k;render()}};
+$('tabs').onclick=e=>{const k=e.target.dataset.k;if(!k)return;if(k==='slots'&&!window.__slotsOk){if(!confirm('These are pretend-money casino-style games for ages 13 and up. No real money is used or won. Continue?'))return;window.__slotsOk=true}cat=k;render()};
 $('q').oninput=render;render();
 </script><script src="mascot.js" defer></script>
+<script src="ads-config.js"></script><script src="ads.js" defer></script>
+<script>if('serviceWorker' in navigator&&location.protocol!=='file:')addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))</script>
 </body></html>

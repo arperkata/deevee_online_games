@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="description" content="Lemonade Shop - Set price, recipe, ads, beat the weather. Free online game, plays on phone, tablet and PC. No sign-up."><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lemonade Shop</title>
+<style>*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;background:linear-gradient(#27a2e8,#bdeafc) fixed;font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;color:#fff;text-shadow:0 2px 0 #1b4f86;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+button{font-family:inherit}
+.home{position:fixed;left:10px;top:10px;z-index:1000;display:flex;align-items:center;min-height:44px;background:#f08a12;color:#fff;text-decoration:none;padding:0 18px;border-radius:999px;font-weight:700;font-size:18px;box-shadow:0 3px 0 #a85d00;text-shadow:none}
+#mute{position:fixed;right:10px;top:10px;z-index:1000;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #1b4f86;font-size:22px;cursor:pointer;box-shadow:0 3px 0 #1b4f86;text-shadow:none}
+.btn{font:inherit;font-size:20px;font-weight:700;min-height:48px;color:#fff;text-shadow:0 2px 0 #1c701c;background:linear-gradient(#5fd35f,#2ea32e);border:0;border-radius:16px;padding:8px 22px;box-shadow:0 5px 0 #1c701c;cursor:pointer}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
+.btn[disabled]{background:linear-gradient(#9aa6b5,#6f7c8e);box-shadow:0 5px 0 #4a5566;text-shadow:0 2px 0 #4a5566;cursor:default}
+.btn.red{background:linear-gradient(#ff7a6a,#e0382a);box-shadow:0 5px 0 #8f1f15;text-shadow:0 2px 0 #8f1f15}
+.btn.red:active{box-shadow:0 1px 0 #8f1f15}
+.btn.blue{background:linear-gradient(#5cc8ff,#1c7fd6);box-shadow:0 5px 0 #0f4a8c;text-shadow:0 2px 0 #0f4a8c}
+.btn.blue:active{box-shadow:0 1px 0 #0f4a8c}
+.btn.gold{background:linear-gradient(#ffd84d,#f09a12);box-shadow:0 5px 0 #a8620a;text-shadow:0 2px 0 #a8620a}
+.btn.gold:active{box-shadow:0 1px 0 #a8620a}
+.btn.sm{min-height:44px;font-size:16px;padding:6px 14px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:#14367a;border:3px solid #5cc8ff;border-radius:999px;padding:2px 14px;min-height:40px;font-weight:700;font-size:20px;white-space:nowrap}
+#ov{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:900;text-align:center;padding:16px;overflow:auto;background:radial-gradient(circle at 50% 35%,#2a6fcf 0,#123a7c 55%,#0a1f4d 100%)}
+#ov.hide{display:none}
+#ov h1{margin:0;color:#ffe14d;text-shadow:0 4px 0 #1b4f86,0 0 18px #ff9a3d;font-size:clamp(32px,9vw,60px);line-height:1.05}
+#ov p{margin:0;background:#14367a;border:3px solid #5cc8ff;border-radius:20px;padding:12px 22px;max-width:min(92vw,460px);font-size:clamp(16px,4.4vw,21px);line-height:1.4;font-weight:600;text-shadow:0 2px 0 #0b2a5c}
+#ov p b{color:#ffe14d}
+#ov .btn{font-size:clamp(24px,6vw,32px);padding:12px 44px}
+#ov .btn.ghost{font-size:20px;padding:8px 26px}
+#go{animation:pulse 1.1s ease-in-out infinite}
+#go:active{animation:none}
+@keyframes pulse{50%{transform:scale(1.07)}}
+.big{display:block;font-size:2em;font-weight:700;color:#ffe14d;line-height:1.1}
+.stars{display:block;font-size:2.2em;letter-spacing:4px;line-height:1.2}
+.nb{display:inline-block;background:#ff9a3d;color:#fff;border-radius:999px;padding:2px 14px;margin-top:4px;font-weight:700}
+.fly{position:fixed;z-index:800;pointer-events:none;font-weight:700;font-size:24px;white-space:nowrap;transform:translate(-50%,-50%);animation:fly .9s ease-out forwards;text-shadow:0 2px 0 #1b4f86,0 0 4px #1b4f86}
+@keyframes fly{to{transform:translate(-50%,-150px) scale(1.2);opacity:0}}
+.pc{position:fixed;z-index:800;pointer-events:none;font-size:22px;transform:translate(-50%,-50%);animation:pc .8s ease-out forwards}
+@keyframes pc{to{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy)));opacity:0}}
+.cf{position:fixed;top:-40px;z-index:950;pointer-events:none;font-size:28px;animation:cf 2.6s linear forwards}
+@keyframes cf{to{transform:translateY(110vh) rotate(540deg)}}
+@media (max-height:430px){#ov{gap:6px;padding:8px}#ov h1{font-size:28px}#ov p{font-size:14px;padding:6px 14px}.big{font-size:1.5em}.stars{font-size:1.6em}#ov .btn{font-size:20px;padding:6px 28px;min-height:44px}}
+
+#app{position:fixed;inset:0;padding:56px 10px 8px;display:flex;flex-direction:column;gap:6px;max-width:560px;margin:0 auto}
+#left,#right{display:flex;flex-direction:column;gap:6px}
+#chips{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+#wx{display:flex;align-items:center;gap:12px;background:#ffd84d;color:#5a3300;border:3px solid #a8620a;border-radius:18px;padding:4px 14px;box-shadow:0 4px 0 #a8620a;text-shadow:none;font-size:16px;line-height:1.15}
+#wxe{font-size:40px}#wxs{font-size:13px;font-weight:600}
+#stand{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:60;min-width:220px;text-align:center;font-size:44px;background:#fff;border-radius:16px;color:#1b4f86;text-shadow:none;font-weight:700;padding:4px;border:3px solid #1b4f86}
+#stand span{margin:0 8px}#stt{font-size:18px}
+#shop{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.up{min-height:56px;border-radius:14px;border:3px solid #0b2a5c;background:linear-gradient(#3b86e0,#1c55a8);color:#fff;font-size:12px;font-weight:700;line-height:1.05;box-shadow:0 4px 0 #0b2a5c;cursor:pointer;padding:2px;text-shadow:0 1px 0 #0b2a5c}
+.up span{display:block;font-size:22px}
+.up.got{background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 4px 0 #1c701c;border-color:#1c701c}
+.up.poor{background:linear-gradient(#7c8798,#556070)}
+#rows{display:grid;grid-template-columns:1fr;gap:5px}
+.row{display:flex;align-items:center;gap:6px;background:#14367a;border:3px solid #5cc8ff;border-radius:16px;padding:2px 6px 2px 12px;min-height:50px}
+.row .lb{flex:1;font-weight:700;font-size:17px}
+.row .v{min-width:70px;text-align:center;font-weight:700;font-size:20px;color:#ffe14d}
+.row button{width:46px;height:44px;border-radius:12px;border:0;font-size:26px;font-weight:700;color:#fff;background:linear-gradient(#5cc8ff,#1c7fd6);box-shadow:0 4px 0 #0f4a8c;cursor:pointer;padding:0;text-shadow:none}
+.row button:active{transform:translateY(3px);box-shadow:0 1px 0 #0f4a8c}
+#est{text-align:center;font-weight:700;font-size:16px;background:#14367a;border:3px solid #5cc8ff;border-radius:16px;padding:4px 8px}
+#acts{display:flex;gap:8px;justify-content:center;align-items:center}
+#open{flex:1;max-width:300px;font-size:24px}
+@media (max-height:700px){.row{min-height:46px}.row .lb{font-size:15px}#wxe{font-size:32px}.chip{min-height:34px;font-size:17px}}
+@media (min-aspect-ratio:12/10){
+#app{max-width:none;flex-direction:row;padding:54px 10px 6px;gap:12px;align-items:stretch}
+#left,#right{flex:1;min-width:0}
+#left{justify-content:flex-start}
+#rows{grid-template-columns:1fr 1fr;gap:5px}
+.row{padding-left:8px;min-height:44px;flex-wrap:nowrap}.row .lb{font-size:13px}.row .v{min-width:48px;font-size:15px}.row button{width:40px;height:40px;font-size:22px}
+#chips{justify-content:flex-start;padding-left:0}
+#wx{padding:2px 12px}#wxe{font-size:30px}
+.up{min-height:50px}
+}
+@media (max-width:520px){#rows{grid-template-columns:1fr 1fr}.tx{display:none}.row{padding-left:6px;gap:2px}.row .lb{font-size:24px}.row .v{min-width:40px;font-size:16px}.row button{width:38px}}
+@media (min-aspect-ratio:12/10) and (max-width:900px){.tx{display:none}.row .lb{font-size:22px}}
+@keyframes bounce{50%{transform:translateY(-14px) scale(1.15)}}
+.bn{animation:bounce .35s}
+</style></head><body>
+<a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Mute">🔊</button>
+<div id="app">
+<div id="left"><div id="chips"><span class="chip">📅 Day <b id="day">1</b></span><span class="chip">💵 $<b id="cash">0</b></span><span class="chip">⭐ <b id="rep">0</b>%</span></div>
+<div id="wx"><span id="wxe">☀️</span><div><b id="wxn"></b><div id="wxs"></div></div></div>
+<div id="stand"><span id="sti">🍋</span><span id="stt">Your stand</span></div>
+<div id="shop"></div></div>
+<div id="right"><div id="rows"></div><div id="est"></div>
+<div id="acts"><button class="btn" id="open">🍋 Open stand!</button><button class="btn red sm" id="reset">Reset</button></div></div>
+</div>
+
+<div id="ov"><h1 id="t"></h1><p id="m"></p><button class="btn" id="go">Play</button><button class="btn ghost blue" id="cont" hidden></button></div>
+<script>
+const KEY='lemonade-tycoon.html_';
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function ld(k,d){try{const v=localStorage.getItem(KEY+k);return v==null?d:JSON.parse(v)}catch(e){return d}}
+function sv(k,v){try{localStorage.setItem(KEY+k,JSON.stringify(v))}catch(e){}}
+function rmk(k){try{localStorage.removeItem(KEY+k)}catch(e){}}
+let muted=ld('m',0)==1;
+$('mute').textContent=muted?'🔇':'🔊';
+$('mute').onclick=e=>{muted=!muted;$('mute').textContent=muted?'🔇':'🔊';sv('m',muted?1:0);e.currentTarget.blur();beep(660,.08)};
+let AC;
+function audio(){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state=='suspended')AC.resume()}catch(e){}}
+['pointerdown','touchstart','keydown','click'].forEach(ev=>addEventListener(ev,audio,{passive:true}));
+function beep(f,d=.1,t='square',v=.05,s=0){if(muted)return;try{audio();if(!AC)return;const n=AC.currentTime,o=AC.createOscillator(),a=AC.createGain();o.type=t;o.frequency.setValueAtTime(f,n);if(s)o.frequency.exponentialRampToValueAtTime(Math.max(30,f+s),n+d);a.gain.setValueAtTime(v,n);a.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(a);a.connect(AC.destination);o.start(n);o.stop(n+d)}catch(e){}}
+document.addEventListener('contextmenu',e=>e.preventDefault());
+function fly(x,y,txt,col){const d=document.createElement('div');d.className='fly';d.textContent=txt;d.style.left=x+'px';d.style.top=y+'px';d.style.color=col||'#ffe14d';document.body.appendChild(d);setTimeout(()=>d.remove(),950)}
+function pieces(x,y,em,n){for(let i=0;i<n;i++){const d=document.createElement('div');d.className='pc';d.textContent=em[i%em.length];d.style.left=x+'px';d.style.top=y+'px';const a=Math.random()*6.283,s=40+Math.random()*70;d.style.setProperty('--dx',Math.cos(a)*s+'px');d.style.setProperty('--dy',Math.sin(a)*s-20+'px');document.body.appendChild(d);setTimeout(()=>d.remove(),850)}}
+function confetti(n){const e=['🎉','⭐','🎊','✨','🍬','💛'];for(let i=0;i<(n||30);i++){const d=document.createElement('div');d.className='cf';d.textContent=e[i%e.length];d.style.left=Math.random()*100+'vw';d.style.animationDelay=Math.random()*.8+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),3600)}}
+function fmt(n){n=Math.floor(n);if(n<10000)return''+n;const u=['K','M','B','T','Qa'];let i=-1;let v=n;while(v>=1000&&i<u.length-1){v/=1000;i++}return(v<10?v.toFixed(2):v<100?v.toFixed(1):Math.floor(v))+u[i]}
+function fmtT(s){s=Math.floor(s);const m=Math.floor(s/60);return m+':'+String(s%60).padStart(2,'0')}
+const starRow=n=>'<span class="stars">'+(n>=3?'⭐⭐⭐':n==2?'⭐⭐☆':n==1?'⭐☆☆':'☆☆☆')+'</span>';
+const ovHidden=()=>$('ov').classList.contains('hide');
+let ovGo=null,ovCont=null;
+function showOv(t,m,b,c,onGo,onCont){$('t').textContent=t;$('m').innerHTML=m;$('go').textContent=b;ovGo=onGo;ovCont=onCont;$('cont').hidden=!c;$('cont').textContent=c||'';$('ov').classList.remove('hide')}
+function hideOv(){$('ov').classList.add('hide')}
+$('go').onclick=()=>{$('go').blur();if(ovGo)ovGo()};
+$('cont').onclick=()=>{$('cont').blur();if(ovCont)ovCont()};
+addEventListener('keydown',e=>{if(!ovHidden()&&(e.code=='Space'||e.code=='Enter')){e.preventDefault();if(ovGo)ovGo()}});
+function wireReset(btn,fn){let t=0,tm;const lab=btn.textContent;btn.onclick=()=>{if(!t){t=1;btn.textContent='Sure? Tap again';tm=setTimeout(()=>{t=0;btn.textContent=lab},3000)}else{clearTimeout(tm);t=0;btn.textContent=lab;fn()}}}
+
+const WX=[{e:'☀️',n:'Sunny',dem:1.25,ice:5,t:'Hot'},{e:'⛅',n:'Mild',dem:1,ice:3,t:'Nice'},{e:'🌧️',n:'Rainy',dem:.55,ice:1,t:'Cool'},{e:'❄️',n:'Chilly',dem:.4,ice:0,t:'Cold'},{e:'🔥',n:'Heat wave',dem:1.7,ice:7,t:'Scorching'}];
+const GOAL=400;
+const ROWS=[['price','💲 <span class="tx">Price/cup</span>',.25,5,.25,v=>'$'+v.toFixed(2)],['lemon','🍋 <span class="tx">Lemons</span>',1,8,1,v=>v],['sugar','🍬 <span class="tx">Sugar</span>',1,8,1,v=>v],['ice','🧊 <span class="tx">Ice</span>',0,8,1,v=>v],['cups','🥤 <span class="tx">Cups</span>',10,120,5,v=>v],['ads','📣 <span class="tx">Ads $</span>',0,20,5,v=>'$'+v]];
+const UPS=[['stand','🛒','Big stand',40,'+25% customers'],['sign','🪧','Sign',30,'+15% customers'],['cooler','🧊','Cooler',30,'Ice matters less'],['grove','🍋','Lemon grove',50,'Cups cost 25% less']];
+let best=ld('best',0),L=null,busy=false,fc=null;
+function rw(){const r=Math.random();return r<.35?0:r<.7?1:r<.82?2:r<.92?3:4}
+function fresh(){return{day:1,cash:50,rep:40,price:1,lemon:4,sugar:3,ice:3,cups:30,ads:0,up:{stand:0,sign:0,cooler:0,grove:0},fc:rw()}}
+function actual(f){return Math.random()<.75?f:clamp(f+(Math.random()<.5?-1:1),0,4)}
+function quality(w){const ip=L.up.cooler?.04:.07;return clamp(1-.12*Math.abs(L.lemon-4)-.12*Math.abs(L.sugar-3)-ip*Math.abs(L.ice-WX[w].ice),.1,1)}
+const cupCost=()=>(L.lemon*.04+L.sugar*.02+L.ice*.01)*(L.up.grove?.75:1);
+function demand(w){const q=quality(w),will=.6+q*1.4,pf=clamp(1.4-.8*L.price/will,0,1.4),mult=1+.25*L.up.stand+.15*L.up.sign;
+  return 30*WX[w].dem*(.5+L.rep/100)*pf*mult*(1+Math.sqrt(L.ads)*.12)}
+function save(){sv('save',L)}
+function buildRows(){const w=$('rows');w.innerHTML='';ROWS.forEach(r=>{const d=document.createElement('div');d.className='row';d.innerHTML='<span class="lb">'+r[1]+'</span><button data-k="'+r[0]+'" data-d="-1">−</button><span class="v" id="v_'+r[0]+'"></span><button data-k="'+r[0]+'" data-d="1">+</button>';w.appendChild(d);
+  d.querySelectorAll('button').forEach(b=>b.onclick=()=>adj(r,+b.dataset.d))});
+  const s=$('shop');s.innerHTML='';UPS.forEach(u=>{const b=document.createElement('button');b.className='up';b.id='up_'+u[0];b.onclick=()=>buy(u);s.appendChild(b)})}
+function adj(r,d){if(busy)return;const k=r[0];L[k]=Math.round(clamp(L[k]+d*r[4],r[2],r[3])*100)/100;beep(500+d*80,.04);save();render()}
+function buy(u){if(busy)return;const k=u[0];if(L.up[k]||L.cash<u[3]){beep(200,.1,'sawtooth');return}L.cash-=u[3];L.up[k]=1;beep(800,.15,'triangle');const e=$('up_'+k).getBoundingClientRect();pieces(e.left+e.width/2,e.top,['✨','⭐'],8);save();render()}
+function render(){
+  const w=WX[L.fc];$('day').textContent=L.day;$('cash').textContent=L.cash.toFixed(2);$('rep').textContent=Math.round(L.rep);
+  $('wxe').textContent=w.e;$('wxn').textContent='Forecast: '+w.n;$('wxs').textContent=w.t+' day. Ideal ice ≈ '+w.ice+'. Forecast is usually right!';
+  ROWS.forEach(r=>$('v_'+r[0]).textContent=r[5](L[r[0]]));
+  UPS.forEach(u=>{const b=$('up_'+u[0]);b.innerHTML='<span>'+u[1]+'</span>'+(L.up[u[0]]?'Owned':u[2]+' $'+u[3]);b.className='up'+(L.up[u[0]]?' got':L.cash<u[3]?' poor':'')});
+  const q=quality(L.fc);$('est').innerHTML='Taste '+(q>.8?'😋':q>.55?'🙂':'😖')+' '+Math.round(q*100)+'% · Cup cost $'+cupCost().toFixed(2)+' · Batch $'+(cupCost()*L.cups+L.ads).toFixed(2);
+  $('open').disabled=busy;
+}
+function openDay(){
+  if(busy)return;busy=true;
+  if(L.cash<3){L.cash+=10;fly(innerWidth/2,200,'Mom lent you $10 💛','#fff')}
+  const c=cupCost();const maxC=Math.max(10,Math.floor((L.cash-L.ads)/c/5)*5);if(L.cups>maxC)L.cups=maxC;
+  if(L.cups*c+L.ads>L.cash){L.ads=0;L.cups=Math.max(5,Math.floor(L.cash/c))}
+  const w=actual(L.fc),dm=Math.round(demand(w)*(.9+Math.random()*.2)),sold=Math.min(L.cups,dm),cost=L.cups*c+L.ads,rev=sold*L.price,q=quality(w);
+  L.cash-=cost;save();render();
+  $('stand').style.display='block';$('wxe').textContent=WX[w].e;$('wxn').textContent='Today: '+WX[w].n;
+  const n=12;let i=0;const r=$('stand').getBoundingClientRect();
+  const iv=setInterval(()=>{i++;const k=Math.round(sold*i/n),prev=Math.round(sold*(i-1)/n);
+    if(k>prev){L.cash+=(k-prev)*L.price;$('cash').textContent=L.cash.toFixed(2);fly(r.left+r.width/2+(Math.random()-.5)*120,r.top,'+$'+((k-prev)*L.price).toFixed(2),'#ffe14d');pieces(r.left+r.width/2,r.top+10,['🙂','🥤','😋','🪙'],3);beep(600+i*40,.06,'triangle',.04);$('sti').classList.remove('bn');void $('sti').offsetWidth;$('sti').classList.add('bn')}
+    $('stt').textContent=k+' / '+L.cups+' cups sold';
+    if(i>=n){clearInterval(iv);setTimeout(()=>finish(w,dm,sold,cost,rev,q),500)}},200);
+}
+function finish(w,dm,sold,cost,rev,q){
+  $('stand').style.display='none';busy=false;
+  const profit=rev-cost,lost=Math.max(0,dm-sold),left=L.cups-sold;
+  L.rep=clamp(L.rep+(q-.55)*10+(lost>0?-1.5:1),0,100);
+  let tip=lost>3?'😢 '+lost+' thirsty people left - make more cups!':left>8?'🗑️ '+left+' cups spoiled - make fewer.':sold<dm*.6?'💬 Fewer people than hoped...':'👍 Nice day!';
+  if(q<.6)tip='😖 The lemonade tasted off. Aim for 4 lemons, 3 sugar.';else if(L.price>(.6+q*1.4)*1.1&&sold<L.cups)tip='💸 Price too high for this taste!';
+  const win=L.cash>=GOAL&&!L.won,day=L.day;if(win)L.won=1;L.day++;L.fc=rw();save();render();
+  beep(profit>0?740:240,.3,'triangle',.06);
+  if(win){const stars=day<=12?3:day<=20?2:1,nb=!best||day<best;if(nb){best=day;sv('best',best)}confetti(36);
+    showOv('🏆 Lemon Tycoon!',starRow(stars)+'<span class="big">$'+L.cash.toFixed(2)+'</span>Reached $'+GOAL+' in <b>'+day+' days</b> · Best '+best+' days'+(nb?'<br><span class="nb">🎉 New best!</span>':''),'Play again','Keep playing',()=>{newRun()},()=>{hideOv()});return}
+  showOv(WX[w].e+' Day '+day+' report','Sold <b>'+sold+'</b> of '+dm+' customers<br>Money in <b>$'+rev.toFixed(2)+'</b> · costs <b>$'+cost.toFixed(2)+'</b><br>Profit <b style="color:'+(profit>=0?'#7dff7d':'#ff8a7a')+'">'+(profit>=0?'+':'-')+'$'+Math.abs(profit).toFixed(2)+'</b><br>'+tip+'<br>Goal: $'+GOAL+' (you have $'+L.cash.toFixed(2)+')','Next day ▶',null,()=>hideOv());
+}
+function newRun(){rmk('save');L=fresh();save();hideOv();render()}
+$('open').onclick=openDay;
+wireReset($('reset'),()=>{if(busy)return;newRun()});
+const sd=ld('save',null);L=sd&&sd.up?Object.assign(fresh(),sd):fresh();buildRows();render();
+showOv('🍋 Lemonade Shop',sd?'Welcome back! Day <b>'+L.day+'</b> · 💵 $'+L.cash.toFixed(2)+'<br>Goal: reach <b>$'+GOAL+'</b>':'Set your price, recipe and ads each day. Watch the weather and reach <b>$'+GOAL+'</b>!','Play'+(best?'':''),null,()=>hideOv());
+
+</script><script src="mascot.js" defer></script>
+</body></html>

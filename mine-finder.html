@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="description" content="Mine Finder - Beginner-friendly mine clearing. Free online game, plays on phone, tablet and PC. No sign-up.">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mine Finder</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
+body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:linear-gradient(#27a2e8,#bdeafc) fixed;color:#fff;text-shadow:0 2px 0 #14407a;display:flex;flex-direction:column;align-items:center;padding:58px 6px 6px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.home{position:fixed;left:10px;top:10px;background:linear-gradient(#ffc766,#f08a12);color:#fff;border-radius:999px;padding:0 16px;min-height:44px;text-decoration:none;font-weight:700;box-shadow:0 4px 0 #a85d00;z-index:5;text-shadow:0 2px 0 #a85d00;display:flex;align-items:center}
+#mute{min-width:44px;min-height:44px;position:fixed;right:10px;top:10px;z-index:5;border:2px solid #0c2c58;background:linear-gradient(#2a6fc0,#14407a);color:#fff;border-radius:999px;font-size:20px;padding:4px 10px;cursor:pointer;box-shadow:0 4px 0 #0c2c58}
+.btn{min-height:44px;background:linear-gradient(#7be07b,#2ea32e);color:#fff;border:0;border-radius:16px;padding:8px 16px;font:inherit;font-size:18px;font-weight:700;box-shadow:0 5px 0 #1c701c,inset 0 2px 0 rgba(255,255,255,.45);text-shadow:0 2px 0 #1c701c;cursor:pointer;touch-action:manipulation}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c,inset 0 2px 0 rgba(255,255,255,.45)}
+.btn.b2{background:linear-gradient(#6ec3ff,#2a7fd4);box-shadow:0 5px 0 #14407a,inset 0 2px 0 rgba(255,255,255,.45);text-shadow:0 2px 0 #14407a}
+.btn.b2:active{box-shadow:0 1px 0 #14407a,inset 0 2px 0 rgba(255,255,255,.45)}
+.btn.sel{background:linear-gradient(#ffc766,#f08a12);box-shadow:0 5px 0 #a85d00,inset 0 2px 0 rgba(255,255,255,.45);text-shadow:0 2px 0 #a85d00}
+.btn.sel:active{box-shadow:0 1px 0 #a85d00,inset 0 2px 0 rgba(255,255,255,.45)}
+.row{display:flex;gap:6px 8px;align-items:center;justify-content:center;flex-wrap:wrap;margin:4px 6px 8px}
+.stat{background:linear-gradient(#2a6fc0,#14407a);border:2px solid #0c2c58;box-shadow:0 3px 0 #0c2c58;border-radius:12px;padding:2px 8px;text-align:center;font-size:12px;font-weight:700;min-width:56px;color:#fff}
+.stat b{display:block;font-size:21px;line-height:1.15}
+.msg{min-height:28px;font-size:20px;font-weight:700;color:#ffe66b;text-align:center;text-shadow:0 2px 0 #14407a,2px 0 0 #14407a,-2px 0 0 #14407a,0 -2px 0 #14407a;margin-bottom:2px}
+.hintp{margin:6px 12px 0;font-size:14px;text-align:center;background:#14407a;border-radius:14px;padding:6px 14px;font-weight:700;box-shadow:0 3px 0 #0c2c58}
+.ov{position:fixed;inset:0;background:rgba(10,40,90,.86);display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;z-index:4;text-align:center;padding:16px}
+.ov.show{display:flex}
+.ov h1{margin:0;font-size:clamp(30px,9vw,52px);color:#ffe66b;text-shadow:0 4px 0 #14407a,0 0 14px rgba(0,0,0,.45)}
+.ov p{margin:0;font-size:clamp(16px,4.5vw,22px);line-height:1.4;font-weight:700}
+.ov .btn{font-size:clamp(20px,5vw,26px);padding:12px 34px;margin-top:6px}
+.big{font-size:clamp(56px,16vw,104px);line-height:1;animation:bnc .8s ease-in-out infinite alternate}
+.stars{font-size:clamp(28px,8vw,44px);letter-spacing:4px;animation:spp .6s}
+@keyframes bnc{to{transform:translateY(-12px) scale(1.08)}}
+@keyframes spp{from{transform:scale(.2)}60%{transform:scale(1.3)}to{transform:scale(1)}}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:8;width:100%;height:100%}
+.pop{position:fixed;font-size:28px;font-weight:700;color:#ffe66b;text-shadow:0 3px 0 #14407a,2px 0 0 #14407a,-2px 0 0 #14407a;pointer-events:none;z-index:9;transform:translate(-50%,0);animation:up .9s forwards;white-space:nowrap}
+@keyframes up{to{opacity:0;transform:translate(-50%,-60px)}}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@media(max-width:520px){.msg{min-height:52px;display:flex;align-items:center;justify-content:center}}
+@media(max-height:700px){.hintp{display:none}}
+@media(max-height:520px){body{padding-top:6px}.home,#mute{min-height:38px}.home{padding:0 12px}#mute{min-width:38px;padding:2px 8px}.btn{min-height:38px;padding:4px 12px;font-size:16px;box-shadow:0 4px 0 #1c701c,inset 0 2px 0 rgba(255,255,255,.45)}.btn.b2{box-shadow:0 4px 0 #14407a,inset 0 2px 0 rgba(255,255,255,.45)}.btn.sel{box-shadow:0 4px 0 #a85d00,inset 0 2px 0 rgba(255,255,255,.45)}.row{margin:3px 4px 6px}.stat{padding:1px 6px}.stat b{font-size:17px}.msg{min-height:22px;font-size:16px}.soft{display:none}.ov .btn{font-size:20px;padding:8px 24px}.big{font-size:48px}.ov h1{font-size:28px}.stars{font-size:24px}.ov p{font-size:15px}.ov{gap:4px}}
+@media(max-height:520px) and (min-width:560px){body{display:grid;grid-template-columns:clamp(220px,38vw,300px) 1fr;grid-template-rows:repeat(6,min-content) 1fr;justify-items:center;align-items:start;align-content:start;column-gap:10px;padding:6px}
+body>.row:first-of-type{margin-top:46px}#mute{left:108px;right:auto}#bd{grid-column:2;grid-row:1/8;align-self:center;justify-self:center}.row{max-width:100%}}
+#bd{display:grid;gap:2px;padding:6px;background:#14407a;border-radius:14px;touch-action:none;margin:6px 0 8px;box-shadow:0 6px 0 #0c2c58,0 12px 24px rgba(0,0,0,.35)}
+.c{border:0;border-radius:7px;padding:0;background:linear-gradient(#7fd0ff,#2b8be0);box-shadow:0 3px 0 #0c2c58,inset 0 2px 0 rgba(255,255,255,.5);font:inherit;font-weight:700;cursor:pointer;touch-action:none;text-shadow:none;line-height:1;color:#14407a}
+.c:active{transform:translateY(2px)}
+.c.r{background:#fffdf2;box-shadow:inset 0 2px 0 #d8e6f5;cursor:default}
+.c.x{background:#ff5a5a}
+.c.f{background:linear-gradient(#ffd98a,#f6931c);box-shadow:0 3px 0 #a85d00,inset 0 2px 0 rgba(255,255,255,.5)}
+.c.hint{outline:3px solid #5fd35f}
+#bd.sh{animation:shake .4s}
+</style></head><body>
+<a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Mute">🔊</button><canvas id="fx"></canvas>
+<div class="row top"><div class="stat">💣 Left<b id="ml">0</b></div><div class="stat">⏱ Time<b id="tm">0</b></div><div class="stat">Score<b id="sc">0</b></div><div class="stat">Best<b id="bs">0</b></div><div class="stat">Streak 🔥<b id="st">0</b></div></div>
+<div class="row"><button class="btn sel" id="s0">Small</button><button class="btn b2" id="s1">Medium</button><button class="btn b2" id="s2">Large</button></div>
+<div class="msg" id="msg">Tap a square to start - first tap is always safe!</div>
+<div id="bd"></div>
+<div class="row bot"><button class="btn b2" id="fm">⛏ Dig mode</button><button class="btn" id="again">▶ New game</button><button class="btn b2" id="mnb">☰ Menu</button></div>
+<div class="ov show" id="mn"><div class="big">💣</div><h1>Mine Finder</h1><p>Clear the board without hitting a mine!</p><button class="btn" id="play">▶ Play</button></div>
+<div class="ov" id="ov"><div class="big" id="ob">🏆</div><h1 id="ot">Cleared!</h1><div class="stars" id="osr">⭐⭐⭐</div><p id="os"></p><button class="btn" id="oa">▶ Play Again</button></div>
+<p class="hintp">Numbers = mines touching that square. Switch to 🚩 mode (or long-press / right-click) to flag.</p>
+<script>
+/* ===== DUO helper v1 (shared, pasted inline into each game as its own <script> BEFORE the game script) ===== */
+const Duo=(()=>{
+const KEY='duo_names',S={mode:null,names:['Player 1','Player 2'],scores:[null,null],turn:0,hw:true,cpuR:[0,100],lvl:'easy',start:null,game:'',unit:''};
+let pill=null,ac=null;
+function css(){if(document.getElementById('duoCss'))return;const s=document.createElement('style');s.id='duoCss';s.textContent=
+'.duoOv{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(6,30,70,.88);padding:14px;font-family:"Fredoka","Trebuchet MS","Comic Sans MS",sans-serif}'+
+'.duoCard{background:linear-gradient(#2f8cff,#0b4fb3);border:5px solid #ffe14a;border-radius:26px;padding:18px 20px;max-width:min(92vw,420px);width:100%;color:#fff;text-align:center;box-shadow:0 8px 0 #06244d;animation:duoPop .35s}'+
+'@keyframes duoPop{0%{transform:scale(.6)}70%{transform:scale(1.05)}}'+
+'.duoCard h2{margin:0 0 8px;font-size:clamp(22px,6vw,32px);text-shadow:0 3px 0 #0b3a78}.duoCard p{margin:6px 0;font-size:clamp(15px,4vw,19px);font-weight:600}'+
+'.duoCard .big{font-size:clamp(34px,10vw,52px);line-height:1.1}'+
+'.duoCard input{width:100%;box-sizing:border-box;font:600 20px inherit;font-family:inherit;padding:10px 14px;border-radius:14px;border:3px solid #fff;margin:6px 0;color:#0b3a78;text-align:center}'+
+'.duoCard label{display:block;text-align:left;font-weight:700;margin-top:6px;font-size:15px}'+
+'.duoB{font:700 clamp(18px,5vw,24px) inherit;font-family:inherit;margin:8px 4px 0;padding:.45em 1.3em;min-height:46px;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}'+
+'.duoB.o{background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9560b;text-shadow:0 2px 0 #a9560b}.duoB.g{background:linear-gradient(#8a9bb5,#5d6f8a);box-shadow:0 5px 0 #3b4a63;text-shadow:none}'+
+'.duoB:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.3)}'+
+'.duoMenu{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 0}.duoMenu .duoB{margin:0}'+
+'.duoPill{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:8000;background:#0b3a78;color:#fff;border:3px solid #ffe14a;border-radius:999px;padding:3px 14px;font:700 clamp(13px,3.6vw,17px) "Fredoka","Trebuchet MS",sans-serif;box-shadow:0 3px 0 #06244d;pointer-events:none;white-space:nowrap;max-width:62vw;overflow:hidden;text-overflow:ellipsis}';
+document.head.appendChild(s)}
+function beep(f,d){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type='triangle';g.gain.setValueAtTime(.12,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+(d||.15));o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+(d||.15))}catch(e){}}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function modal(html,buttons){css();return new Promise(res=>{const ov=document.createElement('div');ov.className='duoOv';ov.innerHTML='<div class="duoCard">'+html+'<div class="duoMenu"></div></div>';const m=ov.querySelector('.duoMenu');
+ buttons.forEach(([label,cls,val])=>{const b=document.createElement('button');b.className='duoB '+(cls||'');b.innerHTML=label;b.onclick=()=>{const out=typeof val==='function'?val(ov):val;ov.remove();res(out)};m.appendChild(b)});
+ document.body.appendChild(ov);const i=ov.querySelector('input');if(i){i.focus();i.select()}})}
+function saved(){try{const a=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(a))return a}catch(e){}return null}
+function save(a){try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}}
+function clean(v,d){v=(v||'').trim().slice(0,14);return v||d}
+const api={
+ /* Ask both player names. Resolves to [n1,n2] or null if cancelled. opts.cpu=true asks only P1 name (P2 is "Computer"). opts.t1/t2 = labels */
+ askNames(opts){opts=opts||{};const sv=saved()||['',''];
+  const html='<div class="big">'+(opts.cpu?'🤖':'👥')+'</div><h2>'+(opts.cpu?'Your name':'Who is playing?')+'</h2>'+
+   '<label>'+esc(opts.t1||'Player 1')+'</label><input id="duoN1" maxlength="14" placeholder="Player 1" value="'+esc(sv[0]||'')+'">'+
+   (opts.cpu?'':'<label>'+esc(opts.t2||'Player 2')+'</label><input id="duoN2" maxlength="14" placeholder="Player 2" value="'+esc(sv[1]||'')+'">');
+  return modal(html,[['▶ Start','',ov=>{const a=clean(ov.querySelector('#duoN1').value,'Player 1');const b=opts.cpu?'🤖 Computer':clean(ov.querySelector('#duoN2')&&ov.querySelector('#duoN2').value,'Player 2');if(!opts.cpu)save([a,b]);else save([a,sv[1]||'']);return [a,b]}],['Cancel','g',null]])},
+ /* "Pass the device" screen for hot-seat turns / hidden information. Resolves when tapped. */
+ cover(name,msg){beep(660,.12);return modal('<div class="big">🔄</div><h2>Pass to '+esc(name)+'</h2><p>'+esc(msg||'Tap when you are ready')+'</p>',[['I am '+esc(name),'',true]])},
+ /* Add "2 Players" and "vs Computer" buttons into an element (start menu/overlay).
+    o={game:'snake', start:fn(), hw:true(higher wins)|false(lower wins, e.g. time), cpu:[lo,hi] typical score range for the computer (e.g. [40,160]), unit:' pts', noTwo:false, noCpu:false} */
+ addButtons(el,o){css();const wrap=document.createElement('div');wrap.className='duoMenu';
+  if(!o.noTwo){const b=document.createElement('button');b.className='duoB o';b.innerHTML='👥 2 Players';b.onclick=async()=>{const n=await api.askNames();if(n)api.begin(Object.assign({},o,{mode:'two',names:n}))};wrap.appendChild(b)}
+  if(!o.noCpu&&o.cpu){const b=document.createElement('button');b.className='duoB o';b.innerHTML='🤖 vs Computer';b.onclick=async()=>{const lv=await modal('<div class="big">🤖</div><h2>Computer level</h2>',[['😊 Easy','',  'easy'],['🧠 Hard','o','hard'],['Cancel','g',null]]);if(!lv)return;const n=await api.askNames({cpu:true});if(n)api.begin(Object.assign({},o,{mode:'cpu',names:n,lvl:lv}))};wrap.appendChild(b)}
+  el.appendChild(wrap);return wrap},
+ begin(o){S.mode=o.mode;S.names=o.names.slice();S.scores=[null,null];S.turn=0;S.hw=o.hw!==false;S.cpuR=o.cpu||[0,100];S.lvl=o.lvl||'easy';S.start=o.start;S.game=o.game||'';S.unit=o.unit||'';S.fmt=o.fmt||null;
+  api.pill();if(o.start)o.start()},
+ active(){return !!S.mode},
+ mode(){return S.mode},
+ player(){return S.names[S.turn]},
+ names(){return S.names.slice()},
+ pill(){css();if(!S.mode){if(pill){pill.remove();pill=null}return}if(!pill){pill=document.createElement('div');pill.className='duoPill';document.body.appendChild(pill)}
+  pill.textContent=S.mode==='two'?'👤 '+S.names[S.turn]+'  ('+(S.turn+1)+'/2)':'👤 '+S.names[0]+'  vs  🤖'},
+ fmt(v){return S.fmt?S.fmt(v):(Math.round(v*100)/100)+S.unit},
+ cpuScore(){const [lo,hi]=S.cpuR,mid=(lo+hi)/2,r=Math.random();let v;
+  if(S.hw)v=S.lvl==='easy'?lo+r*(mid-lo):mid+r*(hi-mid);else v=S.lvl==='easy'?mid+r*(hi-mid):lo+r*(mid-lo);return (hi-lo)>20?Math.round(v):Math.round(v*100)/100},
+ /* Call when a round ends with the player's score. Returns true if Duo took over (the game must NOT show its own game-over overlay). */
+ finish(score){if(!S.mode)return false;const sc=Number(score)||0;
+  if(S.mode==='two'){S.scores[S.turn]=sc;
+   if(S.turn===0){S.turn=1;api.pill();setTimeout(()=>{modal('<div class="big">✅</div><h2>'+esc(S.names[0])+' scored '+esc(api.fmt(sc))+'</h2><p>Now it is <b>'+esc(S.names[1])+'</b>\'s turn. Beat that!</p>',[['▶ '+esc(S.names[1])+': Go!','',true]]).then(()=>{if(S.start)S.start()})},700);return true}
+   const [a,b]=S.scores,aw=S.hw?a>b:a<b,bw=S.hw?b>a:b<a;const win=aw?0:bw?1:-1;
+   setTimeout(()=>{beep(880,.2);modal('<div class="big">'+(win<0?'🤝':'🏆')+'</div><h2>'+(win<0?'It is a tie!':esc(S.names[win])+' wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(a))+'</b></p><p>'+esc(S.names[1])+': <b>'+esc(api.fmt(b))+'</b></p>',[['🔁 Rematch','',1],['🏠 Menu','o',0]]).then(r=>{if(r){S.scores=[null,null];S.turn=0;api.pill();if(S.start)S.start()}else api.end(true)})},700);return true}
+  /* vs computer */
+  const c=api.cpuScore(),win=S.hw?(sc>c?0:sc<c?1:-1):(sc<c?0:sc>c?1:-1);
+  setTimeout(()=>{beep(win===0?880:300,.25);modal('<div class="big">'+(win===0?'🏆':win<0?'🤝':'🤖')+'</div><h2>'+(win===0?esc(S.names[0])+' wins!':win<0?'Tie!':'Computer wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(sc))+'</b></p><p>🤖 Computer: <b>'+esc(api.fmt(c))+'</b></p>',[['🔁 Play again','',1],['🏠 Menu','o',0]]).then(r=>{if(r){api.pill();if(S.start)S.start()}else api.end(true)})},700);return true},
+ /* Leave duo mode. If reload, the page reloads to the game's normal start menu. */
+ end(reload){S.mode=null;api.pill();if(reload)location.reload()}
+};
+return api})();
+/* ===== end DUO ===== */
+</script>
+<script>
+const LS=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:+v}catch(e){return d}};
+const SS=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+const $=id=>document.getElementById(id);
+const cv=$('fx'),cx=cv.getContext('2d');let P=[];
+function rs(){cv.width=innerWidth;cv.height=innerHeight}rs();addEventListener('resize',rs);
+function burst(x,y,n=20,cols=['#ffd23f','#ff6b6b','#5fd35f','#4db8ff','#ff8ad8','#fff']){for(let i=0;i<n;i++){const a=Math.random()*6.28,s=2+Math.random()*5;P.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-2,l:1,c:cols[i%cols.length]})}}
+(function loop(){cx.clearRect(0,0,cv.width,cv.height);P=P.filter(p=>p.l>0);for(const p of P){p.x+=p.vx;p.y+=p.vy;p.vy+=.2;p.l-=.02;cx.globalAlpha=Math.max(p.l,0);cx.fillStyle=p.c;cx.fillRect(p.x-4,p.y-4,8,8)}cx.globalAlpha=1;requestAnimationFrame(loop)})();
+function pop(t,x,y){const d=document.createElement('div');d.className='pop';d.textContent=t;d.style.left=x+'px';d.style.top=y+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),900)}
+function at(el,n,c){const r=el.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,n,c)}
+let mute=LS('mute',0)===1,AC;
+function beep(f,d=.1,t='sine',v=.15){if(mute)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
+function jingle(a){a.forEach((f,i)=>setTimeout(()=>beep(f,.18,'triangle'),i*110))}
+addEventListener('pointerdown',()=>{try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){}},{once:true});
+const mb=$('mute');function um(){mb.textContent=mute?'🔇':'🔊'}um();
+mb.onclick=()=>{mute=!mute;SS('mute',mute?1:0);um();beep(600)};
+const SZ=[[6,6,5],[9,9,10],[12,12,24]],COLS=['','#0d5fe0','#1f8f1f','#e02020','#6a1fc8','#a01010','#0a8a88','#111','#555'];
+let sz=0,R,C,M,mine,rev,flg,num,started,dead,won,flagMode=false,t0=0,tmr,streak=0,score=0,best=LS('ms_best',0),lp=false,cs,els=[];
+const bd=$('bd');
+function avail(){const bs=getComputedStyle(document.body),bm=getComputedStyle(bd),mv=parseFloat(bm.marginTop)+parseFloat(bm.marginBottom);
+if(bs.display==='grid')return{w:innerWidth-parseFloat(bs.gridTemplateColumns)-34,h:innerHeight-14-mv};
+let o=parseFloat(bs.paddingTop)+parseFloat(bs.paddingBottom)+mv+6;for(const e of document.body.children){if(e===bd)continue;const s=getComputedStyle(e);if(s.position==='fixed'||s.display==='none')continue;o+=e.offsetHeight+parseFloat(s.marginTop)+parseFloat(s.marginBottom)}
+return{w:document.body.clientWidth-16,h:innerHeight-o}}
+const nb=i=>{const r=i/C|0,c=i%C,o=[];for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){if(!dr&&!dc)continue;const rr=r+dr,cc=c+dc;if(rr>=0&&rr<R&&cc>=0&&cc<C)o.push(rr*C+cc)}return o};
+function newGame(){[R,C,M]=SZ[sz];mine=Array(R*C).fill(0);rev=Array(R*C).fill(0);flg=Array(R*C).fill(0);num=Array(R*C).fill(0);started=dead=won=false;clearInterval(tmr);$('ov').classList.remove('show');$('tm').textContent=0;$('msg').textContent='Tap a square to start - first tap is always safe!';build();upd()}
+function build(){const av=avail();cs=Math.max(18,Math.min(48,Math.floor((Math.min(av.w-4,av.h)-12-(C-1)*2)/C)));
+bd.style.gridTemplateColumns='repeat('+C+','+cs+'px)';bd.innerHTML='';els=[];
+for(let i=0;i<R*C;i++){const c=document.createElement('button');c.className='c';c.style.width=c.style.height=cs+'px';c.style.fontSize=cs*.55+'px';
+let tm=null;
+c.addEventListener('pointerdown',e=>{if(e.button===2)return;lp=false;clearTimeout(tm);tm=setTimeout(()=>{lp=true;if(!dead&&!won&&!rev[i])toggleFlag(i)},420)});
+['pointerup','pointerleave','pointercancel'].forEach(ev=>c.addEventListener(ev,()=>clearTimeout(tm)));
+c.addEventListener('click',()=>{if(lp){lp=false;return}tap(i)});
+c.addEventListener('contextmenu',e=>{e.preventDefault();if(!dead&&!won&&!rev[i])toggleFlag(i)});
+bd.appendChild(c);els.push(c)}}
+function upd(){for(let i=0;i<R*C;i++){const c=els[i];c.className='c'+(rev[i]?' r':'')+(flg[i]&&!rev[i]?' f':'');
+ c.textContent=rev[i]?(mine[i]?'💣':num[i]||''):flg[i]?'🚩':'';c.style.color=COLS[num[i]]||'#1b4f86'}
+ $('ml').textContent=M-flg.reduce((a,b)=>a+b,0);$('sc').textContent=score;$('bs').textContent=best;$('st').textContent=streak}
+function place(f){const ban=new Set([f,...nb(f)]);let k=0;while(k<M){const i=Math.random()*R*C|0;if(!mine[i]&&!ban.has(i)){mine[i]=1;k++}}
+for(let i=0;i<R*C;i++)num[i]=nb(i).filter(j=>mine[j]).length;started=true;t0=Date.now();tmr=setInterval(()=>$('tm').textContent=Math.floor((Date.now()-t0)/1000),500)}
+function toggleFlag(i){flg[i]^=1;beep(flg[i]?800:500,.06,'triangle');upd()}
+function tap(i){if(dead||won)return;if(flagMode){if(!rev[i])toggleFlag(i);return}
+if(rev[i]){if(num[i]&&nb(i).filter(j=>flg[j]).length===num[i]){let hit=false;nb(i).forEach(j=>{if(!flg[j]&&!rev[j]){open(j);if(mine[j])hit=true}});finish(hit)}return}
+if(flg[i])return;if(!started)place(i);open(i);finish(mine[i],i)}
+function open(i){const st=[i];while(st.length){const k=st.pop();if(rev[k]||flg[k])continue;rev[k]=1;if(!mine[k]&&!num[k])nb(k).forEach(j=>{if(!rev[j])st.push(j)})}}
+function finish(hit,idx){if(hit){lose(idx);return}
+const left=rev.reduce((a,b,i)=>a+(b&&!mine[i]?1:0),0);beep(400+Math.min(left,40)*10,.05,'sine',.1);upd();
+if(left===R*C-M)win()}
+function lose(idx){dead=true;clearInterval(tmr);streak=0;for(let i=0;i<R*C;i++)if(mine[i])rev[i]=1;upd();if(idx!==undefined)els[idx].classList.add('x');
+bd.classList.remove('sh');void bd.offsetWidth;bd.classList.add('sh');beep(100,.5,'sawtooth',.2);at(bd,60,['#ff6b6b','#ffb347','#333']);
+$('msg').textContent='💥 Boom! Try again - you can do it!';setTimeout(()=>{if(dead&&Duo.active()){Duo.finish(999);return}if(dead)endOv('💥','Boom!','','Score '+score+' · Best '+best+' — you can do it!')},1000)}
+function win(){won=true;clearInterval(tmr);const secs=Math.floor((Date.now()-t0)/1000);for(let i=0;i<R*C;i++)if(mine[i])flg[i]=1;
+const pts=Math.round((M*20+Math.max(0,M*10-secs))*(1+streak*.25));score+=pts;streak++;if(!Duo.active()&&score>best){best=score;SS('ms_best',best)}
+upd();jingle([523,659,784,1047]);at(bd,100);pop('+'+pts,innerWidth/2,innerHeight/3);
+$('msg').textContent='🎉 Cleared in '+secs+'s! +'+pts+(streak>1?'  🔥 x'+streak:'');burst(innerWidth/2,innerHeight/2,90);setTimeout(()=>{if(won&&Duo.active()){Duo.finish(secs);return}if(won)endOv('🏆','Cleared!','⭐⭐⭐','Time '+secs+'s · +'+pts+(streak>1?' · 🔥 x'+streak:'')+' · Best '+best)},800)}
+function endOv(e,t,st,m){$('ob').textContent=e;$('ot').textContent=t;$('osr').textContent=st;$('osr').style.display=st?'':'none';$('os').textContent=m;$('ov').classList.add('show')}
+$('oa').onclick=()=>{beep(500);newGame()};$('ov').onclick=e=>{if(e.target===$('ov'))$('ov').classList.remove('show')};
+function setSize(s){if(Duo.active())return;sz=s;streak=0;[0,1,2].forEach(k=>$('s'+k).className='btn '+(k===s?'sel':'b2'));beep(450);newGame()}
+[0,1,2].forEach(k=>$('s'+k).onclick=()=>setSize(k));
+$('fm').onclick=()=>{flagMode=!flagMode;$('fm').className='btn '+(flagMode?'sel':'b2');$('fm').textContent=flagMode?'🚩 Flag mode':'⛏ Dig mode';beep(600,.06)};
+$('again').onclick=()=>{beep(500);newGame()};
+$('play').onclick=()=>{$('mn').classList.remove('show');newGame();beep(500)};
+$('mnb').onclick=()=>{if(Duo.active()){Duo.end(true);return}$('mn').classList.add('show')};
+Duo.addButtons($('mn'),{game:'mine-sweeper',start:()=>{$('mn').classList.remove('show');$('ov').classList.remove('show');sz=1;streak=0;[0,1,2].forEach(k=>$('s'+k).className='btn '+(k===1?'sel':'b2'));newGame()},cpu:[20,90],hw:false,unit:'s',fmt:v=>v>=999?'💥 Boom':Math.round(v)+'s'});
+let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{build();upd()},150)});
+newGame();
+</script><script src="mascot.js" defer></script>
+</body></html>

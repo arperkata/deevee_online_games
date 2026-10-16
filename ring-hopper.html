@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="description" content="Ring Hopper - Tap to hop through matching rings. Free online game, plays on phone, tablet and PC. No sign-up."><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ring Hopper</title>
+<style>*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;background:linear-gradient(#3b1a8c,#12082e) fixed;font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;color:#fff;text-shadow:0 2px 0 #1b4f86;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+.home{position:fixed;left:10px;top:10px;z-index:1000;display:flex;align-items:center;min-height:44px;background:#f08a12;color:#fff;text-decoration:none;padding:0 18px;border-radius:999px;font-weight:700;font-size:18px;box-shadow:0 3px 0 #a85d00;text-shadow:none;touch-action:manipulation}
+#mute{position:fixed;right:10px;top:10px;z-index:100;width:48px;height:48px;border:3px solid #1b4f86;border-radius:50%;background:#fff;font-size:22px;cursor:pointer;box-shadow:0 3px 0 #1b4f86;touch-action:manipulation}
+canvas{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:16px;box-shadow:0 0 0 4px #5cc8ff,0 8px 0 4px #0b2a5c;touch-action:none;max-width:100vw}
+#ov{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:50;text-align:center;padding:20px;overflow:auto;background:radial-gradient(circle at 50% 35%,#2a6fcf 0,#123a7c 55%,#0a1f4d 100%)}
+#ov.hide{display:none}
+#ov h1{margin:0;color:#ffe14d;text-shadow:0 4px 0 #1b4f86,0 0 18px #ff9a3d;font-size:clamp(34px,10vw,64px);line-height:1.05}
+#ov p{margin:0;background:#14367a;border:3px solid #5cc8ff;border-radius:20px;padding:12px 22px;max-width:min(92vw,440px);color:#fff;font-weight:600;font-size:clamp(16px,4.5vw,22px);line-height:1.4;text-shadow:0 2px 0 #0b2a5c}
+#ov p b{color:#ffe14d}
+.big{display:block;font-size:2em;font-weight:700;color:#ffe14d;line-height:1.1}
+.stars{display:block;font-size:2.2em;letter-spacing:4px;line-height:1.2}
+.nb{display:inline-block;background:#ff9a3d;color:#fff;border-radius:999px;padding:2px 14px;margin-top:4px;font-weight:700}
+.btn{font:inherit;font-size:clamp(24px,6vw,32px);font-weight:700;min-height:52px;color:#fff;text-shadow:0 2px 0 #1c701c;background:linear-gradient(#5fd35f,#2ea32e);border:0;border-radius:18px;padding:12px 44px;box-shadow:0 5px 0 #1c701c;cursor:pointer;touch-action:manipulation}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
+#go{animation:pulse 1.1s ease-in-out infinite}
+#go:active{animation:none}
+@keyframes pulse{50%{transform:scale(1.07)}}
+@media (max-height:430px){#ov{gap:6px;padding:8px}#ov h1{font-size:28px}#ov p{font-size:14px;padding:6px 14px}.big{font-size:1.5em}.stars{font-size:1.6em}.btn{font-size:20px;padding:6px 28px;min-height:44px}}
+</style></head><body>
+<a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Mute">🔊</button>
+<canvas id="c"></canvas>
+<div id="ov"><h1 id="t"></h1><p id="m"></p><button class="btn" id="go">Play</button></div>
+<script>
+/* ===== DUO helper v1 (shared, pasted inline into each game as its own <script> BEFORE the game script) ===== */
+const Duo=(()=>{
+const KEY='duo_names',S={mode:null,names:['Player 1','Player 2'],scores:[null,null],turn:0,hw:true,cpuR:[0,100],lvl:'easy',start:null,game:'',unit:''};
+let pill=null,ac=null;
+function css(){if(document.getElementById('duoCss'))return;const s=document.createElement('style');s.id='duoCss';s.textContent=
+'.duoOv{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(6,30,70,.88);padding:14px;font-family:"Fredoka","Trebuchet MS","Comic Sans MS",sans-serif}'+
+'.duoCard{background:linear-gradient(#2f8cff,#0b4fb3);border:5px solid #ffe14a;border-radius:26px;padding:18px 20px;max-width:min(92vw,420px);width:100%;color:#fff;text-align:center;box-shadow:0 8px 0 #06244d;animation:duoPop .35s}'+
+'@keyframes duoPop{0%{transform:scale(.6)}70%{transform:scale(1.05)}}'+
+'.duoCard h2{margin:0 0 8px;font-size:clamp(22px,6vw,32px);text-shadow:0 3px 0 #0b3a78}.duoCard p{margin:6px 0;font-size:clamp(15px,4vw,19px);font-weight:600}'+
+'.duoCard .big{font-size:clamp(34px,10vw,52px);line-height:1.1}'+
+'.duoCard input{width:100%;box-sizing:border-box;font:600 20px inherit;font-family:inherit;padding:10px 14px;border-radius:14px;border:3px solid #fff;margin:6px 0;color:#0b3a78;text-align:center}'+
+'.duoCard label{display:block;text-align:left;font-weight:700;margin-top:6px;font-size:15px}'+
+'.duoB{font:700 clamp(18px,5vw,24px) inherit;font-family:inherit;margin:8px 4px 0;padding:.45em 1.3em;min-height:46px;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fd35f,#2ea32e);box-shadow:0 5px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}'+
+'.duoB.o{background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9560b;text-shadow:0 2px 0 #a9560b}.duoB.g{background:linear-gradient(#8a9bb5,#5d6f8a);box-shadow:0 5px 0 #3b4a63;text-shadow:none}'+
+'.duoB:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.3)}'+
+'.duoMenu{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 0}.duoMenu .duoB{margin:0}'+
+'.duoPill{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:8000;background:#0b3a78;color:#fff;border:3px solid #ffe14a;border-radius:999px;padding:3px 14px;font:700 clamp(13px,3.6vw,17px) "Fredoka","Trebuchet MS",sans-serif;box-shadow:0 3px 0 #06244d;pointer-events:none;white-space:nowrap;max-width:62vw;overflow:hidden;text-overflow:ellipsis}';
+document.head.appendChild(s)}
+function beep(f,d){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.type='triangle';g.gain.setValueAtTime(.12,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+(d||.15));o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+(d||.15))}catch(e){}}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function modal(html,buttons){css();return new Promise(res=>{const ov=document.createElement('div');ov.className='duoOv';ov.innerHTML='<div class="duoCard">'+html+'<div class="duoMenu"></div></div>';const m=ov.querySelector('.duoMenu');
+ buttons.forEach(([label,cls,val])=>{const b=document.createElement('button');b.className='duoB '+(cls||'');b.innerHTML=label;b.onclick=()=>{const out=typeof val==='function'?val(ov):val;ov.remove();res(out)};m.appendChild(b)});
+ document.body.appendChild(ov);const i=ov.querySelector('input');if(i){i.focus();i.select()}})}
+function saved(){try{const a=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(a))return a}catch(e){}return null}
+function save(a){try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}}
+function clean(v,d){v=(v||'').trim().slice(0,14);return v||d}
+const api={
+ /* Ask both player names. Resolves to [n1,n2] or null if cancelled. opts.cpu=true asks only P1 name (P2 is "Computer"). opts.t1/t2 = labels */
+ askNames(opts){opts=opts||{};const sv=saved()||['',''];
+  const html='<div class="big">'+(opts.cpu?'🤖':'👥')+'</div><h2>'+(opts.cpu?'Your name':'Who is playing?')+'</h2>'+
+   '<label>'+esc(opts.t1||'Player 1')+'</label><input id="duoN1" maxlength="14" placeholder="Player 1" value="'+esc(sv[0]||'')+'">'+
+   (opts.cpu?'':'<label>'+esc(opts.t2||'Player 2')+'</label><input id="duoN2" maxlength="14" placeholder="Player 2" value="'+esc(sv[1]||'')+'">');
+  return modal(html,[['▶ Start','',ov=>{const a=clean(ov.querySelector('#duoN1').value,'Player 1');const b=opts.cpu?'🤖 Computer':clean(ov.querySelector('#duoN2')&&ov.querySelector('#duoN2').value,'Player 2');if(!opts.cpu)save([a,b]);else save([a,sv[1]||'']);return [a,b]}],['Cancel','g',null]])},
+ /* "Pass the device" screen for hot-seat turns / hidden information. Resolves when tapped. */
+ cover(name,msg){beep(660,.12);return modal('<div class="big">🔄</div><h2>Pass to '+esc(name)+'</h2><p>'+esc(msg||'Tap when you are ready')+'</p>',[['I am '+esc(name),'',true]])},
+ /* Add "2 Players" and "vs Computer" buttons into an element (start menu/overlay).
+    o={game:'snake', start:fn(), hw:true(higher wins)|false(lower wins, e.g. time), cpu:[lo,hi] typical score range for the computer (e.g. [40,160]), unit:' pts', noTwo:false, noCpu:false} */
+ addButtons(el,o){css();const wrap=document.createElement('div');wrap.className='duoMenu';
+  if(!o.noTwo){const b=document.createElement('button');b.className='duoB o';b.innerHTML='👥 2 Players';b.onclick=async()=>{const n=await api.askNames();if(n)api.begin(Object.assign({},o,{mode:'two',names:n}))};wrap.appendChild(b)}
+  if(!o.noCpu&&o.cpu){const b=document.createElement('button');b.className='duoB o';b.innerHTML='🤖 vs Computer';b.onclick=async()=>{const lv=await modal('<div class="big">🤖</div><h2>Computer level</h2>',[['😊 Easy','',  'easy'],['🧠 Hard','o','hard'],['Cancel','g',null]]);if(!lv)return;const n=await api.askNames({cpu:true});if(n)api.begin(Object.assign({},o,{mode:'cpu',names:n,lvl:lv}))};wrap.appendChild(b)}
+  el.appendChild(wrap);return wrap},
+ begin(o){S.mode=o.mode;S.names=o.names.slice();S.scores=[null,null];S.turn=0;S.hw=o.hw!==false;S.cpuR=o.cpu||[0,100];S.lvl=o.lvl||'easy';S.start=o.start;S.game=o.game||'';S.unit=o.unit||'';S.fmt=o.fmt||null;
+  api.pill();if(o.start)o.start()},
+ active(){return !!S.mode},
+ mode(){return S.mode},
+ player(){return S.names[S.turn]},
+ names(){return S.names.slice()},
+ pill(){css();if(!S.mode){if(pill){pill.remove();pill=null}return}if(!pill){pill=document.createElement('div');pill.className='duoPill';document.body.appendChild(pill)}
+  pill.textContent=S.mode==='two'?'👤 '+S.names[S.turn]+'  ('+(S.turn+1)+'/2)':'👤 '+S.names[0]+'  vs  🤖'},
+ fmt(v){return S.fmt?S.fmt(v):(Math.round(v*100)/100)+S.unit},
+ cpuScore(){const [lo,hi]=S.cpuR,mid=(lo+hi)/2,r=Math.random();let v;
+  if(S.hw)v=S.lvl==='easy'?lo+r*(mid-lo):mid+r*(hi-mid);else v=S.lvl==='easy'?mid+r*(hi-mid):lo+r*(mid-lo);return (hi-lo)>20?Math.round(v):Math.round(v*100)/100},
+ /* Call when a round ends with the player's score. Returns true if Duo took over (the game must NOT show its own game-over overlay). */
+ finish(score){if(!S.mode)return false;const sc=Number(score)||0;
+  if(S.mode==='two'){S.scores[S.turn]=sc;
+   if(S.turn===0){S.turn=1;api.pill();setTimeout(()=>{modal('<div class="big">✅</div><h2>'+esc(S.names[0])+' scored '+esc(api.fmt(sc))+'</h2><p>Now it is <b>'+esc(S.names[1])+'</b>\'s turn. Beat that!</p>',[['▶ '+esc(S.names[1])+': Go!','',true]]).then(()=>{if(S.start)S.start()})},700);return true}
+   const [a,b]=S.scores,aw=S.hw?a>b:a<b,bw=S.hw?b>a:b<a;const win=aw?0:bw?1:-1;
+   setTimeout(()=>{beep(880,.2);modal('<div class="big">'+(win<0?'🤝':'🏆')+'</div><h2>'+(win<0?'It is a tie!':esc(S.names[win])+' wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(a))+'</b></p><p>'+esc(S.names[1])+': <b>'+esc(api.fmt(b))+'</b></p>',[['🔁 Rematch','',1],['🏠 Menu','o',0]]).then(r=>{if(r){S.scores=[null,null];S.turn=0;api.pill();if(S.start)S.start()}else api.end(true)})},700);return true}
+  /* vs computer */
+  const c=api.cpuScore(),win=S.hw?(sc>c?0:sc<c?1:-1):(sc<c?0:sc>c?1:-1);
+  setTimeout(()=>{beep(win===0?880:300,.25);modal('<div class="big">'+(win===0?'🏆':win<0?'🤝':'🤖')+'</div><h2>'+(win===0?esc(S.names[0])+' wins!':win<0?'Tie!':'Computer wins!')+'</h2><p>'+esc(S.names[0])+': <b>'+esc(api.fmt(sc))+'</b></p><p>🤖 Computer: <b>'+esc(api.fmt(c))+'</b></p>',[['🔁 Play again','',1],['🏠 Menu','o',0]]).then(r=>{if(r){api.pill();if(S.start)S.start()}else api.end(true)})},700);return true},
+ /* Leave duo mode. If reload, the page reloads to the game's normal start menu. */
+ end(reload){S.mode=null;api.pill();if(reload)location.reload()}
+};
+return api})();
+/* ===== end DUO ===== */
+</script>
+<script>
+const W=400,H=700,KEY='color-switch.html_best';
+const $=id=>document.getElementById(id);
+const cv=$('c'),g=cv.getContext('2d');const DPR=Math.min(2,window.devicePixelRatio||1);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
+let best=0,muted=false;
+try{best=+localStorage.getItem(KEY)||0;muted=localStorage.getItem(KEY+'_m')=='1'}catch(e){}
+function saveBest(s){if(s>best){best=s;try{localStorage.setItem(KEY,best)}catch(e){}return true}return false}
+$('mute').textContent=muted?'🔇':'🔊';
+$('mute').onclick=e=>{muted=!muted;$('mute').textContent=muted?'🔇':'🔊';try{localStorage.setItem(KEY+'_m',muted?1:0)}catch(x){}e.currentTarget.blur();beep(660,.08)};
+let AC;
+function audio(){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state=='suspended')AC.resume()}catch(e){}}
+['pointerdown','touchstart','keydown','click'].forEach(ev=>addEventListener(ev,audio,{passive:true}));
+function beep(f,d=.1,t='square',v=.05,s=0){if(muted)return;try{audio();if(!AC)return;const n=AC.currentTime,o=AC.createOscillator(),a=AC.createGain();o.type=t;o.frequency.setValueAtTime(f,n);if(s)o.frequency.exponentialRampToValueAtTime(Math.max(30,f+s),n+d);a.gain.setValueAtTime(v,n);a.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(a);a.connect(AC.destination);o.start(n);o.stop(n+d)}catch(e){}}
+function fit(){const vw=innerWidth,vh=innerHeight;let top=60,s=Math.min(vw/W,(vh-top-6)/H);const s2=Math.min(vw/W,(vh-10)/H);if((vw-W*s2)/2>=128){top=5;s=s2}cv.style.width=Math.floor(W*s)+'px';cv.style.height=Math.floor(H*s)+'px';cv.style.top=(top+(vh-top-5)/2)+'px'}
+addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,100));fit();
+document.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
+function pos(e){const r=cv.getBoundingClientRect();return[(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]}
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a);
+let parts=[],pops=[],shake=0;
+function burst(x,y,n,cols,sp=200){for(let i=0;i<n;i++){const a=Math.random()*6.283,s=sp*(.3+Math.random());parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:.5+Math.random()*.4,m:.9,c:cols[i%cols.length],r:2+Math.random()*3})}}
+function pop(x,y,t,c,s){pops.push({x,y,t,c,s,l:.8})}
+function updFx(dt){for(const p of parts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=400*dt;p.l-=dt}parts=parts.filter(p=>p.l>0);for(const q of pops){q.y-=40*dt;q.l-=dt}pops=pops.filter(q=>q.l>0);shake=Math.max(0,shake-dt*30)}
+function drawFx(){g.save();for(const p of parts){g.globalAlpha=Math.max(0,p.l/p.m);g.fillStyle=p.c;g.beginPath();g.arc(p.x,p.y,p.r,0,6.283);g.fill()}g.restore();for(const q of pops){g.save();g.globalAlpha=Math.min(1,q.l*2);txt(q.t,q.x,q.y,q.s||22,'center',q.c);g.restore()}}
+function txt(t,x,y,s,al,c){g.font='bold '+s+"px Fredoka,'Trebuchet MS',sans-serif";g.textAlign=al||'left';g.textBaseline='alphabetic';g.lineWidth=s/4.5;g.shadowBlur=0;g.strokeStyle='#1b4f86';g.lineJoin='round';g.strokeText(t,x,y);g.fillStyle=c||'#fff';g.fillText(t,x,y)}
+function rr(x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+function pill(x,y,w,h,c){g.save();g.globalAlpha=1;g.fillStyle=c||'#14367a';rr(x,y,w,h,h/2);g.fill();g.lineWidth=3;g.strokeStyle='#5cc8ff';g.stroke();g.restore()}
+function emo(e,x,y,s,rot,al){g.save();g.globalAlpha=al==null?1:al;g.shadowBlur=0;g.translate(x,y);if(rot)g.rotate(rot);g.font=s+"px 'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif";g.textAlign='center';g.textBaseline='middle';g.fillStyle='#000';g.fillText(e,0,0);g.restore()}
+function hud(sc,extra){pill(8,8,150,40);txt('Score '+sc,20,37,22);pill(W-128,8,120,40);txt('Best '+best,W-20,36,19,'right');if(extra)txt(extra,W/2+14,36,20,'center','#ffe14d')}
+const starRow=(s,a,b,c)=>'<span class="stars">'+(s>=c?'⭐⭐⭐':s>=b?'⭐⭐☆':s>=a?'⭐☆☆':'☆☆☆')+'</span>';
+function shakeOn(){g.setTransform(DPR,0,0,DPR,0,0);g.globalAlpha=1;g.shadowBlur=0;g.save();if(shake>0)g.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake)}
+const ovHidden=()=>$('ov').classList.contains('hide');
+function hideOv(){$('ov').classList.add('hide')}
+function showOv(t,m,b){$('t').textContent=t;$('m').innerHTML=m;$('go').textContent=b;$('ov').classList.remove('hide')}
+function endGame(emoji,score,a,b,c,extra){if(Duo.active()&&Duo.finish(score)){state='over';return}const nb=saveBest(score);setTimeout(()=>{state='over';showOv(emoji+(nb&&score>0?' New Record!':' Game Over'),starRow(score,a,b,c)+'<span class="big">'+score+'</span>'+(extra||'')+' Best '+best+(nb&&score>0?'<br><span class="nb">🎉 New best!</span>':''),'Play again')},700)}
+let state='ready',t=0;
+const CS=['#ff3b5c','#ffd21f','#2fd35f','#2f8cff'],TH=18,BR=11;
+let ball,cam,obs=[],sw=[],nextY,count,started,streak,score=0;
+function addObs(){
+  const i=count++,y=nextY,r=Math.random(),ty=i<1?0:(r<.4?0:r<.7?1:2);
+  const sp=Math.min(3,1.2+i*.12)*(Math.random()<.5?-1:1);
+  const o={y,ty,a:Math.random()*6.28,sp,off:0,rings:ty==1?[{R:96,d:1},{R:66,d:-1.15}]:[{R:90,d:1}],star:{y:ty==2?y-62:y,got:false}};
+  obs.push(o);sw.push({y:y-165,got:false,x:W/2});nextY-=330;
+}
+const duoOpen=()=>!!document.querySelector('.duoOv');
+function start(){if(ovHidden())return;startRound()}
+function startRound(){hideOv();parts=[];pops=[];shake=0;cam=0;obs=[];sw=[];count=0;nextY=H-480;started=false;streak=0;score=0;
+  ball={x:W/2,y:H-130,vy:0,c:Math.random()*4|0,dead:false};while(nextY>-H)addObs();state='play';beep(520,.1,'triangle')}
+function hop(){if(state!='play')return;started=true;ball.vy=-470;beep(620,.05,'square',.04,120)}
+cv.addEventListener('pointerdown',e=>{e.preventDefault();hop()});
+addEventListener('keydown',e=>{if(duoOpen())return;if(e.code=='Space'||e.key=='ArrowUp'){e.preventDefault();if(ovHidden())hop()}});
+function die(){
+  state='dying';shake=16;burst(ball.x,ball.y,40,CS,300);beep(200,.5,'sawtooth',.07,-150);ball.dead=true;
+  endGame('🎨',score,5,15,30,'Stars '+score+'. ');
+}
+function update(dt){
+  if(state!='play'&&state!='dying')return;
+  if(state=='dying')return;
+  for(const o of obs){o.a+=o.sp*dt;o.off+=o.sp*60*dt}
+  if(started){ball.vy=Math.min(720,ball.vy+1150*dt);ball.y+=ball.vy*dt}
+  else ball.y=H-130+Math.sin(t*5)*5;
+  cam=Math.min(cam,ball.y-H*.45);
+  while(nextY>cam-H)addObs();
+  while(obs.length&&obs[0].y>cam+H+350){obs.shift();sw.shift()}
+  if(ball.y>cam+H+20)return die();
+  for(const o of obs){
+    const s=o.star;
+    if(!s.got&&Math.hypot(ball.x-W/2,ball.y-s.y)<26){s.got=true;streak++;score++;burst(W/2,s.y,14,['#ffe14d','#fff'],200);pop(W/2,s.y-20-cam*0,'+1','#ffe14d',26);beep(880+Math.min(streak,10)*40,.1,'triangle',.06);}
+    if(o.ty==2){
+      if(Math.abs(ball.y-o.y)<TH/2+BR-2){const seg=Math.floor((((ball.x-o.off)%400)+400)%400/100);if(seg!=ball.c)return die()}
+    }else for(const rg of o.rings){
+      const dx=ball.x-W/2,dy=ball.y-o.y,d=Math.hypot(dx,dy);
+      if(Math.abs(d-rg.R)<TH/2+BR-2){
+        let a=Math.atan2(dy,dx)-o.a*rg.d;a=((a%6.283185)+12.56637)%6.283185;
+        if((Math.floor(a/1.570796)%4)!=ball.c)return die();
+      }
+    }
+  }
+  for(const w of sw)if(!w.got&&Math.hypot(ball.x-w.x,ball.y-w.y)<24){w.got=true;let c;do{c=Math.random()*4|0}while(c==ball.c);ball.c=c;burst(w.x,w.y,18,CS,220);beep(300,.12,'sine',.06,300)}
+}
+function draw(){
+  shakeOn();
+  g.fillStyle='#160a3a';g.fillRect(-20,-20,W+40,H+40);
+  g.save();g.translate(0,-cam);
+  for(let i=0;i<14;i++){const sy=Math.floor(cam/90)*90+i*90+((i*37)%50);g.fillStyle='#4a2fa8';g.fillRect((i*131)%W,sy,3,3)}
+  if(obs)for(const o of obs){
+    if(o.ty==2){
+      g.fillStyle='#0b0620';g.fillRect(0,o.y-TH/2-3,W,TH+6);
+      for(let k=-1;k<6;k++)for(let c=0;c<4;c++){const x=((o.off%400)+400)%400+k*400+c*100-400;g.fillStyle=CS[c];g.fillRect(x,o.y-TH/2,100,TH)}
+    }else for(const rg of o.rings){
+      for(let pass=0;pass<2;pass++)for(let i=0;i<4;i++){
+        g.beginPath();const a0=o.a*rg.d+i*1.570796;g.arc(W/2,o.y,rg.R,a0,a0+1.570796+(pass?0:.04));
+        g.lineWidth=pass?TH:TH+6;g.strokeStyle=pass?CS[i]:'#0b0620';g.lineCap='butt';g.stroke();
+      }
+    }
+    if(!o.star.got)emo('⭐',W/2,o.star.y+Math.sin(t*5)*3,30);
+  }
+  for(const w of sw)if(!w.got){
+    for(let i=0;i<4;i++){g.beginPath();g.arc(w.x,w.y,15,t*3+i*1.5708,t*3+(i+1)*1.5708);g.lineWidth=14;g.strokeStyle=CS[i];g.stroke()}
+  }
+  if(ball&&!ball.dead){
+    g.fillStyle='#0b0620';g.beginPath();g.arc(ball.x,ball.y+3,BR+2,0,6.283);g.fill();
+    const gr=g.createRadialGradient(ball.x-4,ball.y-4,1,ball.x,ball.y,BR);gr.addColorStop(0,'#fff');gr.addColorStop(.35,CS[ball.c]);gr.addColorStop(1,CS[ball.c]);
+    g.fillStyle=gr;g.beginPath();g.arc(ball.x,ball.y,BR,0,6.283);g.fill();g.lineWidth=3;g.strokeStyle='#fff';g.stroke();
+  }
+  drawFx();
+  g.restore();
+  if(state=='play'&&!started)txt('TAP to hop!',W/2,H-60,30,'center','#ffe14d');
+  hud(score,streak>1?'Streak '+streak:'');
+  g.restore();
+}
+showOv('🎨 Ring Hopper','Tap to <b>hop</b> the ball.<br>Pass only through <b>matching colors</b>,<br>grab ⭐ and 🌈 color orbs!','Play');
+
+
+$('go').onclick=()=>{$('go').blur();start()};
+addEventListener('keydown',e=>{if(duoOpen())return;if(!ovHidden()&&(e.code=='Space'||e.code=='Enter')){e.preventDefault();start()}});
+Duo.addButtons($('ov'),{game:'color-switch',start:()=>startRound(),cpu:[4,22],hw:true,unit:' pts',fmt:v=>Math.round(v)+' ⭐'});
+let last=performance.now();
+function loop(now){const dt=Math.min(.033,Math.max(0,(now-last)/1000)||0);last=now;t+=dt;update(dt);updFx(dt);draw();requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+</script><script src="mascot.js" defer></script>
+</body></html>
