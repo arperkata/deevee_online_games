@@ -215,4 +215,5 @@ function cpuStart(l){return async()=>{const n=await Duo.askNames({cpu:true});if(
 function menu(){tkn++;clearInterval(tInt);busy=true;mode='solo';setMode();
 overlay({em:'🎴',title:'Higher or Lower',btn:'Play solo ▶',cb:()=>{mode='solo';newGame()},alts:[{t:'🤖 vs Computer 😊',cb:cpuStart('easy')},{t:'🤖 vs Computer 🧠',cb:cpuStart('hard')},{t:'👥 2 Players',cb:async()=>{const n=await Duo.askNames();if(!n){menu();return}nm=n;mode='two';newGame()}}],html:'Is the next card <b>higher</b> or <b>lower</b>?<br>Ace is low, King is high. Same rank is safe.<br>3 lives - build a streak for big points!<br>The timer gets faster as your streak grows.<br>2 players or vs Computer: take turns on the same deck - last one with lives wins!'})}
 newGame();clearInterval(tInt);busy=true;menu();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

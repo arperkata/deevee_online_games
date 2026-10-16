@@ -208,4 +208,5 @@ function up(e){
   else doSwap(sel,d.slot)}
 board.addEventListener('pointerup',up);board.addEventListener('pointercancel',e=>{if(drag){drag.el.classList.remove('drag');drag.el.style.transform='';drag=null;layout()}});
 $('bpv').onclick=()=>{if(state!=='play')return;const h=pvc.classList.toggle('hide');$('bpv').textContent=h?'👁 Preview':'🙈 Hide';sfx.tap()};
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

@@ -153,4 +153,5 @@ function onBet(){hud()}
 addEventListener('keydown',e=>{if(e.code==='Enter'&&!document.querySelector('.ov.show')&&phase!=='pick')startGame()});
 function mkEmpty(){grid.innerHTML='';btns=[];for(let i=0;i<12;i++){const b=document.createElement('button');b.className='ch';b.innerHTML='<span class="lk">🔒</span>';b.disabled=true;grid.appendChild(b)}fit()}
 buildBets();showCoins();mkEmpty();hud();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

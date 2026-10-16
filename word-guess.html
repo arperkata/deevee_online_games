@@ -205,4 +205,5 @@ async function duoStart(mode){let lvl='easy';
  [['👥 2 Players','r','two'],['🤖 vs Computer','r','cpu']].forEach(([t,cl,m])=>{const b=document.createElement('button');b.className='btn '+cl;b.innerHTML=t;b.onclick=()=>duoStart(m);card.appendChild(b)})})();
 $('#go').onclick=startGame;build();best=load('wg_best');score=0;streak=0;upd();
 document.addEventListener('keydown',e=>{if(document.querySelector('.duoOv'))return;if(e.ctrlKey||e.metaKey||e.altKey)return;if(e.key==='Enter'&&!$('#ov').classList.contains('hide')){$('#go').click();e.preventDefault();return}const k=e.key.length===1?e.key.toLowerCase():e.key;press(k)});
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

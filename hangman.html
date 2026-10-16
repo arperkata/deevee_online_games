@@ -209,4 +209,5 @@ async function duoStart(mode){let lvl='easy';
 (function(){const card=document.querySelector('#ov .card');Duo.addButtons(document.createElement('div'),{start(){}});
  [['👥 2 Players','r','two'],['🤖 vs Computer','r','cpu']].forEach(([t,cl,m])=>{const b=document.createElement('button');b.className='btn '+cl;b.innerHTML=t;b.onclick=()=>duoStart(m);card.appendChild(b)})})();
 setup();draw(0);word='';
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

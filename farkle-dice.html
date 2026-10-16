@@ -217,4 +217,5 @@ $('#roll').onclick=()=>{if($('#roll').disabled)return;if(phase==='idle')doRoll()
 $('#bank').onclick=()=>{if(!$('#bank').disabled)bank()};
 addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();$('#roll').onclick()}else if(e.key==='b'&&!$('#bank').disabled)bank()});
 wins=load('wins');bestTurn=load('bestTurn');menu();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

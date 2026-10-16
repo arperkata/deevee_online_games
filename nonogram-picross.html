@@ -196,4 +196,5 @@ if(window.ResizeObserver)new ResizeObserver(fit).observe($('wrap'));
 load(0);requestAnimationFrame(loop);
 duoW=Duo.addButtons($('box'),{game:'nonogram-picross',start:()=>{$('msg').style.display='none';started=true;score=0;streak=0;$('sc').textContent=0;load(3)},cpu:[35,110],hw:false,fmt:v=>(Math.round(v*10)/10)+'s'});
 startScreen('🖼️','Nonogram Picross','Numbers tell how many squares in a row are filled in a row. Fill blue squares, mark empty ones with X. Finish to reveal the picture!',()=>{started=true;score=0;streak=0;$('sc').textContent=0;load(0)});
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

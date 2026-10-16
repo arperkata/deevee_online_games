@@ -284,4 +284,5 @@ $('cash').onclick=()=>{if(phase=='bet'&&!busy){if(DUEL){SP[cur]={pts,bet,streak}
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(k=='h')hit();else if(k=='s')stand();else if(k=='d'&&phase=='play')dbl();else if(k==' '||k=='enter'){if(phase=='bet'&&$('msg').style.display!='flex')deal()}});
 addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,200));
 showMenu();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

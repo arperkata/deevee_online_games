@@ -134,4 +134,5 @@ $('bUndo').onclick=doUndo;$('bClear').onclick=clearAll;$('bSave').onclick=save;
 addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();doUndo()}});
 newGrid();buildPal();fit();render();
 ov('🎨 Pixel Paint','Tap or drag to paint pixels. Pick colors, fill, undo, then <b>save your art as a PNG</b>!',[{t:'Paint 16×16',f:function(){setSize(16)}},{t:'Paint 24×24',c:'alt',f:function(){setSize(24)}}]);
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

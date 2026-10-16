@@ -219,4 +219,5 @@ $('#roll').onclick=()=>{if(rollRes&&!$('#roll').disabled){const f=rollRes;rollRe
 addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();$('#roll').onclick()}});
 function fit(){const s=Math.max(260,Math.floor(Math.min(innerWidth-12,innerHeight-$('#top').offsetHeight-16)));board.style.setProperty('--bs',s+'px')}addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,200));
 fit();wins=load('wins');menu();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

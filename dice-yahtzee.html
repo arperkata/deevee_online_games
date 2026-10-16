@@ -226,4 +226,5 @@ function menu(){ov('🎲 Lucky Five Dice','','Roll five dice up to 3 times, hold
 $('#roll').onclick=roll;
 addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();roll()}else if(e.key>='1'&&e.key<='5')toggle(+e.key-1)});
 best=load('best');wins=load('wins');P=[{n:'You',s:{}}];render();menu();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

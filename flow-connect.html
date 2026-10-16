@@ -225,4 +225,5 @@ newPuzzle();fit();requestAnimationFrame(loop);
 const runStart=()=>{started=true;lv=0;score=0;combo=0;$('sc').textContent=0;newPuzzle()};
 duoW=Duo.addButtons($('box'),{game:'flow-connect',start:()=>{$('msg').style.display='none';runStart()},cpu:[1500,3500],hw:true,unit:' pts'});
 startScreen('🌈','Flow Connect','Drag from a dot to its matching twin. Fill EVERY square. Paths cannot cross - drawing over a line cuts it!',runStart);
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

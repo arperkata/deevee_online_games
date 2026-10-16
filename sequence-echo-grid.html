@@ -186,4 +186,5 @@ function end(){run=false;phase='end';if(Duo.active()&&Duo.finish(score)){hud();r
 best=load('best');score=0;lives=3;seq=null;hud();
 overlay('🔁 Sequence Echo','','9 shape pads light up in order.<br>Watch, then <i>tap the same order</i>!<br>The pattern grows by one each round.<br>3 lives ❤️',[['▶ Play',start]]);
 Duo.addButtons($('#ovB'),{game:'sequence-echo-grid',start:duoStart,hw:true,cpu:[100,450],unit:' pts'});
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

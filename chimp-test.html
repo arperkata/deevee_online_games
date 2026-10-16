@@ -185,4 +185,5 @@ $('#info').textContent='Perfect! Level up!';hud();const my=sid;setTimeout(()=>{i
 function end(){run=false;phase='end';if(Duo.active()&&Duo.finish(maxN))return;const st=maxN>=9?3:maxN>=7?2:maxN>=1?1:0;best=finish('best',score,st,'Memorised up to <b>'+maxN+'</b> numbers'+(maxN>=10?'<br>Smarter than a chimp! 🧠':''),'🐒 Game Over',[['▶ Play Again',start]]);duoBtns();hud()}
 best=load('best');score=0;lives=3;n=START;hud();
 overlay('🐒 Chimp Test','','Numbers flash on screen.<br>Tap <i>1</i> and the rest hide!<br>Then tap them in order <i>1, 2, 3...</i><br>Each level adds one more number.',[['▶ Play',start]]);duoBtns();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

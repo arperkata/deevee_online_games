@@ -173,4 +173,5 @@ parts=parts.filter(p=>p.l>0);for(const p of parts){p.x+=p.vx;p.y+=p.vy;p.vy+=.4;
 texts=texts.filter(q=>q.l>0);x.font='bold 30px Fredoka,Trebuchet MS,sans-serif';x.lineWidth=6;x.strokeStyle='#1b4f86';x.fillStyle='#fff';for(const q of texts){q.y-=.8;q.l--;x.globalAlpha=Math.min(1,q.l/20);x.strokeText(q.t,q.x,q.y);x.fillText(q.t,q.x,q.y)}x.globalAlpha=1;
 requestAnimationFrame(loop)}
 shuffleBoard();ui();requestAnimationFrame(loop);
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

@@ -159,4 +159,5 @@ g.font='bold '+Math.round(b.r*1.0)+"px 'Fredoka','Trebuchet MS',sans-serif";g.li
 P.forEach(p=>{g.globalAlpha=Math.max(0,p.l);g.fillStyle=p.c;g.beginPath();g.arc(p.x,p.y,4,0,6.3);g.fill()});g.globalAlpha=1;g.restore()}
 $('#go').onclick=()=>{if(Duo.active())Duo.end();startGame()};hud();
 Duo.addButtons(document.querySelector('#ov .card'),{game:'bubble-pop-math',start:()=>startGame(),cpu:[150,900],hw:true,unit:' pts'});
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

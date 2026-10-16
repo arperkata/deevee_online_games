@@ -187,4 +187,5 @@ function reveal(p,i,ok,pts){
   if(ok){burst(x,y,16);floatTxt(x,y,'+'+pts+(Q.streak>1?' 🔥x'+Q.streak:''))}else floatTxt(x,y,'Oops!','#ff8a8a');
 }
 addEventListener('keydown',e=>{if(document.querySelector('.duoOv'))return;const n=+e.key;if(n>=1&&n<=4&&Q.state==='play')answerQ(n-1)});
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

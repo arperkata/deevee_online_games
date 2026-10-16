@@ -208,4 +208,5 @@ function loop(){if(running){tleft=TIME-(performance.now()-tStart)/1000;if(tleft<
 letters='BOGGLEWORDSGAME1'.slice(0,16).replace('1','S').split('');poss=new Set();found=[];path=[];score=0;combo=1;tleft=TIME;running=false;build();hud();fit();loop();
 overlay({e:'🔠',t:'Boggle Grid',p:'Drag through touching letters (any direction) to spell words of 3+ letters. Or tap letters one by one, then tap the last one again. 2 minutes - quick words keep your combo alive!<br>Best: '+best,btn:'Start!',go:newGame});duoBtns();
 
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

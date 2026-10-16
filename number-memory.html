@@ -178,4 +178,5 @@ await sleep(2200);if(my!==sid)return;if(lives<=0)end();else round()}}
 function end(){run=false;phase='end';if(Duo.active()&&Duo.finish(maxL))return;const st=maxL>=9?3:maxL>=6?2:maxL>=3?1:0;best=finish('best',score,st,'You remembered <b>'+maxL+'</b> digits!','🧠 Game Over',[['▶ Play Again',start]]);duoBtns();hud()}
 best=load('best');score=0;lives=3;L=3;hud();show('?','ask');
 overlay('🔢 Number Memory','','A number flashes, then hides.<br>Type it back with the keypad!<br>Every win adds <i>one more digit</i>.<br>You have 3 lives ❤️',[['▶ Play',start]]);duoBtns();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

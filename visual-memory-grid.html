@@ -182,4 +182,5 @@ lvl++;setTimeout(()=>{if(my===sid&&run){hud();round()}},1000)}
 function end(){run=false;phase='end';const done=lvl-1;if(Duo.active()&&Duo.finish(done))return;const st=done>=9?3:done>=5?2:done>=2?1:0;best=finish('best',score,st,'Cleared <b>'+done+'</b> level'+(done===1?'':'s')+'!','🔳 Game Over',[['▶ Play Again',start]]);duoBtns();hud()}
 best=load('best');score=0;lives=3;lvl=1;sz=3;build();hud();
 overlay('🔳 Visual Memory','','Some squares light up <i>yellow</i>.<br>Remember where they were!<br>Then tap them all.<br>The grid grows as you go. 3 lives ❤️',[['▶ Play',start]]);duoBtns();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

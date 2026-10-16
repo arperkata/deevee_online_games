@@ -199,4 +199,5 @@ function menu(){over=true;showBox('<span class="em">🔵🔴</span><h2>Territory
  const g2=$('go2');g2.style.display='';g2.textContent='👥 2 Players';g2.onclick=async()=>{hideBox();const n=await Duo.askNames();if(!n){menu();return}nm=n;mode='two';lvl=2;startGame()}}
 menu();
 mk();render();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

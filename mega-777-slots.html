@@ -164,4 +164,5 @@ function frame(t){update(t);draw(t);requestAnimationFrame(frame)}
 $('spin').onclick=spin;[0,1,2].forEach(i=>{$('h'+i).onclick=()=>toggleHold(i);$('n'+i).onclick=()=>nudge(i)});
 addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='Enter')&&!document.querySelector('.ov.show')){e.preventDefault();spin()}});
 buildBets();showCoins();showJP();refreshBtns();requestAnimationFrame(frame);
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

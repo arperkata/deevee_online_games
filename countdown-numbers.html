@@ -195,4 +195,5 @@ function menu(){showOv('🎯 Countdown Numbers','','Reach the target using the 6
 OPS.forEach(o=>{const b=document.createElement('button');b.className='k op';b.dataset.o=o;b.textContent=o;b.onclick=()=>{if(!run||busy)return;if(selA===null){info('Pick a number first');return}selOp=selOp===o?null:o;beep(450,.05);render()};$('#ops').appendChild(b)});
 $('#bu').onclick=undo;$('#br').onclick=reset;$('#bh').onclick=hint;$('#bg').onclick=()=>{if(run&&!busy)finishRound('submit')};
 tiles=[];hist=[];score=0;streak=0;best=0;time=0;round=1;target=0;upd();menu();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

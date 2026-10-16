@@ -195,4 +195,5 @@ addEventListener('keydown',e=>{if(document.querySelector('.duoOv')||$('mn').clas
 else if(sel>=0&&e.key.startsWith('Arrow')){e.preventDefault();const d={ArrowLeft:-1,ArrowRight:1,ArrowUp:-N,ArrowDown:N}[e.key],r=sel/N|0,k=sel%N;if((e.key==='ArrowLeft'&&k===0)||(e.key==='ArrowRight'&&k===N-1))return;const s=sel+d;if(s>=0&&s<N*N){sel=s;upd()}}});
 let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(build,150)});
 newLevel();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

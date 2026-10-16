@@ -200,4 +200,5 @@ function start(m){mode=m;best=load('best_'+m);score=0;streak=0;solved=0;time=75;
 function menu(){showOv('➗ Equation Builder','','Drag number tiles into the boxes (or just tap them) so both sides are equal.<br>Tap a placed tile to take it back. Any true equation counts!',[['😊 Easy (+ −)','',()=>start('easy')],['🙂 Normal (+ − ×)','o',()=>start('normal')],['😤 Hard (÷ and decoys)','r',()=>start('hard')]]);Duo.addButtons($('#ovB'),{game:'equation-builder',start:()=>start('normal'),cpu:[300,1200],hw:true,unit:' pts'})}
 $('#bh').onclick=hint;$('#bc').onclick=clearAll;
 eqn={vals:[1,1],ops:[]};tiles=[];slots=[];score=0;streak=0;best=0;time=0;solved=0;upd();menu();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

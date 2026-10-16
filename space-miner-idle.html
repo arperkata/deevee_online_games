@@ -147,4 +147,5 @@ let away=0;if(sd){away=cpsF()*clamp((Date.now()-(S.ts||Date.now()))/1000,0,28800
 build();render();last=Date.now();setInterval(tick,200);requestAnimationFrame(draw);
 showOv('🚀 Space Miner',sd?'Welcome back, captain!'+(away>1?'<br>Your drones mined <b>'+fmt(away)+'</b> 💎 while you were away.':''):'Tap the planet to mine 💎, buy drones and lasers, then unlock new planets.<br>Reach the 🌌 Galaxy Core!','Launch!',null,()=>{hideOv();last=Date.now()});
 
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

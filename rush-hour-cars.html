@@ -211,4 +211,5 @@ addEventListener('keydown',e=>{if(document.querySelector('.duoOv'))return;if(e.k
 load(0);requestAnimationFrame(loop);
 duoW=Duo.addButtons($('box'),{game:'rush-hour-cars',start:()=>{$('msg').style.display='none';started=true;score=0;streak=0;load(4)},cpu:[9,32],hw:false,fmt:v=>v+' moves'});
 startScreen('🚗','Rush Hour Cars','Slide the cars forward or back to clear a path. Get the red star car out through the exit on the right! Fewer moves = more stars.',()=>{started=true;score=0;streak=0;load(0)});
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

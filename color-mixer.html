@@ -230,4 +230,5 @@ function drop(c){
 $('#undo').onclick=()=>{if(busy||lock||!drops.length)return;drops.pop();beep(300,.08);render()};
 $('#clr').onclick=()=>{if(busy||lock)return;drops=[];beep(260,.1);render()};
 $('#hbtn').onclick=()=>{if(busy)return;hintOn=true;showHint();beep(600,.1)};
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

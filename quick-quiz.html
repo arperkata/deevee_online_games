@@ -225,4 +225,5 @@ function sz(){cf.width=innerWidth;cf.height=innerHeight}sz();addEventListener('r
 function confetti(n){for(let i=0;i<20+Math.min(n,10)*8;i++)ps.push({x:innerWidth/2,y:innerHeight/2.5,vx:(Math.random()-.5)*14,vy:-Math.random()*12,l:70,c:['#ffd23f','#ff6b6b','#5fd35f','#fff','#6bc4ff'][i%5]});if(!run){run=true;cl()}}
 function cl(){cx.clearRect(0,0,cf.width,cf.height);ps=ps.filter(p=>p.l>0);for(const p of ps){p.x+=p.vx;p.y+=p.vy;p.vy+=.5;p.l--;cx.globalAlpha=Math.min(1,p.l/20);cx.fillStyle=p.c;cx.fillRect(p.x,p.y,8,8)}cx.globalAlpha=1;if(ps.length)requestAnimationFrame(cl);else run=false}
 ui();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

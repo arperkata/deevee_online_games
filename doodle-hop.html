@@ -253,4 +253,5 @@ Duo.addButtons($('ov'),{game:'doodle-hop',start:()=>startRound(),cpu:[300,1400],
 let last=performance.now();
 function loop(now){const dt=Math.min(.033,Math.max(0,(now-last)/1000)||0);last=now;try{update(dt);updFx(dt);draw()}catch(e){console.error(e)}requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

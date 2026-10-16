@@ -189,4 +189,5 @@ if(window.ResizeObserver)new ResizeObserver(fit).observe($('wrap'));
 reset();fit();
 startScreen('📍','Peg Solitaire','Jump a peg over a neighbor into an empty hole - the jumped peg disappears. Clear the board until only 1 peg is left! Chain jumps with one peg for combos.',()=>{started=true;reset()});
 Duo.addButtons($('mt'),{game:'peg-solitaire',start:()=>{started=true;$('msg').style.display='none';reset()},cpu:[2,9],hw:false,unit:' pegs',fmt:v=>Math.round(v)+(Math.round(v)===1?' peg left':' pegs left')});
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

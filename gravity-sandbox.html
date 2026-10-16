@@ -158,4 +158,5 @@ $('bPause').onclick=function(){paused=!paused;this.textContent=paused?'▶':'⏸
 $('bClear').onclick=function(){ov('🗑️ Clear the sandbox?','Everything will vanish. Ready for a fresh start?',[{t:'Yes, clear',c:'alt',f:function(){T.fill(0);L.fill(0);U.fill(0);tone(500,.4,'sawtooth',.08,80);toast('Fresh sand!')}},{t:'Keep playing',f:function(){}}])};
 buildEls();init();loop();
 ov('⏳ Gravity Sandbox','Pick <b>sand, water, stone, wood or fire</b> and draw! Water puts out fire, and wood burns.',[{t:'Start Playing',f:function(){}}]);
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

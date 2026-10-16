@@ -217,4 +217,5 @@ function loop(){if(running&&!busy){tt=(performance.now()-t0)/1000;const t=Math.f
 order=shuffle(PZ.map((x,i)=>i));total=0;running=false;busy=true;pi=0;setup(PZ[order[0]]);sel=null;dir='A';build();render();fit();loop();
 overlay({e:'📰',t:'Mini Crossword',p:'Tap a square, read the clue, type the letters. Tap a crossing square again to switch Across/Down. 3 mini puzzles per round - go fast for more points!<br>Best: '+best,btn:'Start!',go:newGame});duoBtns();
 
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

@@ -149,4 +149,5 @@ for(let k=0;k<7;k++){const d=document.createElement('div');d.className='day'+((k
 const b=$('claim');b.disabled=i.claimed;b.textContent=i.claimed?'✅ Claimed - come back tomorrow!':'🎁 Claim +'+DB[pos]+' coins (day '+(pos+1)+')'}
 $('claim').onclick=()=>{const i=dInfo();if(i.claimed)return;const pos=(i.streak-1)%7;daily={day:ymd(new Date()),streak:i.streak};sv('daily',daily);setCoins(coins+DB[pos]);jingle(5);burst(innerWidth/2,innerHeight/2,26);renderDays()};
 buildBets();showCoins();renderDays();requestAnimationFrame(frame);
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

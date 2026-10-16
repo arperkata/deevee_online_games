@@ -163,4 +163,5 @@ addEventListener('keydown',e=>{const m={ArrowUp:[0,-1],w:[0,-1],ArrowDown:[0,1],
 function startGame(){floor=1;gold=0;kills=0;pot=1;xp=0;plv=1;over=false;pl={x:1,y:1,hp:20,mx:20,atk:2,def:0};newFloor();fit();render();log('Explore! Tap tiles or use arrows. Find 🪜')}
 showBox('<span class="em">🧙🗡️🐉</span><h2>Dungeon Crawl Lite</h2>Tap a tile or use the arrows to move.<br>Bump monsters to fight. Grab 🧪 ⚔️ 🛡️ ❤️ 💰.<br>Reach 🪜 to go deeper. <b>One life only!</b>','Enter the Dungeon ▶',startGame);
 pl={x:1,y:1,hp:20,mx:20,atk:2,def:0};M=Array.from({length:N},()=>new Array(N).fill(1));seen=M.map(r=>r.map(()=>false));vis=seen;en=[];items=[];floor=1;gold=0;pot=0;over=true;fit();render();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

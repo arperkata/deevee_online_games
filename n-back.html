@@ -187,4 +187,5 @@ function onKey(e){if(e.key==='ArrowLeft'||e.key==='s'||e.key==='y')answer(true);
 $('#bSame').onpointerdown=e=>{e.preventDefault();answer(true)};$('#bDiff').onpointerdown=e=>{e.preventDefault();answer(false)};
 function intro(){sid++;run=false;overlay('🧠 N-Back Shapes','','Shapes appear one at a time.<br>Is the shape the <i>same</i> as the one before?<br><b>1-Back:</b> compare with the last shape.<br>🔺 → 🔺 = Same! &nbsp; 🔺 → ⭐ = Different.<br><b>2-Back:</b> compare with 2 shapes ago.<br>🔺 ⭐ 🔺 = Same!<br>Tap fast, you get 3 seconds each.',[['🟢 1-Back (easy)',()=>start(1)],['🟣 2-Back (hard)',()=>start(2),'p']]);duoBtns()}
 best=0;score=0;streak=0;idx=0;setBtns(false);intro();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

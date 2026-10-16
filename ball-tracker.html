@@ -185,4 +185,5 @@ function end(){phase='idle';balls=[];sel=[];if(Duo.active()&&Duo.finish(score)){
 best=load('best');upd();requestAnimationFrame(loop);
 showOv('🔵 Ball Tracker','','Some balls glow gold, then <b>all turn blue and move</b>. Keep track of the gold ones, then tap them!<br>3 lives. More balls and more speed each level.',[{t:'▶ Start',f:start}]);
 Duo.addButtons($('#ovB'),{game:'ball-tracker',start:start,cpu:[60,260],hw:true,unit:' pts'});
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

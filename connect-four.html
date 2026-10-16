@@ -171,4 +171,5 @@ if(win){x.strokeStyle='#fff';x.lineWidth=8;x.globalAlpha=.6+.4*Math.sin(fr/5);fo
 parts=parts.filter(p=>p.l>0);for(const p of parts){p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.l--;x.globalAlpha=Math.min(1,p.l/20);x.fillStyle=p.c;x.beginPath();x.arc(p.x,p.y,6,0,7);x.fill()}x.globalAlpha=1;
 requestAnimationFrame(draw)}
 reset();over=true;ui();showOv('');fit();draw();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

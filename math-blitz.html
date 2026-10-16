@@ -150,4 +150,5 @@ let duoN=0,duoSeed=1;
 function duoStart(){duoN++;if(!(Duo.mode()==='two'&&duoN%2===0))duoSeed=1+Math.floor(Math.random()*1e9);startGame('mid',duoSeed)}
 Duo.addButtons(document.querySelector('#ov .card'),{game:'math-blitz',start:duoStart,cpu:[250,800],hw:true,unit:' pts'});
 document.addEventListener('keydown',e=>{if(document.querySelector('.duoOv'))return;if(e.ctrlKey||e.metaKey)return;if(/^\d$/.test(e.key))key(e.key);else if(e.key==='Backspace')key('⌫');else if(e.key==='Enter')key('OK')});
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

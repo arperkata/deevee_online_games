@@ -155,4 +155,5 @@ parts=parts.filter(p=>p.l>0);for(const p of parts){p.x+=p.vx;p.y+=p.vy;p.vy+=.35
 texts=texts.filter(t=>t.l>0);x.font='bold 34px Fredoka,Trebuchet MS,sans-serif';x.textAlign='center';x.lineWidth=7;x.lineJoin='round';for(const t of texts){t.y-=1;t.l--;x.globalAlpha=Math.min(1,t.l/20);x.strokeStyle='#0c2c58';x.strokeText(t.t,t.x,t.y);x.fillStyle='#fff';x.fillText(t.t,t.x,t.y)}x.globalAlpha=1;
 requestAnimationFrame(loop)}
 g=Array.from({length:ROWS},()=>Array(COLS).fill(-1));off=0;miss=6;cur=0;nxt=1;ui();fit();loop();setTimeout(fit,100);
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

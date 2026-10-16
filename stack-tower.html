@@ -160,4 +160,5 @@ pill(8,8,128,38);pill(W-120,8,112,38);x.font='bold 20px Fredoka,Trebuchet MS,san
 texts=texts.filter(q=>q.l>0);x.textAlign='center';x.font='bold 28px Fredoka,Trebuchet MS,sans-serif';x.lineWidth=6;for(const q of texts){q.y-=.8*dt;q.l-=dt;x.globalAlpha=Math.min(1,q.l/20);x.strokeText(q.t,q.x,q.y);x.fillStyle=q.c||'#fff';x.fillText(q.t,q.x,q.y)}x.globalAlpha=1;x.fillStyle='#fff';
 requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

@@ -190,4 +190,5 @@ function menu(){gen++;over=true;ui();ov('🐷 Pig Dice','','Roll the die and pil
 $('#roll').onclick=()=>{if(!over&&!busy&&!ai[cur])doRoll()};$('#hold').onclick=()=>{if(!ai[cur])doHold()};
 addEventListener('keydown',e=>{if(e.key===' '||e.key==='r'||e.key==='Enter'){e.preventDefault();if(!over&&!busy&&!ai[cur])doRoll()}else if(e.key==='h'&&!ai[cur])doHold()});
 wins=load('wins');bestT=load('bestT');mkDice();menu();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

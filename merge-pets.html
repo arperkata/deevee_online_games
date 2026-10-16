@@ -158,4 +158,5 @@ let away=0;if(sd){away=inc()*clamp((Date.now()-(S.ts||Date.now()))/1000,0,7200)*
 build();fit();render();setTimeout(fit,60);last=Date.now();setInterval(tick,200);
 showOv('🐾 Merge Pets',sd?'Welcome back!'+(away>1?'<br>Your pets earned <b>'+fmt(away)+'</b> 🪙 while you were away.':''):'Buy pets, drag or tap two <b>matching</b> pets to evolve them.<br>Pets earn coins. Reach the 🐲 dragon!','Play',null,()=>hideOv());
 
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

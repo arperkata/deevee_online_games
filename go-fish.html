@@ -253,4 +253,5 @@ function showMenu(){MODE='classic';LVL='normal';NMB=['You','🤖 AI'];newGame();
   overlay({em:'🐟',title:'Go Fish',btn:'Play ▶',cb:()=>{MODE='classic';NMB=['You','🤖 AI'];newGame()},html:'Tap a card in your hand to ask for that rank.<br>Collect <b>4 of a kind</b> to make a book.<br>Most books wins!<div id="modes"></div>'});
   $('modes').innerHTML='';mkB('🤖 Computer: Easy','g',()=>pick('cpu','easy'));mkB('🧠 Computer: Hard','o',()=>pick('cpu','hard'));mkB('👥 2 Players','r',()=>pick('2p','normal'))}
 showMenu();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

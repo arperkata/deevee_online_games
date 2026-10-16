@@ -133,4 +133,5 @@ $('et').onclick=endTurn;
 addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){if($('msg').style.display!=='flex')endTurn()}const m={1:'h',2:'f',3:'k',4:'p',5:'s',6:'x'}[e.key];if(m){sel=m;ui()}});
 G=Array.from({length:N},()=>new Array(N).fill(null));money=0;food=0;pop=0;turn=1;ui();fit();
 showBox('<span class="em">🏙️</span><h2>City Builder</h2>Place 🏠 houses, 🌾 farms, 🏭 factories, 🌳 parks &amp; 🏪 shops.<br>Balance <b>food, money &amp; happiness</b>, then tap <b>Next Season</b>.<br>Reach each level goal before time runs out!','Start ▶',()=>{lv=0;total=0;startGame()});
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

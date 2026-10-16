@@ -170,4 +170,5 @@ Duo.addButtons($('mn'),{game:'lights-out',start:()=>{$('mn').classList.remove('s
 $('hint').onclick=()=>{if(done||!sol.size)return;hinted=true;const a=[...sol],i=a[Math.random()*a.length|0];bd.children[i].classList.remove('h');void bd.children[i].offsetWidth;bd.children[i].classList.add('h');beep(900,.15);$('msg').textContent='💡 Try the green one! (streak bonus lost)'};
 let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(build,150)});
 newLevel();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

@@ -136,4 +136,5 @@ pad.addEventListener('pointerdown',e=>{e.preventDefault();press()});
 addEventListener('keydown',e=>{if(document.querySelector('.duoOv')||(e.target&&/^(INPUT|BUTTON)$/.test(e.target.tagName)))return;if((e.code==='Space'||e.code==='Enter')&&!e.repeat){e.preventDefault();press()}});
 drawDots();drawBest();
 Duo.addButtons($('duoRow'),{game:'reaction-test',start:()=>{clearTimeout(timer);tries=[];drawDots();next();$('duoRow').style.display='none'},cpu:[210,380],hw:false,unit:' ms',fmt:v=>Math.round(v)+' ms'});
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

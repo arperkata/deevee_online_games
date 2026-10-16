@@ -225,4 +225,5 @@ cv.addEventListener('pointerdown',e=>{if(!pickRes||!movable.length)return;e.prev
 addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();rollClick()}});
 function fit(){fitBoard(cv,$('#main'),250,110)}addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,200));
 drawBG();fit();wins=load('wins');pls=[];requestAnimationFrame(frame);menu();ui();
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

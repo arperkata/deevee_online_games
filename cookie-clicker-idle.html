@@ -148,4 +148,5 @@ let away=0;if(sd){const el=clamp((Date.now()-(S.ts||Date.now()))/1000,0,28800);a
 build();upd(true);last=Date.now();setInterval(tick,100);
 showOv('🍪 Cookie Clicker',sd?'Welcome back baker!'+(away>1?'<br>Your bakers made <b>'+fmt(away)+'</b> cookies while you were away.':'')+'<br>You have <b>'+fmt(S.c)+'</b> 🍪':'Tap the giant cookie, buy bakers and upgrades.<br>Bake <b>'+fmt(GOAL)+'</b> cookies to win! Your bakers keep working even when you leave.','Bake!',null,()=>{hideOv();last=Date.now()});
 
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>

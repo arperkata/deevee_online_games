@@ -147,4 +147,5 @@ for(var i=0;i<16;i++){var s=document.createElement('div');s.className='st'+(i%4=
 addEventListener('keydown',function(e){if(e.repeat||e.ctrlKey||e.metaKey||!$('ov').classList.contains('hide'))return;if(e.key===' '){e.preventDefault();$('bPlay').onclick();return}var i=KEYS.indexOf(e.key.toLowerCase());if(i>=0)hit(i,true)});
 fit();vis();
 ov('🥁 Drum Pad','Tap the pads to jam! Press <b>Rec</b>, tap a beat, and it <b>loops</b> back.',[{t:'Let\'s Jam!',f:function(){}}]);
-</script></body></html>
+</script><script src="mascot.js" defer></script>
+</body></html>
