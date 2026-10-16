@@ -60,7 +60,8 @@ else{const dep=diff=='easy'?2:6;let bv=-1e9,bc=[];for(const q of cols){const r=d
 pick=diff=='easy'?bc[Math.random()*bc.length|0]:bc[0]}
 drop(pick,2)}
 function drop(q,p){const r=dropRow(B,q);if(r<0)return;busy=true;anim={c:q,r,p,y:40,v:0,b:0};beep(p==1?500:380,.05,'triangle')}
-function land(){const{c,r,p}=anim;B[r][c]=p;moves++;anim=null;beep(p==1?330:260,.12,'sine',.2);
+let lastMv=null;
+function land(){const{c,r,p}=anim;B[r][c]=p;lastMv=[r,c];moves++;anim=null;beep(p==1?330:260,.12,'sine',.2);
 for(let i=0;i<8;i++)parts.push({x:c*100+50,y:80+r*100+90,vx:(Math.random()-.5)*6,vy:-Math.random()*3,l:25,c:p==1?'#ff7a7a':'#ffe46b'});
 const w=findWin(B,p);if(w){win=w;end(p)}else if(moves==42)end(0);else{turn=3-p;busy=false;if(turn==2){busy=true;setTimeout(ai,350)}}}
 function end(p){lastRes=p;over=true;busy=true;let m;
@@ -78,15 +79,17 @@ cv.addEventListener('pointermove',e=>{hover=colOf(e)});
 cv.addEventListener('pointerdown',e=>{hover=colOf(e);if(!over&&!busy&&turn==1&&dropRow(B,hover)>=0)drop(hover,1)});
 function disc(cx,cy,p,a){x.globalAlpha=a||1;const g=x.createRadialGradient(cx-12,cy-12,5,cx,cy,42);g.addColorStop(0,p==1?'#ff8a8a':'#fff6a0');g.addColorStop(.35,p==1?'#ff3030':'#ffd21f');g.addColorStop(1,p==1?'#b80f0f':'#e09a00');x.fillStyle=g;x.beginPath();x.arc(cx,cy,40,0,7);x.fill();x.strokeStyle=p==1?'#a30d0d':'#c78400';x.lineWidth=4;x.beginPath();x.arc(cx,cy,28,0,7);x.stroke();x.globalAlpha=1}
 function draw(){fr++;x.clearRect(0,0,700,680);
+x.globalAlpha=1;x.fillStyle='#0a2a5a';x.beginPath();if(x.roundRect)x.roundRect(0,80,700,600,24);else x.rect(0,80,700,600);x.fill();
 if(anim){anim.y+=anim.v;anim.v+=1.5;const ty=80+anim.r*100+50;if(anim.y>=ty){anim.y=ty;if(!anim.b&&anim.v>6){anim.v=-anim.v*.25;anim.b=1}else land()}}
 if(!over&&!busy&&turn==1)disc(hover*100+50,40+Math.sin(fr/8)*4,1);
 for(let r=0;r<6;r++)for(let q=0;q<7;q++)if(B[r][q])disc(q*100+50,80+r*100+50,B[r][q]);
 if(anim)disc(anim.c*100+50,anim.y,anim.p);
-x.globalAlpha=1;x.fillStyle='#0a2a5a';x.beginPath();if(x.roundRect)x.roundRect(0,80,700,600,24);else x.rect(0,80,700,600);x.fill();
+x.globalAlpha=1;
 const bg=x.createLinearGradient(0,80,0,680);bg.addColorStop(0,'#3a8cf2');bg.addColorStop(1,'#1553b8');x.fillStyle=bg;x.beginPath();if(x.roundRect)x.roundRect(0,80,700,600,24);else x.rect(0,80,700,600);
 for(let r=0;r<6;r++)for(let q=0;q<7;q++){const cx=q*100+50,cy=80+r*100+50;x.moveTo(cx+38,cy);x.arc(cx,cy,38,0,Math.PI*2)}
 x.fill('evenodd');x.strokeStyle='#0c3a8a';x.lineWidth=5;
 for(let r=0;r<6;r++)for(let q=0;q<7;q++){x.beginPath();x.arc(q*100+50,80+r*100+50,38,0,7);x.stroke()}
+if(lastMv&&!anim&&B[lastMv[0]][lastMv[1]]){x.strokeStyle='#fff';x.lineWidth=6;x.globalAlpha=.65+.35*Math.sin(fr/6);x.beginPath();x.arc(lastMv[1]*100+50,80+lastMv[0]*100+50,45,0,7);x.stroke();x.globalAlpha=1}
 if(win){x.strokeStyle='#fff';x.lineWidth=8;x.globalAlpha=.6+.4*Math.sin(fr/5);for(const[r,q]of win){x.beginPath();x.arc(q*100+50,80+r*100+50,40,0,7);x.stroke()}x.globalAlpha=1}
 parts=parts.filter(p=>p.l>0);for(const p of parts){p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.l--;x.globalAlpha=Math.min(1,p.l/20);x.fillStyle=p.c;x.beginPath();x.arc(p.x,p.y,6,0,7);x.fill()}x.globalAlpha=1;
 requestAnimationFrame(draw)}

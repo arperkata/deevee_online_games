@@ -85,7 +85,7 @@ function findWin(p){for(let i=0;i<9;i++)if(!b[i]){b[i]=p;const w=win(b);b[i]=0;i
 function pick(){const e=[];b.forEach((v,i)=>v||e.push(i));
 if(!hard){let m=findWin('O');if(m<0&&Math.random()<.5)m=findWin('X');return m>=0&&Math.random()<.7?m:e[Math.random()*e.length|0]}
 let bs=-99,bm=[];for(const i of e){b[i]='O';const s=mm(b,'X',1);b[i]=0;if(s>bs){bs=s;bm=[i]}else if(s===bs)bm.push(i)}return bm[Math.random()*bm.length|0]}
-function draw(){cells.forEach((c,i)=>{c.innerHTML=b[i]?'<span>'+(b[i]==='X'?'❌':'⭕')+'</span>':'';c.classList.remove('w')});$('st').textContent=streak;$('bst').textContent=bestS;$('sc').textContent=score;$('bs').textContent=best}
+function draw(){cells.forEach((c,i)=>{c.innerHTML=b[i]?'<span>'+(b[i]==='X'?'❌':'🔵')+'</span>':'';c.classList.remove('w')});$('st').textContent=streak;$('bst').textContent=bestS;$('sc').textContent=score;$('bs').textContent=best}
 function endOv(e,t,st,m){clearTimeout(ovT);ovT=setTimeout(()=>{if(!over)return;$('ob').textContent=e;$('ot').textContent=t;$('osr').textContent=st;$('osr').style.display=st?'':'none';$('os').textContent=m;$('ov').classList.add('show')},900)}
 let ovT;$('oa').onclick=()=>{beep(500);newRound()};$('ov').onclick=e=>{if(e.target===$('ov'))$('ov').classList.remove('show')};
 function newRound(){clearTimeout(ovT);$('ov').classList.remove('show');fit();b=Array(9).fill(0);over=false;busy=false;draw();$('msg').textContent=rounds%2?'Computer starts...':'Your turn!';
