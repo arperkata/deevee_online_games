@@ -45,7 +45,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 .k.del{background:linear-gradient(#ff8a8a,#d63030);color:#fff;text-shadow:0 2px 0 #8f1c1c;box-shadow:0 5px 0 #8f1c1c}
 .k.go{background:linear-gradient(#7be07b,#2ea32e);color:#fff;text-shadow:0 2px 0 #1c701c;box-shadow:0 5px 0 #1c701c}
 @media (max-height:480px){#top{padding-top:6px}#game{flex-direction:row;justify-content:center;align-items:center;gap:24px}#lcol{width:auto;flex:1 1 0;max-width:420px}#bar{width:min(380px,46vw);margin-top:0}#pad{margin:0;width:min(300px,42vw);padding:0;gap:6px;flex:none}.k{height:clamp(34px,10vh,48px);font-size:22px}#q{font-size:clamp(28px,12vh,44px);margin-top:6px}#ans{font-size:clamp(26px,10vh,38px)}#info{height:24px;margin-top:2px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 <div id="top"><div class="pill">⭐ <b id="sc">0</b></div><div class="pill">🏆 <b id="bs">0</b></div><div class="pill">⏱ <b id="tm">60</b></div><div class="pill">🔥 <b id="st">0</b></div></div>
 <div id="game"><div id="lcol"><div id="bar"><div id="fill"></div></div>
@@ -151,5 +152,5 @@ let duoN=0,duoSeed=1;
 function duoStart(){duoN++;if(!(Duo.mode()==='two'&&duoN%2===0))duoSeed=1+Math.floor(Math.random()*1e9);startGame('mid',duoSeed)}
 Duo.addButtons(document.querySelector('#ov .card'),{game:'math-blitz',start:duoStart,cpu:[250,800],hw:true,unit:' pts'});
 document.addEventListener('keydown',e=>{if(document.querySelector('.duoOv'))return;if(e.ctrlKey||e.metaKey)return;if(/^\d$/.test(e.key))key(e.key);else if(e.key==='Backspace')key('⌫');else if(e.key==='Enter')key('OK')});
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

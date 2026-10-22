@@ -53,7 +53,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 #game.land #pad{grid-template-columns:repeat(3,1fr)}
 #pad .k{height:48px;font-size:26px}
 @media (max-height:480px){#pad .k{height:42px;font-size:22px}#tools .k{height:40px}#pad{gap:6px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Sound">🔊</button>
 <div class="ov" id="ov"><div class="card"><h1 id="ovT"></h1><div class="stars" id="ovS"></div><p id="ovP"></p><div id="ovB"></div></div></div>
 
@@ -213,5 +214,5 @@ b=Math.max(180,Math.floor(b));$('#board').style.setProperty('--b',b+'px');$('#ct
 addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,150));
 sol=Array(81).fill(0);val=Array(81).fill(0);notes=Array(81).fill(0);given=Array(81).fill(false);
 fit();render();upd();menu();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

@@ -46,7 +46,8 @@ body>.row:first-of-type{margin-top:46px}#mute{left:108px;right:auto}#bd{grid-col
 .c.f{background:linear-gradient(#ffd98a,#f6931c);box-shadow:0 3px 0 #a85d00,inset 0 2px 0 rgba(255,255,255,.5)}
 .c.hint{outline:3px solid #5fd35f}
 #bd.sh{animation:shake .4s}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Mute">🔊</button><canvas id="fx"></canvas>
 <div class="row top"><div class="stat">💣 Left<b id="ml">0</b></div><div class="stat">⏱ Time<b id="tm">0</b></div><div class="stat">Score<b id="sc">0</b></div><div class="stat">Best<b id="bs">0</b></div><div class="stat">Streak 🔥<b id="st">0</b></div></div>
 <div class="row"><button class="btn sel" id="s0">Small</button><button class="btn b2" id="s1">Medium</button><button class="btn b2" id="s2">Large</button></div>
@@ -189,5 +190,5 @@ $('mnb').onclick=()=>{if(Duo.active()){Duo.end(true);return}$('mn').classList.ad
 Duo.addButtons($('mn'),{game:'mine-sweeper',start:()=>{$('mn').classList.remove('show');$('ov').classList.remove('show');sz=1;streak=0;[0,1,2].forEach(k=>$('s'+k).className='btn '+(k===1?'sel':'b2'));newGame()},cpu:[20,90],hw:false,unit:'s',fmt:v=>v>=999?'💥 Boom':Math.round(v)+'s'});
 let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{build();upd()},150)});
 newGame();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

@@ -54,7 +54,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 #game.land #ctl{width:min(230px,38vw)}
 #msg{min-height:24px;font-size:clamp(15px,3.4vh,19px);font-weight:bold;text-align:center;margin-bottom:4px}
 @media (max-height:480px){#pad .k{height:40px;font-size:22px}#pad{gap:5px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Sound">🔊</button>
 <div class="ov" id="ov"><div class="card"><h1 id="ovT"></h1><div class="stars" id="ovS"></div><p id="ovP"></p><div id="ovB"></div></div></div>
 
@@ -187,5 +188,5 @@ if(land){aw=innerWidth-290;ah=innerHeight-topH-16}else{aw=innerWidth-16;ah=inner
 const w=Math.max(34,Math.min(84,Math.floor(aw/R_)-4,Math.floor(ah/R_/.74)-6));$('#pyr').style.setProperty('--w',w+'px')}
 addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,150));
 sol=[];val=[];hid=[];rows=3;score=0;streak=0;best=0;time=0;solved=0;fit();upd();menu();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

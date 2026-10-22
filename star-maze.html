@@ -30,7 +30,8 @@ canvas{display:block;border-radius:14px;border:4px solid #0b3a78;box-shadow:0 8p
 #pad button:active{transform:translateY(3px);box-shadow:0 1px 0 #1c701c}
 @media (hover:hover) and (pointer:fine){#pad{display:none}}
 @media (orientation:landscape) and (max-height:520px){#main{flex-direction:row;gap:14px}#bw{width:auto;flex:0 1 auto;height:100%}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <div id="top"><a class="home" href="index.html">⌂ Home</a><span class="pill">Lv <b id="lv">1</b></span><span class="pill">⏱ <b id="tm">0</b></span><span class="pill">Score <b id="sc">0</b></span><span class="pill">Best <b id="bs">0</b></span><button id="fog" class="btn sm">🌫 Fog: off</button><button id="mute" class="btn sm" aria-label="Sound">🔊</button></div>
 <div id="main"><div id="bw"><canvas id="c" width="960" height="960"></canvas><div id="tbw"><div id="tb"></div></div></div>
 <div id="pad"><span></span><button data-d="0,-1">▲</button><span></span><button data-d="-1,0">◀</button><button data-d="0,1">▼</button><button data-d="1,0">▶</button></div></div>
@@ -168,5 +169,5 @@ if(fog&&!over){const gr=x.createRadialGradient((vx+.5)*cs,(vy+.5)*cs,0,(vx+.5)*c
 if(msgT>0){msgT--;x.save();x.textAlign='center';x.textBaseline='middle';x.font='bold 38px '+FONT;x.lineWidth=7;x.lineJoin='round';x.strokeStyle='#0b3a78';x.fillStyle='#ffe14a';x.globalAlpha=Math.min(1,msgT/20);x.strokeText(msg,S/2,60);x.fillText(msg,S/2,60);x.restore()}
 requestAnimationFrame(loop)}
 gen(7);stars=[];ui();fit();requestAnimationFrame(loop);
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

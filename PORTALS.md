@@ -20,7 +20,7 @@ Chosen because they are the most original, polished and replayable in this colle
 
 ## What each game needs before you submit
 1. **Remove the "Home" link** (portals do not allow links out of the game) and the privacy/footer links.
-2. **No outside files.** Portals usually require the game to work without loading anything from other sites. The dragon buddy (`mascot.js`) and the 3D story game load three.js from a CDN. For a portal build, download `three.min.js` into the game folder and point to it, or remove the buddy.
+2. **No outside files.** Portals usually require the game to work without loading anything from other sites. The 3D story game (`dragon-keys-quest.html`) loads three.js from a CDN, and every game links `dragon-theme.css` / `dragon-theme.js`. For a portal build, download `three.min.js` into the game folder and point to it, and inline or remove the theme files.
 3. **One folder per game** with `index.html` as the entry (rename the game file) plus any assets. Zip it (most portals want a zip under 50 MB; these are tiny).
 4. **Add the portal's SDK** (ads between rounds, "gameplay start/stop" events). Each portal documents this. I have not added any SDK yet.
 5. **Thumbnails and screenshots** (usually 1280x720 and square). Take them from the game.

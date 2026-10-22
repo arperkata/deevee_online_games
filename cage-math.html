@@ -52,7 +52,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 #pad .k{height:48px;font-size:26px}
 #game.land #pad{grid-template-columns:repeat(3,1fr)}
 @media (max-height:480px){#pad .k{height:42px;font-size:22px}#pad{gap:6px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Sound">🔊</button>
 <div class="ov" id="ov"><div class="card"><h1 id="ovT"></h1><div class="stars" id="ovS"></div><p id="ovP"></p><div id="ovB"></div></div></div>
 
@@ -213,5 +214,5 @@ if(land)b=Math.min(innerHeight-topH-14,innerWidth-290,600);else b=Math.min(inner
 b=Math.max(180,Math.floor(b/N)*N);$('#board').style.setProperty('--b',b+'px');$('#ctl').style.setProperty('--b',b+'px')}
 addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,150));
 sol=[];val=[];cage=[];cages=[];fit();upd();menu();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

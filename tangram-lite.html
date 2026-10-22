@@ -37,7 +37,8 @@ canvas{height:var(--h);aspect-ratio:5/6;width:auto;display:block;background:#eaf
 #ctl{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 #ctl .btn{font-size:17px;padding:6px 14px}
 @media (orientation:landscape) and (max-height:520px){:root{--h:calc(100dvh - 60px)}#game{justify-content:center}#wrap{flex-direction:row}#ctl{flex-direction:column}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Sound">🔊</button>
 <div id="top"><span class="pill" id="pr">Level 1/8</span><span class="pill" id="ps">⭐ 0</span><span class="pill" id="pt">⏱ 0s</span><span class="pill" id="pp">🎯 0%</span></div>
 <div id="game"><div id="wrap"><canvas id="cv" width="400" height="480"></canvas><div id="ctl"><button class="btn p" id="brot">↻ Rotate</button><button class="btn o" id="bhint">💡 Hint</button><button class="btn b" id="bskip">⏭ Skip</button></div></div></div>
@@ -246,5 +247,5 @@ $('bskip').onclick=()=>{if(state!=='play')return;state='wait';streak=0;skips++;l
 addEventListener('keydown',e=>{if(document.querySelector('.duoOv'))return;if((e.key==='r'||e.key==='R')&&state==='play'&&sel){rotate(sel);check()}});
 addEventListener('resize',draw);addEventListener('orientationchange',draw);
 fitCanvas();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

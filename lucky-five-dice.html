@@ -70,7 +70,8 @@ body{background:radial-gradient(ellipse at 50% 30%,#1fa05f,#0b4a2c 80%) fixed}
 .row.bon{color:#7b3fe0}
 @keyframes pl{50%{filter:brightness(1.12)}}
 @media (min-aspect-ratio:5/4) and (max-height:700px){#main{flex-direction:row;align-items:center;gap:12px}#left{--dsz:min(6.6vw,12vh,60px);flex:none;width:min(50vw,420px)}#tray{flex-wrap:wrap}#cardw{align-self:stretch;align-items:flex-start;max-height:100%}.row{min-height:clamp(22px,7vh,30px)}#msg{min-height:30px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 <div id="top"><div class="pill" id="pTurn">🎲 Lucky Five</div><div class="pill">🏆 Wins <b id="bw">0</b></div><div class="pill">⭐ Best <b id="bs">0</b></div></div>
 <div id="main"><div id="left"><div id="msg"></div><div id="tray"></div><button class="btn" id="roll">🎲 Roll!</button></div>
@@ -227,5 +228,5 @@ function menu(){ov('🎲 Lucky Five Dice','','Roll five dice up to 3 times, hold
 $('#roll').onclick=roll;
 addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();roll()}else if(e.key>='1'&&e.key<='5')toggle(+e.key-1)});
 best=load('best');wins=load('wins');P=[{n:'You',s:{}}];render();menu();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

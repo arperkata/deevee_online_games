@@ -56,7 +56,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 .c.n.rev{background:linear-gradient(#ffe27a,#f5b800);color:#1b4f86;box-shadow:0 5px 0 #a87a00}
 @media (max-height:480px){#board{width:min(calc(100dvh - 60px),52vw)}#info{max-width:34vw}}
 .duoPill{top:auto!important;bottom:6px}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 <div id="top"><div class="pill">&#11088; <b id="sc">0</b></div><div class="pill">&#127942; <b id="bs">0</b></div><div class="pill">&#128018; <b id="lv">4</b></div><div class="pill" id="lf"></div></div>
 <div id="game"><div class="board" id="boardw" style="padding:0;border:0;box-shadow:none;background:none"><div id="board"></div></div><div id="info"></div></div>
@@ -186,5 +187,5 @@ $('#info').textContent='Perfect! Level up!';hud();const my=sid;setTimeout(()=>{i
 function end(){run=false;phase='end';if(Duo.active()&&Duo.finish(maxN))return;const st=maxN>=9?3:maxN>=7?2:maxN>=1?1:0;best=finish('best',score,st,'Memorised up to <b>'+maxN+'</b> numbers'+(maxN>=10?'<br>Smarter than a chimp! 🧠':''),'🐒 Game Over',[['▶ Play Again',start]]);duoBtns();hud()}
 best=load('best');score=0;lives=3;n=START;hud();
 overlay('🐒 Monkey Numbers','','Numbers flash on screen.<br>Tap <i>1</i> and the rest hide!<br>Then tap them in order <i>1, 2, 3...</i><br>Each level adds one more number.',[['▶ Play',start]]);duoBtns();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

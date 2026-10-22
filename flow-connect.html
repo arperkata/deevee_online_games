@@ -39,7 +39,8 @@ button.go:active{transform:translateY(4px);box-shadow:0 2px 0 #1c701c}
 @keyframes fl{to{transform:translate(-50%,-150%);opacity:0}}
 .shake{animation:sh .35s}
 @keyframes sh{20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
-#cv{touch-action:none;border-radius:20px;box-shadow:0 8px 0 #06204a,0 12px 24px rgba(0,0,0,.35);border:4px solid #3aa0ff;background:#14407a;cursor:pointer}</style></head><body>
+#cv{touch-action:none;border-radius:20px;box-shadow:0 8px 0 #06204a,0 12px 24px rgba(0,0,0,.35);border:4px solid #3aa0ff;background:#14407a;cursor:pointer}</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <div id="top"><h1>Flow Connect</h1><span class="pill">Level <b id="lv">1</b></span><span class="pill">⏱ <b id="tm">0</b></span><span class="pill">Score <b id="sc">0</b></span><span class="pill">Best <b id="bs">0</b></span><button class="mute" id="mute" aria-label="Sound">🔊</button></div>
 <div id="stage"><div id="wrap"><canvas id="cv" width="600" height="600"></canvas></div>
@@ -226,5 +227,5 @@ newPuzzle();fit();requestAnimationFrame(loop);
 const runStart=()=>{started=true;lv=0;score=0;combo=0;$('sc').textContent=0;newPuzzle()};
 duoW=Duo.addButtons($('box'),{game:'flow-connect',start:()=>{$('msg').style.display='none';runStart()},cpu:[1500,3500],hw:true,unit:' pts'});
 startScreen('🌈','Flow Connect','Drag from a dot to its matching twin. Fill EVERY square. Paths cannot cross - drawing over a line cuts it!',runStart);
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

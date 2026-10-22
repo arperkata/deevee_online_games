@@ -55,7 +55,8 @@ body{background:linear-gradient(#27a2e8,#bdeafc)}
 #rt div{background:#0b3a78;border-radius:10px;padding:3px 8px;white-space:nowrap}
 .pbtn{display:inline-block}
 @media (max-height:500px) and (orientation:landscape){#main{flex-direction:row;flex-wrap:wrap;align-content:center;padding-bottom:4px}#arena{width:52%}#picks{width:44%;flex-wrap:wrap}.pk{flex:1 1 28%;min-height:60px}#res{width:52%;min-height:2em}#foot{width:44%}.hand{font-size:clamp(36px,22dvh,80px)}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button class="mute" id="mute" aria-label="Sound">🔊</button>
 
 <div id="hud"><span class="pill">Round <b id="rd">1</b></span><span class="pill"><span id="hn1">🧑</span> <b id="ps">0</b> : <b id="as">0</b> <span id="hn2">🤖</span></span><span class="pill" id="cbp">Combo <b id="cb">0</b></span><span class="pill" id="bsp">Best <b id="bs">0</b></span></div>
@@ -219,5 +220,5 @@ function finish(){
 function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 addEventListener('keydown',e=>{const n=+e.key;if(n>=1&&n<=5)play(n-1)});
 startMenu();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

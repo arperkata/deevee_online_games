@@ -68,7 +68,8 @@ body{background:linear-gradient(#8fdcff,#c9f2a0 60%,#7ccf4a) fixed}
 @media (min-aspect-ratio:12/10){
 #app{flex-direction:row;padding-top:6px}#panel{width:250px;padding-top:54px;justify-content:center}#seeds{flex-wrap:wrap}.sd{min-width:70px}
 }
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Mute">🔊</button>
 <div id="app"><div id="board"><div id="grid"></div></div>
 <div id="panel"><div id="chips"><span class="chip">🪙 <b id="coins">0</b></span><span class="chip" id="mk">📈 x1.0</span></div>
@@ -157,5 +158,5 @@ build();fit();render();setTimeout(fit,60);last=Date.now();setInterval(tick,250);
 const rp=S.pl.filter((p,i)=>i<S.own&&ripe(i)).length;
 showOv('🌾 Farm Grow',sd?'Welcome back farmer!<br><b>'+rp+'</b> crops are ready to harvest.':'Plant seeds, wait, harvest, sell!<br>Expand your farm and earn <b>'+fmt(GOAL)+'</b> 🪙.','Play',null,()=>{hideOv();last=Date.now()});
 
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

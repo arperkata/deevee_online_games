@@ -55,7 +55,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 #acts .k{height:50px;font-size:18px}
 #msg{min-height:26px;font-size:clamp(16px,3.4vh,20px);font-weight:bold;text-align:center}
 @media (max-height:480px){#ops .op{height:44px}#acts .k{height:44px}#game{gap:6px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Sound">🔊</button>
 <div class="ov" id="ov"><div class="card"><h1 id="ovT"></h1><div class="stars" id="ovS"></div><p id="ovP"></p><div id="ovB"></div></div></div>
 
@@ -199,5 +200,5 @@ OPS.forEach(o=>{const b=document.createElement('button');b.className='k op';b.da
 $('#bu').onclick=undo;$('#bh').onclick=hint;$('#bs2').onclick=skip;
 document.addEventListener('keydown',e=>{if(document.querySelector('.duoOv'))return;if(!run)return;if(e.key==='z'||e.key==='Backspace')undo();else if(e.key==='h')hint()});
 cards=[];hist=[];score=0;streak=0;solved=0;time=0;best=0;level=0;upd();menu();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

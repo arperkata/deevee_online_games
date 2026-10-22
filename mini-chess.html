@@ -50,7 +50,8 @@ h1{margin:0;font-size:clamp(20px,3.4vw,34px);text-shadow:0 3px 0 #1b4f86,2px 2px
 @media (max-width:700px){h1{display:none}}
 @media (max-height:500px){#top{min-height:48px;padding-top:6px}#stage{padding-bottom:6px}.big{font-size:34px}.seg{margin:4px 0}.box p{margin:2px 0 4px}.box{padding:8px 16px}.go{margin-top:4px}}
 
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <div id="top"><h1>Mini Chess</h1><span class="pill" id="p1"></span><span class="pill">Best <b id="bs">0</b></span><button class="mute" id="mute" aria-label="Sound">🔊</button></div>
 <div id="stage">
@@ -230,5 +231,5 @@ dests.forEach(d=>{const x=px(d[1]),y=py(d[1]),cap=b[d[1]]!==0;ctx.beginPath();ct
 $('stE').textContent=CFG.emoji;$('stT').textContent=CFG.title;$('stD').textContent=CFG.desc;$('bs').textContent=best;fxSize();
 if(typeof ResizeObserver!=='undefined')new ResizeObserver(fit).observe($('bw'));
 fit();setStatus('');setPill('Ready');showStart();requestAnimationFrame(frame)})();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

@@ -32,7 +32,8 @@ h1{margin:0;font-size:clamp(22px,4.5vw,40px);text-shadow:0 3px 0 #0b3a78,2px 2px
 button.go{font:700 clamp(20px,5vw,28px) inherit;font-family:inherit;margin-top:14px;padding:.4em 1.5em;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fe35f,#25a025);box-shadow:0 6px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}
 button.go:active{transform:translateY(4px);box-shadow:0 2px 0 #1c701c}
 @media (max-height:500px){h1{display:none}#top{padding:4px 8px 0}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <div id="top"><a class="home" href="index.html">⌂ Home</a><h1>Spot the Odd One!</h1><span class="pill">Score <b id="sc">0</b></span><span class="pill">Round <b id="rd">1</b></span><span class="pill">Best <b id="bs">0</b></span><button class="mute" id="mute" aria-label="Sound">🔊</button></div>
 <div id="bar"><div id="fill"></div></div>
 <div id="stage"><div id="grid"></div></div>
@@ -156,5 +157,5 @@ $('again').onclick=start;
 $('mt').innerHTML='🔎 Spot the Odd One!<br><small>Find the different emoji. 60 seconds.</small>';$('again').textContent='Play';
 Duo.addButtons($('box'),{game:'odd-one-out',start:()=>start(),cpu:[80,300],hw:true,unit:' pts'});
 $('msg').style.display='flex';
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

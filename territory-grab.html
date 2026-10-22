@@ -43,7 +43,8 @@ body{background:linear-gradient(#27a2e8,#bdeafc)}
 @keyframes cp{40%{transform:scale(1.25);filter:brightness(1.3)}}
 #st{background:#0b3a78;border:3px solid #ffe14a;border-radius:999px;padding:5px 16px;font-weight:700;font-size:clamp(14px,3.6vw,20px);box-shadow:0 4px 0 #06244d}
 @media (max-height:500px) and (orientation:landscape){#main{flex-direction:row;align-items:center}#st{max-width:200px;border-radius:18px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button class="mute" id="mute" aria-label="Sound">🔊</button>
 
 <div id="hud"><span class="pill">Lv <b id="lv">1</b></span><span class="pill" id="lvp">Lv <b id="lv">1</b></span><span class="pill">🔵 <span id="n1" class="nn">You</span> <b id="pc">0</b></span><span class="pill">🔴 <span id="n2" class="nn">Bot</span> <b id="ac">0</b></span><span class="pill" id="bsp">Best <b id="bs">0</b></span></div>
@@ -200,5 +201,5 @@ function menu(){over=true;showBox('<span class="em">🔵🔴</span><h2>Territory
  const g2=$('go2');g2.style.display='';g2.textContent='👥 2 Players';g2.onclick=async()=>{hideBox();const n=await Duo.askNames();if(!n){menu();return}nm=n;mode='two';lvl=2;startGame()}}
 menu();
 mk();render();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

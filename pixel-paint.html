@@ -41,7 +41,8 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 
 #c{background:#fff;border-radius:12px;box-shadow:0 0 0 5px #5cc8ff,0 9px 0 5px #0b2a5c;touch-action:none;image-rendering:pixelated;max-width:100%;max-height:100%;cursor:crosshair}
 .pal{display:grid;grid-template-columns:repeat(auto-fill,44px);gap:6px;justify-content:center;width:100%;max-width:340px}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Mute">🔊</button>
 <canvas id="fx"></canvas>
 <div id="ov" class="hide"><h1 id="ot"></h1><p id="om"></p><div id="ob"></div></div>
@@ -135,5 +136,5 @@ $('bUndo').onclick=doUndo;$('bClear').onclick=clearAll;$('bSave').onclick=save;
 addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();doUndo()}});
 newGrid();buildPal();fit();render();
 ov('🎨 Pixel Paint','Tap or drag to paint pixels. Pick colors, fill, undo, then <b>save your art as a PNG</b>!',[{t:'Paint 16×16',f:function(){setSize(16)}},{t:'Paint 24×24',c:'alt',f:function(){setSize(24)}}]);
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

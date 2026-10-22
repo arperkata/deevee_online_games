@@ -55,7 +55,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 #acts{display:flex;gap:8px;flex:none}#acts .btn{font-size:clamp(16px,2.8vh,20px);padding:4px 14px}
 #found{flex:1;min-height:40px;width:100%;overflow-y:auto;display:flex;flex-wrap:wrap;gap:5px;align-content:flex-start;background:#14407a;border:3px solid #fff;border-radius:14px;padding:6px}
 .fw{background:#ffd84a;color:#6b3b00;text-shadow:none;font-weight:bold;font-size:clamp(13px,2.4vh,17px);border-radius:10px;padding:1px 8px;box-shadow:0 2px 0 #a8791f}.fw.pg{background:#ff7ad9;color:#4a004a;box-shadow:0 2px 0 #a0207f}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <button id="mute" aria-label="Sound on/off">🔊</button>
 <div id="ov" class="ov"><div class="card"><div class="big" id="oe"></div><h1 id="ot"></h1><p id="op"></p><div class="stars" id="os"></div><div id="oextra"></div><button class="btn" id="obtn">Play</button></div></div>
@@ -204,5 +205,5 @@ function loop(){if(running){tleft=TIME-(performance.now()-tStart)/1000;if(tleft<
 ctrL='B';outer='EEHIVE'.split('');valid=new Set();total=1;found=[];cur='';score=0;tleft=TIME;running=false;buildHive();show();hud();fit();loop();
 overlay({e:'🐝',t:'Spelling Hive',p:'Make words of 4+ letters using the 7 letters. Every word must include the <b>gold center letter</b>. Letters can repeat. Find the 7-letter pangram for a big bonus!<br>Best: '+best,btn:'Start!',go:newGame});duoBtns();
 
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

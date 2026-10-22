@@ -23,7 +23,8 @@ button#go:active{transform:translateY(4px);box-shadow:0 2px 0 #1c701c}
 @media (max-height:420px){#box{padding:10px 20px}#mt small{margin-top:2px}}
 .duoPill{top:auto!important;bottom:6px}
 @media (max-height:420px){#box{overflow:auto}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <canvas id="c"></canvas>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Sound">🔊</button>
 <div id="msg"><div id="box"><div id="mt">🧺 Catch the Right One!<small>Move the basket (mouse, finger or ← →).<br>Catch only the <b class="y">target</b> shown at the top.<br>Wrong catches cost a heart!</small></div><button id="go">Play</button></div></div>
@@ -179,5 +180,5 @@ function loop(ts){
   requestAnimationFrame(loop);
 }
 reset();requestAnimationFrame(loop);
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

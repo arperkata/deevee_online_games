@@ -46,7 +46,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 .k:active{transform:translateY(3px);box-shadow:0 1px 0 #3f78b4}
 .k.ok{background:linear-gradient(#7be07b,#2ea32e);color:#fff;box-shadow:0 4px 0 #1c701c}.k.no{background:linear-gradient(#ff8a8a,#d63030);color:#fff;box-shadow:0 4px 0 #8f1c1c}.k:disabled{pointer-events:none}
 @media (max-height:480px) and (orientation:landscape){#top{padding-top:6px}#game{flex-direction:row;align-items:center;justify-content:center;gap:16px;padding:0 10px}#left{width:auto;flex:none}#cv{width:min(34vw,56vh);margin-top:0}#right{width:min(56vw,460px);flex:none}#kb{margin-top:0}#msg{height:22px;font-size:18px}.k{height:clamp(32px,10vh,42px)}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 <div id="top"><div class="pill">⭐ <b id="sc">0</b></div><div class="pill">🏆 <b id="bs">0</b></div><div class="pill">🔥 <b id="st">0</b></div><div class="pill">❤️ <b id="lv">7</b></div></div>
 <div id="game"><div id="left"><canvas id="cv" width="600" height="520"></canvas></div><div id="right"><div id="cat"></div><div id="word"></div><div id="msg"></div><div id="kb"></div></div></div>
@@ -210,5 +211,5 @@ async function duoStart(mode){let lvl='easy';
 (function(){const card=document.querySelector('#ov .card');Duo.addButtons(document.createElement('div'),{start(){}});
  [['👥 2 Players','r','two'],['🤖 vs Computer','r','cpu']].forEach(([t,cl,m])=>{const b=document.createElement('button');b.className='btn '+cl;b.innerHTML=t;b.onclick=()=>duoStart(m);card.appendChild(b)})})();
 setup();draw(0);word='';
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

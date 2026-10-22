@@ -72,7 +72,8 @@ body{background:radial-gradient(ellipse at 50% 40%,#1f9fd6,#0b4f86 80%)}
 .pulse{animation:pulse .5s}
 @keyframes pulse{50%{transform:scale(1.25)}}
 @media(max-height:520px){:root{--cw:clamp(34px,min(11vw,16dvh),64px)}#log{min-height:2.4em;padding:4px 10px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <div id="top"><h1>Go Fish</h1><span class="pill"><span id="l1">Your books</span> <b id="mb">0</b></span><span class="pill"><span id="l2">AI books</span> <b id="ab">0</b></span><span class="pill">Best <b id="bs">0</b></span><button class="mute" id="mute">🔊</button></div>
 <div id="stage">
@@ -254,5 +255,5 @@ function showMenu(){MODE='classic';LVL='normal';NMB=['You','🤖 AI'];newGame();
   overlay({em:'🐟',title:'Go Fish',btn:'Play ▶',cb:()=>{MODE='classic';NMB=['You','🤖 AI'];newGame()},html:'Tap a card in your hand to ask for that rank.<br>Collect <b>4 of a kind</b> to make a book.<br>Most books wins!<div id="modes"></div>'});
   $('modes').innerHTML='';mkB('🤖 Computer: Easy','g',()=>pick('cpu','easy'));mkB('🧠 Computer: Hard','o',()=>pick('cpu','hard'));mkB('👥 2 Players','r',()=>pick('2p','normal'))}
 showMenu();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

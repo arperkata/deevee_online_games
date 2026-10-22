@@ -60,7 +60,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 .o.no{background:linear-gradient(#ff8a8a,#d63030);box-shadow:0 5px 0 #8f1c1c;animation:sh .35s}
 #opts.off{visibility:hidden}
 @media (max-height:480px){#left{width:min(52vw,420px)}#board{height:calc(100dvh - 120px)}#opts{width:min(36vw,260px)}.o{width:58px;height:58px;font-size:32px}#info{font-size:16px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 <div id="top"><div class="pill">&#11088; <b id="sc">0</b></div><div class="pill">&#127942; <b id="bs">0</b></div><div class="pill">&#127919; <b id="rd">0</b></div><div class="pill" id="lf"></div></div>
 <div id="game"><div id="left"><div id="board"></div><div class="bar"><div id="fill"></div></div><div id="info"></div></div><div id="opts" class="off"></div></div>
@@ -186,5 +187,5 @@ addEventListener('resize',()=>{if(items&&board.children.length)layout(items.leng
 best=load('best');score=0;lives=3;items=null;hud();
 overlay('🕵️ What’s Missing?','','A bunch of pictures show up.<br>They get hidden, then <i>one is gone</i>!<br>Pick the picture that disappeared.<br>More pictures each round. 3 lives ❤️',[['▶ Play',start]]);
 Duo.addButtons($('#ovB'),{game:'whats-missing',start:duoStart,hw:true,cpu:[120,600],unit:' pts'});
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

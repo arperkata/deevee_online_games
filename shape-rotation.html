@@ -39,7 +39,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 .o:active{transform:translateY(4px);box-shadow:0 1px 0 #0f2f57}
 .o.good{background:#8cf08c;border-color:#1c701c}.o.bad{background:#ff9a9a;border-color:#a01c1c}
 @media (orientation:landscape) and (max-height:520px){:root{--t:min(52vh,30vw);--o:min(76vh,48vw)}#game{flex-direction:row;justify-content:center;gap:4vw}#lab{display:none}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Sound">🔊</button>
 <div id="top"><span class="pill" id="pr">Round 1/10</span><span class="pill" id="ps">⭐ 0</span><span class="pill" id="pl">❤️❤️❤️</span><span class="pill" id="pk">🔥 0</span></div>
 <div id="bar"><div id="fill"></div></div>
@@ -189,5 +190,5 @@ function reveal(p,i,ok,pts){
   if($('tgt').animate)$('tgt').animate([{transform:'rotate(0)'},{transform:'rotate(360deg)'}],{duration:600,easing:'ease-in-out'});
 }
 addEventListener('keydown',e=>{if(document.querySelector('.duoOv'))return;const n=+e.key;if(n>=1&&n<=6&&Q.state==='play'&&Q.cur&&n<=Q.cur.opts.length)answerQ(n-1)});
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

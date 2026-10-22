@@ -59,7 +59,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 .kk.d{max-width:72px;flex:1.5;background:linear-gradient(#ff8a8a,#d63030);color:#fff;box-shadow:0 4px 0 #8f1c1c}
 .kk:active{transform:translateY(3px);box-shadow:0 1px 0 #3f78b4}
 #acts{display:flex;gap:10px}#acts .btn{font-size:clamp(15px,2.8vh,19px);padding:2px 16px}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <button id="mute" aria-label="Sound on/off">🔊</button>
 <div id="ov" class="ov"><div class="card"><div class="big" id="oe"></div><h1 id="ot"></h1><p id="op"></p><div class="stars" id="os"></div><div id="oextra"></div><div id="duoBox" style="width:100%"></div><button class="btn" id="obtn">Play</button></div></div>
@@ -203,5 +204,5 @@ W='PLNT';T='';hn=0;list=[];score=0;streak=0;tleft=TW;running=false;busy=true;$('
 Duo.addButtons($('duoBox'),{game:'missing-vowels',start:()=>{$('ov').classList.add('hide');newGame()},cpu:[1000,2400],hw:true,unit:' pts'});
 overlay({e:'🔤',t:'Missing Vowels',p:'The vowels ran away! Fill them back in and type the whole word. Orange keys are the vowels. Pick a pack!<br>Best: '+best,extra:chips(),btn:'Start!',go:newGame});
 
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

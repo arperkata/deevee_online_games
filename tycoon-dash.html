@@ -67,7 +67,8 @@ body{background:linear-gradient(#27a2e8,#bdeafc) fixed}
 #msg{font-weight:bold;text-align:center;line-height:1.15;min-height:2.3em;display:flex;align-items:center;max-width:100%}
 #roll{font-size:clamp(15px,calc(var(--bs)/18),22px);padding:4px 18px;min-height:44px}
 @media (max-height:480px){#roll{min-height:38px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 <div id="top"><div class="pill" id="pRound">🏙 Tycoon Dash</div><div class="pill" id="pPool">🅿️ Pool 0</div><div class="pill">🏆 Wins <b id="bw">0</b></div></div>
 <div id="main"><div id="board"><div id="ctr"><div id="chips"></div><div id="dice"></div><div id="msg"></div><button class="btn" id="roll">🎲 Roll</button></div></div></div>
@@ -220,5 +221,5 @@ $('#roll').onclick=()=>{if(rollRes&&!$('#roll').disabled){const f=rollRes;rollRe
 addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();$('#roll').onclick()}});
 function fit(){const s=Math.max(260,Math.floor(Math.min(innerWidth-12,innerHeight-$('#top').offsetHeight-16)));board.style.setProperty('--bs',s+'px')}addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,200));
 fit();wins=load('wins');menu();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

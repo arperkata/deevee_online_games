@@ -48,7 +48,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 .w{background:#fff;color:#1b4f86;text-shadow:none;font-weight:bold;font-size:clamp(14px,3.4vmin,19px);border:3px solid #1b4f86;border-radius:12px;padding:2px 10px;box-shadow:0 3px 0 #0f2f57;letter-spacing:1px}
 .w.f{background:#2ea32e;color:#fff;border-color:#1c701c;box-shadow:0 3px 0 #1c701c;text-decoration:line-through;text-decoration-thickness:3px;animation:popk .4s}
 #hint{min-height:44px;padding:4px 18px}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <button id="mute" aria-label="Sound on/off">🔊</button>
 <div id="ov" class="ov"><div class="card"><div class="big" id="oe"></div><h1 id="ot"></h1><p id="op"></p><div class="stars" id="os"></div><div id="oextra"></div><button class="btn" id="obtn">Play</button></div></div>
@@ -237,5 +238,5 @@ function loop(){if(running&&!busy){lvTime=(performance.now()-t0)/1000;if(Math.fl
 words=[];lv=0;total=0;score=0;N=7;cs=SZ/N;busy=false;running=false;lvTime=0;hud();fit();loop();
 overlay({e:'🔎',t:'Word Search',p:'Drag across letters (any direction) or tap the first and last letter. Find every word fast for combos and stars!<br>Best: '+best,extra:chips(),btn:'Play!',go:newGame});duoBtns();
 
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

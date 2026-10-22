@@ -52,7 +52,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 .k:active{transform:translateY(3px);box-shadow:0 1px 0 #3f78b4}
 .k.correct{background:linear-gradient(#7be07b,#2ea32e);color:#fff;box-shadow:0 4px 0 #1c701c}.k.present{background:linear-gradient(#ffd84a,#f08a12);color:#fff;box-shadow:0 4px 0 #a85d00}.k.absent{background:#5b7a99;color:#fff;box-shadow:0 4px 0 #3e5a78}
 @media (max-height:480px){#top{padding-top:6px}#game{flex-direction:row;justify-content:center;align-items:center;gap:20px;padding:0 10px}#board{--t:min(44px,calc((100vh - 120px)/6.3))}#msg{height:24px;margin-top:0;font-size:18px}#kb{margin:0;width:min(46vw,440px);flex:none}.k{height:clamp(34px,11vh,44px)}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 <div id="top"><div class="pill">⭐ <b id="sc">0</b></div><div class="pill">🏆 <b id="bs">0</b></div><div class="pill">🔥 <b id="st">0</b></div><div class="pill" id="pn">Puzzle #1</div></div>
 <div id="game"><div id="left"><div id="msg"></div><div id="board"></div></div>
@@ -206,5 +207,5 @@ async function duoStart(mode){let lvl='easy';
  [['👥 2 Players','r','two'],['🤖 vs Computer','r','cpu']].forEach(([t,cl,m])=>{const b=document.createElement('button');b.className='btn '+cl;b.innerHTML=t;b.onclick=()=>duoStart(m);card.appendChild(b)})})();
 $('#go').onclick=startGame;build();best=load('wg_best');score=0;streak=0;upd();
 document.addEventListener('keydown',e=>{if(document.querySelector('.duoOv'))return;if(e.ctrlKey||e.metaKey||e.altKey)return;if(e.key==='Enter'&&!$('#ov').classList.contains('hide')){$('#go').click();e.preventDefault();return}const k=e.key.length===1?e.key.toLowerCase():e.key;press(k)});
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

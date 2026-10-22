@@ -60,7 +60,8 @@ html,body{background:radial-gradient(circle at 50% 20%,#7a2fd0,#2a0f6b 75%) fixe
 @keyframes glow{50%{box-shadow:0 0 0 6px #ff9a3d,0 0 22px 8px #ffd93b}}
 @keyframes shake{25%{margin-left:-4px}75%{margin-left:4px}}
 .sg{font-size:17px;padding:0 12px;height:44px;min-width:44px}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Mute">🔊</button>
 <canvas id="fx"></canvas>
 <div id="ov" class="hide"><h1 id="ot"></h1><p id="om"></p><div id="ob"></div></div>
@@ -164,5 +165,5 @@ addEventListener('keydown',function(e){var m=KM[e.key.toLowerCase()];if(m&&!e.re
 addEventListener('keyup',function(e){var m=KM[e.key.toLowerCase()];if(m&&keys[m])keys[m].classList.remove('down')});
 build();buildSongs();fit();updHud();
 ov('🎹 Piano Keys','Tap the keys to play, or pick a song and <b>follow the glowing key</b>!',[{t:'Play!',f:function(){}}]);
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

@@ -56,7 +56,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 .t.hint{background:linear-gradient(#fff6a8,#ffd000);box-shadow:0 5px 0 #a87a00}
 @media (max-height:480px){#board{width:min(calc(100dvh - 90px),calc(52vw - 40px))}#info{max-width:30vw}}
 .duoPill{top:auto!important;bottom:6px}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 <div id="top"><div class="pill">&#11088; <b id="sc">0</b></div><div class="pill">&#127942; <b id="bs">0</b></div><div class="pill">&#128306; <b id="lv">1</b></div><div class="pill" id="lf"></div></div>
 <div id="game"><div class="board" id="bw"><div id="board"></div></div><div id="info"></div></div>
@@ -183,5 +184,5 @@ lvl++;setTimeout(()=>{if(my===sid&&run){hud();round()}},1000)}
 function end(){run=false;phase='end';const done=lvl-1;if(Duo.active()&&Duo.finish(done))return;const st=done>=9?3:done>=5?2:done>=2?1:0;best=finish('best',score,st,'Cleared <b>'+done+'</b> level'+(done===1?'':'s')+'!','🔳 Game Over',[['▶ Play Again',start]]);duoBtns();hud()}
 best=load('best');score=0;lives=3;lvl=1;sz=3;build();hud();
 overlay('🔳 Visual Memory','','Some squares light up <i>yellow</i>.<br>Remember where they were!<br>Then tap them all.<br>The grid grows as you go. 3 lives ❤️',[['▶ Play',start]]);duoBtns();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

@@ -69,7 +69,8 @@ body{background:radial-gradient(ellipse at 50% 20%,#7b3fe0,#2a0f5e 85%) fixed}
 #btns{display:flex;gap:12px;width:100%}
 #btns .btn{flex:1;font-size:clamp(16px,4.6vw,24px);min-height:54px;padding:6px 8px}
 @media (max-height:480px){#main{max-width:none;flex-direction:row;flex-wrap:wrap;justify-content:center;align-content:center;gap:5px}#cards{width:100%}.pc{padding:1px 6px 3px}.pc .sc{font-size:26px}.pc .bar{display:none}#felt{width:min(62%,460px);padding:6px;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:4px}#dice{grid-template-columns:repeat(6,auto);gap:4px 8px;--dsz:min(8vw,13vh)}.dw{padding:2px}#btns{width:34%;flex-direction:column}#btns .btn{min-height:44px;font-size:15px;padding:2px 4px}#msg{min-height:24px;font-size:12px}#tt{font-size:15px;padding:0 10px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 <div id="top"><div class="pill" id="pMode">🎲 Farkle</div><div class="pill">🏆 Wins <b id="bw">0</b></div><div class="pill">🔥 Best turn <b id="bs">0</b></div></div>
 <div id="main"><div id="cards"></div>
@@ -218,5 +219,5 @@ $('#roll').onclick=()=>{if($('#roll').disabled)return;if(phase==='idle')doRoll()
 $('#bank').onclick=()=>{if(!$('#bank').disabled)bank()};
 addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();$('#roll').onclick()}else if(e.key==='b'&&!$('#bank').disabled)bank()});
 wins=load('wins');bestTurn=load('bestTurn');menu();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

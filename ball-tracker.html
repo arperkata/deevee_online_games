@@ -46,7 +46,8 @@ body{flex-direction:row;justify-content:center}
 #cv{width:var(--bs);height:var(--bs);background:#14407a;border:4px solid #fff;border-radius:22px;box-shadow:0 8px 0 #0f2f57,0 16px 30px rgba(0,0,0,.3);touch-action:none;display:block}
 #msg{background:#fff;color:#1b4f86;text-shadow:none;border:4px solid #ffd84a;border-radius:999px;padding:3px 18px;font-weight:bold;font-size:clamp(15px,3.8vmin,22px);box-shadow:0 4px 0 #0f2f57;text-align:center;min-height:38px;display:flex;align-items:center;flex:none}
 @media (max-height:480px){#msg{border-radius:20px;max-width:140px;font-size:15px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 
 <div id="top"><div class="pill">🎯 Level <b id="lv">1</b></div><div class="pill"><b id="lf">❤️❤️❤️</b></div><div class="pill">⭐ <b id="sc">0</b></div><div class="pill">🏆 <b id="bs">0</b></div></div>
@@ -186,5 +187,5 @@ function end(){phase='idle';balls=[];sel=[];if(Duo.active()&&Duo.finish(score)){
 best=load('best');upd();requestAnimationFrame(loop);
 showOv('🔵 Ball Tracker','','Some balls glow gold, then <b>all turn blue and move</b>. Keep track of the gold ones, then tap them!<br>3 lives. More balls and more speed each level.',[{t:'▶ Start',f:start}]);
 Duo.addButtons($('#ovB'),{game:'ball-tracker',start:start,cpu:[60,260],hw:true,unit:' pts'});
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

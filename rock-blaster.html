@@ -36,7 +36,8 @@ canvas{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);border-rad
 #pad .pb{width:56px;height:56px;font-size:26px}#pad .pb.f{width:76px}
 .dp{grid-template-columns:repeat(3,56px);grid-template-rows:repeat(2,56px);gap:4px}
 #ov{gap:6px;padding:8px}#ov h1{font-size:28px}#ov p{font-size:14px;padding:6px 14px}.big{font-size:1.5em}.stars{font-size:1.6em}#go{font-size:20px;padding:6px 28px;min-height:44px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Mute">🔊</button>
 <canvas id="c"></canvas>
 <div id="pad"><div id="pl"><button class="btn pb" data-k="left">◀</button><button class="btn pb" data-k="right">▶</button></div><div id="pr"><button class="btn pb t" data-k="up">🔥</button><button class="btn pb f" data-k="fire">💥</button></div></div>
@@ -256,5 +257,5 @@ showOv('☄️ Rock Blaster','Rotate, thrust and blast the space rocks - they <b
 let last=performance.now();
 function loop(now){const dt=Math.min(.033,Math.max(0,(now-last)/1000)||0);last=now;try{update(dt);updFx(dt);draw()}catch(e){console.error(e)}requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

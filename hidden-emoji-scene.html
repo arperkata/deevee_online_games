@@ -51,7 +51,8 @@ body{flex-direction:row;justify-content:center}
 #cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
 #banner{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;color:#1b4f86;text-shadow:none;border:5px solid #ffd84a;border-radius:24px;padding:10px 24px;font-size:clamp(22px,6vmin,34px);font-weight:bold;box-shadow:0 8px 0 #0f2f57;z-index:5;text-align:center;pointer-events:none;animation:popin .35s}
 @media (max-height:480px){#main{flex-direction:row;align-items:stretch;padding:6px}#bar{flex-direction:column;width:auto;flex-wrap:nowrap;justify-content:flex-start}.chip{width:44px;height:44px;font-size:26px}#cw{width:auto;flex:1}#hint{padding:4px 6px;font-size:13px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 
 <div id="top"><div class="pill">🖼 Scene <b id="sn">1</b></div><div class="pill">⏱ <b id="tm">50</b></div><div class="pill">⭐ <b id="sc">0</b></div><div class="pill">🏆 <b id="bs">0</b></div></div>
@@ -196,5 +197,5 @@ addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeo
 fit();best=load('best');upd();requestAnimationFrame(loop);
 showOv('🔍 Hidden Emoji','','Find all the emoji in the top bar hidden in the busy scene before time runs out!<br>Wrong tap = -2s. 💡 hint = -5s. Every scene is new and trickier.',[{t:'▶ Start',f:start}]);
 Duo.addButtons($('#ovB'),{game:'hidden-emoji-scene',start:start,cpu:[100,400],hw:true,unit:' pts'});
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Brain Games Arcade - 158 free brain games for kids and adults</title>
 <meta name="description" content="Play 158 free brain games online: memory, puzzles, math, typing, strategy, 2-player and vs-computer. Works on phone, tablet and PC. No sign-up.">
-<meta name="theme-color" content="#0b3a78"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#0f2f26"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
 <meta property="og:title" content="Brain Games Arcade"><meta property="og:description" content="158 free brain games for kids and adults. No sign-up."><meta property="og:type" content="website"><meta property="og:image" content="icon-512.png">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -50,7 +50,9 @@ a.c:hover .e,a.c:focus-visible .e{animation:bounce .6s infinite}
 @media (min-width:1500px){.g{grid-template-columns:repeat(6,minmax(0,1fr))}}
 @media (max-height:520px){header{position:static}}
 @media (prefers-reduced-motion:reduce){a.c,a.c .e{animation:none!important;transition:none}}
-</style></head><body>
+/*dragon-home*/header{background:linear-gradient(#0f4a37,#10372d) !important;border-bottom-color:#ffb21f !important}h1{text-shadow:0 4px 0 #3a1500,0 0 18px rgba(255,140,30,.6) !important}.tab{background:#0b2d24 !important;border-color:#ffd23a !important}.tab.on{background:linear-gradient(#ffb21f,#e8561a) !important;box-shadow:0 4px 0 #8a3a0a !important}#q{border-color:#ffb21f !important}
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <header>
 <h1>🎮 Brain Games Arcade</h1>
 <p class="sub"><b id="total">158</b> quick games for kids and grown-ups · works on phone, tablet and PC</p>
@@ -236,7 +238,7 @@ function render(){
 }
 $('tabs').onclick=e=>{const k=e.target.dataset.k;if(!k)return;if(k==='slots'&&!window.__slotsOk){if(!confirm('These are pretend-money casino-style games for ages 13 and up. No real money is used or won. Continue?'))return;window.__slotsOk=true}cat=k;render()};
 $('q').oninput=render;render();
-</script><script src="mascot.js" defer></script>
-<script src="ads-config.js"></script><script src="ads.js" defer></script>
+</script><script src="ads-config.js"></script><script src="ads.js" defer></script>
 <script>if('serviceWorker' in navigator&&location.protocol!=='file:')addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))</script>
+<script src="dragon-theme.js" defer></script>
 </body></html>

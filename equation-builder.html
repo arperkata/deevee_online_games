@@ -56,7 +56,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 #acts{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;width:min(420px,100%)}
 #acts .k{height:48px;font-size:18px}
 @media (max-height:480px){#game{gap:6px}#acts .k{height:40px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Sound">🔊</button>
 <div class="ov" id="ov"><div class="card"><h1 id="ovT"></h1><div class="stars" id="ovS"></div><p id="ovP"></p><div id="ovB"></div></div></div>
 
@@ -201,5 +202,5 @@ function start(m){mode=m;best=load('best_'+m);score=0;streak=0;solved=0;time=75;
 function menu(){showOv('➗ Equation Builder','','Drag number tiles into the boxes (or just tap them) so both sides are equal.<br>Tap a placed tile to take it back. Any true equation counts!',[['😊 Easy (+ −)','',()=>start('easy')],['🙂 Normal (+ − ×)','o',()=>start('normal')],['😤 Hard (÷ and decoys)','r',()=>start('hard')]]);Duo.addButtons($('#ovB'),{game:'equation-builder',start:()=>start('normal'),cpu:[300,1200],hw:true,unit:' pts'})}
 $('#bh').onclick=hint;$('#bc').onclick=clearAll;
 eqn={vals:[1,1],ops:[]};tiles=[];slots=[];score=0;streak=0;best=0;time=0;solved=0;upd();menu();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

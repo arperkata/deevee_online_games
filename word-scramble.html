@@ -55,7 +55,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 .tile.u{background:#2a5da8!important;color:#2a5da8;text-shadow:none;border-color:#2a5da8;box-shadow:inset 0 4px 0 #0f2f57;pointer-events:none}
 #acts .btn.sm{font-size:clamp(14px,3.8vw,18px)}
 @media (max-height:480px){#top{padding-top:6px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 <div id="top"><div class="pill">⭐ <b id="sc">0</b></div><div class="pill">🏆 <b id="bs">0</b></div><div class="pill">⏱ <b id="tm">90</b></div><div class="pill">🔥 <b id="st">0</b></div></div>
 <div id="pbar"><div id="pfill"></div></div>
@@ -166,5 +167,5 @@ $('#bShuf').onclick=()=>{if(!run||lock)return;ans=ans.slice(0,0);hints=0;shuffle
 $('#bClr').onclick=()=>{if(!run||lock)return;ans=ans.slice(0,hints);render()};
 $('#bSkip').onclick=()=>{if(!run||lock)return;streak=0;time-=3;beep(200,.15);upd();if(time<=0)end();else next()};
 document.addEventListener('keydown',e=>{if(document.querySelector('.duoOv'))return;if(!run||lock||e.ctrlKey||e.metaKey)return;if(e.key==='Backspace'){if(ans.length>hints){ans.pop();render()}e.preventDefault()}else if(/^[a-z]$/i.test(e.key)){const c=e.key.toLowerCase();const i=tiles.findIndex((x,j)=>x===c&&!ans.includes(j));if(i>=0)place(i)}else if(e.key==='Enter'){document.activeElement.blur()}});
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

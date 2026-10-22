@@ -48,7 +48,8 @@ button.go:active{transform:translateY(4px);box-shadow:0 2px 0 #1c701c}
 .c.tg .h::after{content:'';position:absolute;inset:12%;border-radius:50%;background:#4ade5a;border:4px solid #fff;animation:pl .7s infinite alternate}
 @keyframes pl{to{transform:scale(1.15)}}
 .p.in{animation:pi .3s}
-@keyframes pi{0%{transform:scale(.3)}70%{transform:scale(1.15)}}</style></head><body>
+@keyframes pi{0%{transform:scale(.3)}70%{transform:scale(1.15)}}</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <div id="top"><h1>Peg Solitaire</h1><span class="pill">Pegs <b id="pg">32</b></span><span class="pill">Combo <b id="cb">0</b></span><span class="pill">Score <b id="sc">0</b></span><span class="pill">Best <b id="bs">0</b></span><button class="mute" id="mute" aria-label="Sound">🔊</button></div>
 <div id="stage"><div id="wrap"><div id="bd"></div></div>
@@ -190,5 +191,5 @@ if(window.ResizeObserver)new ResizeObserver(fit).observe($('wrap'));
 reset();fit();
 startScreen('📍','Peg Solitaire','Jump a peg over a neighbor into an empty hole - the jumped peg disappears. Clear the board until only 1 peg is left! Chain jumps with one peg for combos.',()=>{started=true;reset()});
 Duo.addButtons($('mt'),{game:'peg-solitaire',start:()=>{started=true;$('msg').style.display='none';reset()},cpu:[2,9],hw:false,unit:' pegs',fmt:v=>Math.round(v)+(Math.round(v)===1?' peg left':' pegs left')});
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

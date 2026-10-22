@@ -53,7 +53,8 @@ button.go.alt{background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9
 #holds .chip{width:100%;min-width:0;padding:0 2px;font-size:clamp(13px,3.4vw,16px)}
 #holds .chip.on{background:linear-gradient(#ffe14a,#ffb21f)}
 @media (orientation:landscape) and (max-height:520px){:root{--bw:calc((100dvh - 168px)*1.2)}#ctl{display:flex}#jp{min-width:0;width:100%}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <div id="top"><div class="pill">🪙 <b id="coins">1000</b></div><div class="pill">🏆 <b id="best">1000</b></div><button class="mute" id="mute" aria-label="Mute">🔊</button></div>
 <div id="main">
@@ -166,5 +167,5 @@ function frame(t){update(t);draw(t);requestAnimationFrame(frame)}
 $('spin').onclick=spin;[0,1,2].forEach(i=>{$('h'+i).onclick=()=>toggleHold(i);$('n'+i).onclick=()=>nudge(i)});
 addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='Enter')&&!document.querySelector('.ov.show')){e.preventDefault();spin()}});
 buildBets();showCoins();showJP();refreshBtns();requestAnimationFrame(frame);
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

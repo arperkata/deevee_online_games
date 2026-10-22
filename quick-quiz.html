@@ -53,7 +53,8 @@ body{background:linear-gradient(#27a2e8,#bdeafc) fixed;font-family:'Fredoka','Tr
 .card p{white-space:pre-line}
 @media (max-width:560px){#bar{padding:52px 8px 0}.a{min-height:48px}#ans{gap:8px}}
 @media (max-height:480px){#bar{padding:6px 8px 0 108px;min-height:44px}#ans{grid-template-columns:1fr 1fr!important;gap:8px}.a{min-height:40px;padding:4px 8px}#card{padding:8px;margin-top:8px}#q{margin:4px 0 8px;font-size:clamp(16px,4vh,22px)}#pts{height:20px;font-size:18px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <div id="bar"><span>Q <b id="qn">0</b>/10</span><span>Score <b id="sc">0</b></span><span>Streak 🔥<b id="st">0</b></span><span>Best <b id="bs">0</b></span><button id="mute" class="btn sm">🔊</button></div>
 <div id="app"><div id="tbw"><div id="tb"></div></div><div id="card"><div id="cat"></div><div id="q"></div><div id="ans"></div><div id="pts"></div><div id="fact" hidden></div><button class="btn" id="next" hidden>Next ➜</button></div></div>
@@ -226,5 +227,5 @@ function sz(){cf.width=innerWidth;cf.height=innerHeight}sz();addEventListener('r
 function confetti(n){for(let i=0;i<20+Math.min(n,10)*8;i++)ps.push({x:innerWidth/2,y:innerHeight/2.5,vx:(Math.random()-.5)*14,vy:-Math.random()*12,l:70,c:['#ffd23f','#ff6b6b','#5fd35f','#fff','#6bc4ff'][i%5]});if(!run){run=true;cl()}}
 function cl(){cx.clearRect(0,0,cf.width,cf.height);ps=ps.filter(p=>p.l>0);for(const p of ps){p.x+=p.vx;p.y+=p.vy;p.vy+=.5;p.l--;cx.globalAlpha=Math.min(1,p.l/20);cx.fillStyle=p.c;cx.fillRect(p.x,p.y,8,8)}cx.globalAlpha=1;if(ps.length)requestAnimationFrame(cl);else run=false}
 ui();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

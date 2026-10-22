@@ -60,7 +60,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 .kk:active{transform:translateY(3px);box-shadow:0 1px 0 #3f78b4}
 .kk.d{max-width:72px;flex:1.5;background:linear-gradient(#ff8a8a,#d63030);color:#fff;box-shadow:0 4px 0 #8f1c1c}
 #acts{display:flex;gap:8px}#acts .btn{font-size:clamp(15px,2.8vh,19px);padding:2px 14px}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <button id="mute" aria-label="Sound on/off">🔊</button>
 <div id="ov" class="ov"><div class="card"><div class="big" id="oe"></div><h1 id="ot"></h1><p id="op"></p><div class="stars" id="os"></div><div id="oextra"></div><button class="btn" id="obtn">Play</button></div></div>
@@ -218,5 +219,5 @@ function loop(){if(running&&!busy){tt=(performance.now()-t0)/1000;const t=Math.f
 order=shuffle(PZ.map((x,i)=>i));total=0;running=false;busy=true;pi=0;setup(PZ[order[0]]);sel=null;dir='A';build();render();fit();loop();
 overlay({e:'📰',t:'Mini Crossword',p:'Tap a square, read the clue, type the letters. Tap a crossing square again to switch Across/Down. 3 mini puzzles per round - go fast for more points!<br>Best: '+best,btn:'Start!',go:newGame});duoBtns();
 
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

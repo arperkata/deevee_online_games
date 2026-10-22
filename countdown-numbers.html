@@ -56,7 +56,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 #acts .k{height:48px;font-size:clamp(14px,3.6vw,18px);padding:0 2px}
 #info{min-height:2.6em;font-size:clamp(14px,3vh,18px);font-weight:bold;text-align:center;line-height:1.3;max-width:100%}
 @media (max-height:480px){#acts .k,.op{height:40px}#info{min-height:1.4em}#game{gap:4px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Sound">🔊</button>
 <div class="ov" id="ov"><div class="card"><h1 id="ovT"></h1><div class="stars" id="ovS"></div><p id="ovP"></p><div id="ovB"></div></div></div>
 
@@ -196,5 +197,5 @@ function menu(){showOv('🎯 Countdown Numbers','','Reach the target using the 6
 OPS.forEach(o=>{const b=document.createElement('button');b.className='k op';b.dataset.o=o;b.textContent=o;b.onclick=()=>{if(!run||busy)return;if(selA===null){info('Pick a number first');return}selOp=selOp===o?null:o;beep(450,.05);render()};$('#ops').appendChild(b)});
 $('#bu').onclick=undo;$('#br').onclick=reset;$('#bh').onclick=hint;$('#bg').onclick=()=>{if(run&&!busy)finishRound('submit')};
 tiles=[];hist=[];score=0;streak=0;best=0;time=0;round=1;target=0;upd();menu();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

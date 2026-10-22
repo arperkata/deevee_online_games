@@ -51,7 +51,8 @@ html,body{background:radial-gradient(circle at 50% 20%,#34346e,#0e0e2b 80%) fixe
 .st.has{background:#ffd93b}
 .st.now{background:#fff;transform:scale(1.35);border-color:#ff4b4b}
 .st.has.now{background:#ff4b4b}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Mute">🔊</button>
 <canvas id="fx"></canvas>
 <div id="ov" class="hide"><h1 id="ot"></h1><p id="om"></p><div id="ob"></div></div>
@@ -148,5 +149,5 @@ for(var i=0;i<16;i++){var s=document.createElement('div');s.className='st'+(i%4=
 addEventListener('keydown',function(e){if(e.repeat||e.ctrlKey||e.metaKey||!$('ov').classList.contains('hide'))return;if(e.key===' '){e.preventDefault();$('bPlay').onclick();return}var i=KEYS.indexOf(e.key.toLowerCase());if(i>=0)hit(i,true)});
 fit();vis();
 ov('🥁 Drum Pad','Tap the pads to jam! Press <b>Rec</b>, tap a beat, and it <b>loops</b> back.',[{t:'Let\'s Jam!',f:function(){}}]);
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

@@ -68,7 +68,8 @@ button{font-family:inherit}
 .tg{flex:1;background:#fff;color:#1b4f86;text-shadow:none;border:4px solid #ffd84a;border-radius:20px;font-weight:bold;font-size:clamp(30px,9vmin,54px);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 0 #0f2f57;min-height:56px}
 #done{flex:1}
 @media (max-height:480px){#play{flex-direction:row}#opts{flex-direction:column;width:34%}#opts .opt,.tg{min-height:0;flex:1}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Sound">🔊</button>
 <div id="top"><div class="pill">⭐ <b id="sc">0</b></div><div class="pill">🏆 <b id="bs">0</b></div><div class="pill">🎯 <b id="rd">0</b>/<span id="tt"></span></div><div class="pill">🔥 <b id="st">0</b></div></div>
 <div id="game"><div id="mas"><div id="mc"></div><div id="bub">Hi friend! Let's play!</div><button id="hear" aria-label="Hear again">🗣️</button></div>
@@ -245,5 +246,5 @@ function check(){
  if(t===(T.h%12)*60+T.m){solved(!tried,$('#done'),`It is ${words(T)}!`)}
  else miss($('#done'),'Not yet. Drag the long blue hand around. The short red hand follows!');
 }
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

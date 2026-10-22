@@ -35,7 +35,8 @@ canvas{position:fixed;left:0;top:0;width:100%;height:100%;touch-action:none}
 #bar{width:min(340px,80vw);height:18px;background:#0f2f57;border:3px solid #fff;border-radius:10px;overflow:hidden;box-shadow:0 3px 0 #0f2f57}
 #fill{height:100%;background:linear-gradient(#ffd84a,#f08a12)}
 @media (max-height:480px){#hud{padding-top:6px;gap:4px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <canvas id="cv"></canvas>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 <div id="hud"><div id="row"><div class="pill">⭐ <b id="sc">0</b></div><div class="pill">🏆 <b id="bs">0</b></div><div class="pill">🎯 Lv <b id="lvl">1</b></div><div class="pill" id="lives">❤️❤️❤️</div><div class="pill">🔥 <b id="cb">0</b></div></div>
@@ -160,5 +161,5 @@ g.font='bold '+Math.round(b.r*1.0)+"px 'Fredoka','Trebuchet MS',sans-serif";g.li
 P.forEach(p=>{g.globalAlpha=Math.max(0,p.l);g.fillStyle=p.c;g.beginPath();g.arc(p.x,p.y,4,0,6.3);g.fill()});g.globalAlpha=1;g.restore()}
 $('#go').onclick=()=>{if(Duo.active())Duo.end();startGame()};hud();
 Duo.addButtons(document.querySelector('#ov .card'),{game:'bubble-pop-math',start:()=>startGame(),cpu:[150,900],hw:true,unit:' pts'});
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

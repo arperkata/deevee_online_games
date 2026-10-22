@@ -46,7 +46,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 #ctl{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 #ctl .btn{font-size:17px;padding:6px 16px}
 @media (orientation:landscape) and (max-height:520px){:root{--b:calc(100dvh - 64px)}#game{justify-content:center}#wrap{flex-direction:row}#ctl{flex-direction:column}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Sound">🔊</button>
 <div id="top"><span class="pill" id="pr">Puzzle 1/5</span><span class="pill" id="ps">⭐ 0</span><span class="pill" id="pt">⏱ 0s</span><span class="pill" id="pm">🔄 0</span></div>
 <div id="game"><div id="wrap"><div id="board"><canvas id="pv" width="300" height="300" class="hide"></canvas></div><div id="ctl"><button class="btn p" id="bpv">👁 Preview</button></div></div></div>
@@ -209,5 +210,5 @@ function up(e){
   else doSwap(sel,d.slot)}
 board.addEventListener('pointerup',up);board.addEventListener('pointercancel',e=>{if(drag){drag.el.classList.remove('drag');drag.el.style.transform='';drag=null;layout()}});
 $('bpv').onclick=()=>{if(state!=='play')return;const h=pvc.classList.toggle('hide');$('bpv').textContent=h?'👁 Preview':'🙈 Hide';sfx.tap()};
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

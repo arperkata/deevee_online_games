@@ -45,7 +45,8 @@ body>.row:first-of-type{margin-top:46px}#mute{left:108px;right:auto}#bd{grid-col
 .tile.ok .in{box-shadow:0 4px 0 var(--c3),inset 0 3px 0 rgba(255,255,255,.45),0 0 0 3px #fff}
 .tile:active .in{transform:scale(.95)}
 @media(max-height:520px) and (min-width:560px){.hintp{display:none}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Mute">🔊</button><canvas id="fx"></canvas>
 <div class="row top"><div class="stat">Level<b id="lv">1</b></div><div class="stat">Moves<b id="mv">0</b></div><div class="stat">Score<b id="sc">0</b></div><div class="stat">Best<b id="bs">0</b></div><div class="stat">Streak 🔥<b id="st">0</b></div></div>
 <div class="row"><button class="btn sel" id="z3">3x3</button><button class="btn b2" id="z4">4x4</button><button class="btn b2" id="md">🍎 Emoji</button><button class="btn b2" id="sh">🔀 Reshuffle</button><button class="btn b2" id="mnb">☰ Menu</button></div>
@@ -184,5 +185,5 @@ addEventListener('keydown',e=>{if(document.querySelector('.duoOv')||$('mn').clas
 const q=a.indexOf(0),r=(q/n|0)+k[0],c=q%n+k[1];if(r<0||r>=n||c<0||c>=n)return;move(a[r*n+c])});
 let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(fit,120)});
 newGame();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

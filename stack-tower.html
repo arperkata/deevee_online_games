@@ -24,7 +24,8 @@ canvas{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);border-rad
 #go:active{animation:none}
 @keyframes pulse{50%{transform:scale(1.07)}}
 @media (max-height:430px){#ov{gap:6px;padding:8px}#ov h1{font-size:28px}#ov p{font-size:14px;padding:6px 14px}.big{font-size:1.5em}.stars{font-size:1.6em}.btn{font-size:20px;padding:6px 28px;min-height:44px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Mute">🔊</button>
 <canvas id="c"></canvas>
 <div id="ov"><h1 id="t">🏗️ Stack Tower</h1><p id="m">Tap to drop the sliding block. Overhang gets cut off. Land it perfectly for bonus points!</p><button class="btn" id="go">▶ Play</button></div>
@@ -161,5 +162,5 @@ pill(8,8,128,38);pill(W-120,8,112,38);x.font='bold 20px Fredoka,Trebuchet MS,san
 texts=texts.filter(q=>q.l>0);x.textAlign='center';x.font='bold 28px Fredoka,Trebuchet MS,sans-serif';x.lineWidth=6;for(const q of texts){q.y-=.8*dt;q.l-=dt;x.globalAlpha=Math.min(1,q.l/20);x.strokeText(q.t,q.x,q.y);x.fillStyle=q.c||'#fff';x.fillText(q.t,q.x,q.y)}x.globalAlpha=1;x.fillStyle='#fff';
 requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

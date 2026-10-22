@@ -73,7 +73,8 @@ button.go:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
 .chip[disabled]{background:#7d8aa0;cursor:default}
 #acts .btn,#bets .btn.g{font-size:20px;min-height:52px;padding:0 22px}
 @media(orientation:landscape) and (max-height:520px){#stage{flex-direction:row}#ctl{width:170px;justify-content:center}#bets,#acts{flex-direction:column}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <div id="top"><h1>Twenty-One</h1><span class="pill">Points <b id="pts">100</b></span><span class="pill">Bet <b id="bt">10</b></span><span class="pill">Streak <b id="st">0</b>🔥</span><span class="pill">Best <b id="bs">0</b></span><span class="pill" id="duelInfo" style="display:none"></span><button class="btn o" id="cash">💰 Cash out</button><button class="mute" id="mute">🔊</button></div>
 <div id="stage"><div id="table">
@@ -285,5 +286,5 @@ $('cash').onclick=()=>{if(phase=='bet'&&!busy){if(DUEL){SP[cur]={pts,bet,streak}
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(k=='h')hit();else if(k=='s')stand();else if(k=='d'&&phase=='play')dbl();else if(k==' '||k=='enter'){if(phase=='bet'&&$('msg').style.display!='flex')deal()}});
 addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,200));
 showMenu();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

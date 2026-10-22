@@ -48,7 +48,8 @@ button.go.alt{background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9
 #sc{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair;transition:opacity .45s}
 #sc.gone{opacity:0;pointer-events:none}
 @media (orientation:landscape) and (max-height:520px){:root{--bs:calc(100dvh - 78px)}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <div id="top"><div class="pill">🪙 <b id="coins">1000</b></div><div class="pill">🏆 <b id="best">1000</b></div><button class="mute" id="mute" aria-label="Mute">🔊</button></div>
 <div id="main">
@@ -139,5 +140,5 @@ $('rev').onclick=()=>{if(state==='scratch')reveal()};
 $('buy').onclick=buy;
 addEventListener('keydown',e=>{if(e.code==='Enter'&&!document.querySelector('.ov.show'))buy()});
 buildBets();showCoins();onBet();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

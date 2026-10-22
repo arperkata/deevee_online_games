@@ -44,7 +44,8 @@ html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;backgrou
 .el small{font-size:11px;font-weight:700}
 .el.on{background:#ffd93b;outline:3px solid #fff}
 .sz{font-size:18px;min-width:44px}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Mute">🔊</button>
 <canvas id="fx"></canvas>
 <div id="ov" class="hide"><h1 id="ot"></h1><p id="om"></p><div id="ob"></div></div>
@@ -159,5 +160,5 @@ $('bPause').onclick=function(){paused=!paused;this.textContent=paused?'▶':'⏸
 $('bClear').onclick=function(){ov('🗑️ Clear the sandbox?','Everything will vanish. Ready for a fresh start?',[{t:'Yes, clear',c:'alt',f:function(){T.fill(0);L.fill(0);U.fill(0);tone(500,.4,'sawtooth',.08,80);toast('Fresh sand!')}},{t:'Keep playing',f:function(){}}])};
 buildEls();init();loop();
 ov('⏳ Gravity Sandbox','Pick <b>sand, water, stone, wood or fire</b> and draw! Water puts out fire, and wood burns.',[{t:'Start Playing',f:function(){}}]);
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

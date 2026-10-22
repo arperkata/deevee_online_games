@@ -89,7 +89,8 @@ body{background:radial-gradient(ellipse at 50% 40%,#3a3fc9,#1a1a66 80%)}
 #ctl{display:flex;justify-content:center;gap:10px;min-height:48px}
 #pass{display:none}
 @media(max-height:520px){.opp{padding:1px 8px;font-size:14px}.opp .av{font-size:22px}#opps{min-height:40px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <div id="top"><h1>Rainbow Rush</h1><span class="pill">Streak <b id="stk">0</b>🔥</span><span class="pill">Best <b id="bs">0</b></span><button class="btn g" id="pass">Pass ➜</button><button class="mute" id="mute">🔊</button></div>
 <div id="stage">
@@ -301,5 +302,5 @@ $('menuB').onclick=()=>{beep(520);HOT=false;CPUN=false;NMS=['You','Player 2'];st
 addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,200));
 $('bs').textContent=getBest('best');
 fit();startScreen();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

@@ -59,7 +59,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 #ans .btn[disabled]{background:linear-gradient(#aab8c8,#7d8da0);box-shadow:0 5px 0 #56657a;text-shadow:0 2px 0 #56657a;cursor:default}
 @media (max-height:480px){#left{width:min(50vw,420px)}#shapeBox{height:calc(100dvh - 70px)}#shape{font-size:clamp(60px,36vh,120px)}#ans{width:min(40vw,320px);grid-template-columns:1fr}#ans .btn{min-height:calc(50dvh - 50px)}#info{max-width:40vw}}
 .duoPill{top:auto!important;bottom:6px}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 <div id="top"><div class="pill">&#11088; <b id="sc">0</b></div><div class="pill">&#127942; <b id="bs">0</b></div><div class="pill" id="tr">1/24</div><div class="pill">&#128293; <b id="st">0</b></div></div>
 <div id="game"><div id="left"><div id="shapeBox"><span id="tag"></span><div id="shape"></div></div><div class="bar"><div id="fill"></div></div><div id="info"></div></div>
@@ -188,5 +189,5 @@ function onKey(e){if(e.key==='ArrowLeft'||e.key==='s'||e.key==='y')answer(true);
 $('#bSame').onpointerdown=e=>{e.preventDefault();answer(true)};$('#bDiff').onpointerdown=e=>{e.preventDefault();answer(false)};
 function intro(){sid++;run=false;overlay('🧠 N-Back Shapes','','Shapes appear one at a time.<br>Is the shape the <i>same</i> as the one before?<br><b>1-Back:</b> compare with the last shape.<br>🔺 → 🔺 = Same! &nbsp; 🔺 → ⭐ = Different.<br><b>2-Back:</b> compare with 2 shapes ago.<br>🔺 ⭐ 🔺 = Same!<br>Tap fast, you get 3 seconds each.',[['🟢 1-Back (easy)',()=>start(1)],['🟣 2-Back (hard)',()=>start(2),'p']]);duoBtns()}
 best=0;score=0;streak=0;idx=0;setBtns(false);intro();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

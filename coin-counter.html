@@ -78,7 +78,8 @@ button{font-family:inherit}
 .sm.r{background:linear-gradient(#ff8a8a,#d63030);box-shadow:0 5px 0 #8f1c1c;text-shadow:0 2px 0 #8f1c1c}
 .sm:active{transform:translateY(4px)}
 @media (max-height:480px){#info .chip{font-size:18px}#purse .coin{--ps:48px!important}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Sound">🔊</button>
 <div id="top"><div class="pill">⭐ <b id="sc">0</b></div><div class="pill">🏆 <b id="bs">0</b></div><div class="pill">🎯 <b id="rd">0</b>/<span id="tt"></span></div><div class="pill">🔥 <b id="st">0</b></div></div>
 <div id="game"><div id="mas"><div id="mc"></div><div id="bub">Hi friend! Let's play!</div><button id="hear" aria-label="Hear again">🗣️</button></div>
@@ -244,5 +245,5 @@ function guess(b,v){
  if(v===target){b.classList.add('good');solved(!tried,b,`${target} star coins!`)}
  else{b.classList.add('bad');miss(b,'Not quite. Tap each coin to hear its number, then add!')}
 }
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

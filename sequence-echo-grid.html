@@ -57,7 +57,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 .pd.off{cursor:default}
 #info{min-height:30px}
 @media (max-height:480px){#bw{width:min(calc(100dvh - 90px),calc(50vw - 40px))}#info{max-width:34vw}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 <div id="top"><div class="pill">&#11088; <b id="sc">0</b></div><div class="pill">&#127942; <b id="bs">0</b></div><div class="pill">&#128257; <b id="ln">2</b></div><div class="pill" id="lf"></div></div>
 <div id="game"><div class="board" id="bw0"><div id="bw"><div id="board"></div></div></div><div id="info"></div></div>
@@ -187,5 +188,5 @@ function end(){run=false;phase='end';if(Duo.active()&&Duo.finish(score)){hud();r
 best=load('best');score=0;lives=3;seq=null;hud();
 overlay('🔁 Sequence Echo','','9 shape pads light up in order.<br>Watch, then <i>tap the same order</i>!<br>The pattern grows by one each round.<br>3 lives ❤️',[['▶ Play',start]]);
 Duo.addButtons($('#ovB'),{game:'sequence-echo-grid',start:duoStart,hw:true,cpu:[100,450],unit:' pts'});
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

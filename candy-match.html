@@ -17,7 +17,8 @@ body{background:linear-gradient(#27a2e8,#bdeafc) fixed;font-family:'Fredoka','Tr
 #ov.hide{display:none}
 #ov h1{margin:0;font-size:clamp(28px,8vw,44px)}#ov p{margin:0;font-size:18px;max-width:340px}
 canvas{display:block;margin:6px auto 0;width:min(96vw,calc(100vh - 80px));min-width:240px;height:auto;aspect-ratio:1;touch-action:none;background:#14407a;border-radius:18px;box-shadow:0 8px 0 #0c2c58,0 14px 30px rgba(0,0,0,.35)}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <div id="bar"><span>Score <b id="sc">0</b></span><span>Moves <b id="mv">30</b></span><span>Goal <b id="tg">0</b></span><span>Best <b id="bs">0</b></span><button id="mute" class="btn sm">🔊</button></div>
 <canvas id="c" width="480" height="480"></canvas>
@@ -174,5 +175,5 @@ parts=parts.filter(p=>p.l>0);for(const p of parts){p.x+=p.vx;p.y+=p.vy;p.vy+=.4;
 texts=texts.filter(q=>q.l>0);x.font='bold 30px Fredoka,Trebuchet MS,sans-serif';x.lineWidth=6;x.strokeStyle='#1b4f86';x.fillStyle='#fff';for(const q of texts){q.y-=.8;q.l--;x.globalAlpha=Math.min(1,q.l/20);x.strokeText(q.t,q.x,q.y);x.fillText(q.t,q.x,q.y)}x.globalAlpha=1;
 requestAnimationFrame(loop)}
 shuffleBoard();ui();requestAnimationFrame(loop);
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

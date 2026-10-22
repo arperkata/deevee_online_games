@@ -52,7 +52,8 @@ body{background:linear-gradient(#27a2e8,#bdeafc)}
 #prev{font-weight:700;font-size:clamp(12px,3vw,16px);background:#0b3a78;border-radius:999px;padding:3px 12px;border:2px solid #ffe14a}
 button.go.end{margin:0;font-size:clamp(18px,4.5vw,24px);width:100%}
 @media (max-height:500px) and (orientation:landscape){#main{flex-direction:row;flex-wrap:wrap;align-content:center}#goal{order:0;width:100%}#stage{width:auto;flex:1;height:calc(100% - 50px)}#side{width:220px;max-width:220px}#tools{flex-wrap:wrap}.t{flex:1 1 30%;min-height:44px}.t small{display:none}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button class="mute" id="mute" aria-label="Sound">🔊</button>
 
 <div id="hud"><span class="pill">💰 <b id="mo">0</b></span><span class="pill">🍎 <b id="fo">0</b></span><span class="pill">😊 <b id="ha">0</b></span><span class="pill">👥 <b id="po">0</b></span><span class="pill">Turn <b id="tu">1</b>/<b id="tl">12</b></span><span class="pill">Best <b id="bs">0</b></span></div>
@@ -134,5 +135,5 @@ $('et').onclick=endTurn;
 addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){if($('msg').style.display!=='flex')endTurn()}const m={1:'h',2:'f',3:'k',4:'p',5:'s',6:'x'}[e.key];if(m){sel=m;ui()}});
 G=Array.from({length:N},()=>new Array(N).fill(null));money=0;food=0;pop=0;turn=1;ui();fit();
 showBox('<span class="em">🏙️</span><h2>City Builder</h2>Place 🏠 houses, 🌾 farms, 🏭 factories, 🌳 parks &amp; 🏪 shops.<br>Balance <b>food, money &amp; happiness</b>, then tap <b>Next Season</b>.<br>Reach each level goal before time runs out!','Start ▶',()=>{lv=0;total=0;startGame()});
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

@@ -58,7 +58,8 @@ body{background:linear-gradient(#27a2e8,#bdeafc) fixed}
 .chip.on{outline:4px solid #ffd84a;transform:scale(1.1)}
 @media (min-aspect-ratio:23/20){#side{flex-direction:column;width:230px}#sideTxt{width:100%}#dieBox{--dsz:70px}}
 @media (max-height:480px){#side{gap:6px}#dieBox{padding:12px 10px 10px}#dieBox{--dsz:46px}#msg{min-height:40px;font-size:14px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 <div id="top"><div id="chips" style="display:contents"></div><div class="pill">🏆 Wins <b id="bw">0</b></div></div>
 <div id="main"><canvas id="bd" width="600" height="600"></canvas><div id="side"><div id="dieBox"></div><div id="sideTxt"><div id="msg"></div><button class="btn" id="roll">🎲 Roll</button></div></div></div>
@@ -226,5 +227,5 @@ cv.addEventListener('pointerdown',e=>{if(!pickRes||!movable.length)return;e.prev
 addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();rollClick()}});
 function fit(){fitBoard(cv,$('#main'),250,110)}addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,200));
 drawBG();fit();wins=load('wins');pls=[];requestAnimationFrame(frame);menu();ui();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

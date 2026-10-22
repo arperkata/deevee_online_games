@@ -72,7 +72,8 @@ button.go:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
 #ctl{display:flex;justify-content:center;gap:12px}
 #flipb{font-size:22px;min-width:150px;min-height:54px}
 @media(orientation:landscape) and (max-height:520px){:root{--cw:clamp(34px,min(12vw,17dvh),80px)}#stage{flex-direction:row}#mid{display:flex;flex-direction:column;align-items:center;gap:6px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <div id="top"><h1>Card War</h1><span class="pill">Round <b id="rd">0</b></span><span class="pill" id="bsp">Fastest win <b id="bs">-</b></span><button class="mute" id="mute">🔊</button></div>
 <div id="stage">
@@ -217,5 +218,5 @@ $('spd').onclick=function(){mode=(mode+1)%3;this.textContent=['▶ Manual','⏩ 
 addEventListener('keydown',e=>{if(e.key==' '||e.key=='Enter')round()});
 function menu(){over=true;overlay({em:'⚔️',title:'Card War',btn:'🤖 vs Computer',cb:async()=>{const n=await Duo.askNames({cpu:true});if(!n){menu();return}nm=[n[0],'🤖 Computer'];pm='cpu';newGame()},alt:{t:'👥 2 Players',cb:async()=>{const n=await Duo.askNames();if(!n){menu();return}nm=n;pm='two';newGame()}},html:'Flip a card - highest wins both!<br>Tie = <b>WAR</b>: 3 cards down, 1 up.<br>Win all 52 cards. Tap <b>Speed</b> to auto-play!<br>2 players: each taps their own deck to flip.'})}
 newGame();menu();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

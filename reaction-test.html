@@ -22,7 +22,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 .pt{position:fixed;left:50%;top:40%;font-size:34px;z-index:60;pointer-events:none;animation:fly 1.1s ease-out forwards}
 @keyframes fly{to{transform:translate(var(--dx),var(--dy)) rotate(360deg);opacity:0}}
 @keyframes shake{20%{transform:translateX(-14px)}40%{transform:translateX(14px)}60%{transform:translateX(-9px)}80%{transform:translateX(9px)}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="mute">🔊</button>
 <div id="wrap"><div id="pad"><div id="big">⚡ Reaction Test</div><div id="sub">Tap when it turns GREEN. 5 tries!</div></div>
 <div id="dots"></div><div id="best"></div><div id="duoRow"></div></div>
@@ -137,5 +138,5 @@ pad.addEventListener('pointerdown',e=>{e.preventDefault();press()});
 addEventListener('keydown',e=>{if(document.querySelector('.duoOv')||(e.target&&/^(INPUT|BUTTON)$/.test(e.target.tagName)))return;if((e.code==='Space'||e.code==='Enter')&&!e.repeat){e.preventDefault();press()}});
 drawDots();drawBest();
 Duo.addButtons($('duoRow'),{game:'reaction-test',start:()=>{clearTimeout(timer);tries=[];drawDots();next();$('duoRow').style.display='none'},cpu:[210,380],hw:false,unit:' ms',fmt:v=>Math.round(v)+' ms'});
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

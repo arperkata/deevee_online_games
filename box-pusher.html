@@ -45,7 +45,8 @@ button.go:active{transform:translateY(4px);box-shadow:0 2px 0 #1c701c}
 #dp #u{grid-column:2}
 #ctl{gap:14px}
 .col{display:flex;gap:10px}
-@media (orientation:landscape) and (max-height:520px){.col{flex-direction:column}#dp{grid-template-columns:repeat(3,46px);grid-template-rows:repeat(2,46px)}#dp .btn{width:46px;height:46px}}</style></head><body>
+@media (orientation:landscape) and (max-height:520px){.col{flex-direction:column}#dp{grid-template-columns:repeat(3,46px);grid-template-rows:repeat(2,46px)}#dp .btn{width:46px;height:46px}}</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <div id="top"><h1>Box Pusher</h1><span class="pill">Level <b id="lv">1</b></span><span class="pill">Moves <b id="mv">0</b></span><span class="pill">Pushes <b id="pu">0</b></span><span class="pill">Best <b id="bs">0</b></span><button class="mute" id="mute" aria-label="Sound">🔊</button></div>
 <div id="stage"><div id="wrap"><canvas id="cv" width="400" height="400"></canvas></div>
@@ -225,5 +226,5 @@ const DUOSEQ=[3,4,5];let duoQ=0,duoM=0;
 load(0);requestAnimationFrame(loop);
 duoW=Duo.addButtons($('box'),{game:'sokoban-push',start:()=>{$('msg').style.display='none';started=true;score=0;streak=0;duoQ=0;duoM=0;load(DUOSEQ[0])},cpu:[45,95],hw:false,unit:' moves'});
 startScreen('📦','Box Pusher','Push every box onto a red target. You can only push, never pull! Use the arrows, swipe, or keys. Undo is free.',()=>{started=true;score=0;streak=0;load(0)});
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

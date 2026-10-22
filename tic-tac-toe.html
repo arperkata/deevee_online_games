@@ -45,7 +45,8 @@ body>.row:first-of-type{margin-top:46px}#mute{left:108px;right:auto}#bd{grid-col
 .c span{display:inline-block;animation:pn .25s}
 @keyframes pn{from{transform:scale(.1) rotate(-90deg)}to{transform:scale(1)}}
 @keyframes wob{to{transform:scale(1.07)}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Mute">🔊</button><canvas id="fx"></canvas>
 <div class="row top"><div class="stat"><span id="l1">Streak 🔥</span><b id="st">0</b></div><div class="stat"><span id="l2">Best streak</span><b id="bst">0</b></div><div class="stat"><span id="l3">Score</span><b id="sc">0</b></div><div class="stat" id="s4"><span>Best score</span><b id="bs">0</b></div></div>
 <div class="row"><button class="btn sel" id="me">😊 Easy</button><button class="btn b2" id="mh">🧠 Hard</button><button class="btn b2" id="chg">👥 Change players</button></div>
@@ -190,5 +191,5 @@ const c=document.createElement('button');c.className='btn b2';c.textContent='�
 mb.appendChild(a);mb.appendChild(c)})();
 $('chg').onclick=()=>{beep(440);menu()};
 newRound();over=true;
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

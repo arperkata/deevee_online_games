@@ -45,7 +45,8 @@ body{font-family:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;background:
 #ctl .btn{min-width:120px}
 #hint{font-size:clamp(14px,3.6vw,19px);font-weight:bold;text-align:center;flex:none}
 @media (orientation:landscape) and (max-height:520px){:root{--b:min(76vh,48vw)}#game{flex-direction:row;gap:4vw}#ctl{flex-direction:column}#hint{display:none}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Sound">🔊</button>
 <div id="top"><span class="pill" id="pr">Round 1/10</span><span class="pill" id="ps">⭐ 0</span><span class="pill" id="pl">❤️❤️❤️</span><span class="pill" id="pk">🔥 0</span></div>
 <div id="bar"><div id="fill"></div></div>
@@ -204,5 +205,5 @@ function endM(){
   state='idle';clearInterval(tid);const st=won>=8?3:won>=5?2:1;
   finish({score,stars:st,emoji:st===3?'🪞':st===2?'😎':'🤔',title:st===3?'Symmetry Master!':st===2?'Nice reflection!':'Good try!',line:won+' / '+TOTAL+' mirrored'});
 }
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

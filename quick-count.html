@@ -53,7 +53,8 @@ body{flex-direction:row;justify-content:center}
 .o.good{background:linear-gradient(#7be07b,#2ea32e);color:#fff;text-shadow:0 2px 0 #1c701c;box-shadow:0 6px 0 #1c701c}
 .o.bad{background:linear-gradient(#ff8a8a,#d63030);color:#fff;text-shadow:0 2px 0 #8f1c1c;box-shadow:0 6px 0 #8f1c1c}
 @media (max-height:480px){#wrap{flex-direction:row;flex-wrap:wrap;width:min(calc(100vw - 150px),760px);align-content:center;gap:6px}#ask{order:0;flex:1 1 100%;text-align:center;padding:0 14px}#stage{flex:1 1 55%;height:calc(100dvh - 60px);min-height:0}#opts{flex:1 1 35%;width:auto;grid-template-columns:1fr 1fr}.o{height:clamp(46px,28vh,80px)}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 
 <div id="top"><div class="pill">⭐ <b id="sc">0</b></div><div class="pill">🎯 <b id="rd">0</b>/10</div><div class="pill">🔥 <b id="st">0</b></div><div class="pill">🏆 <b id="bs">0</b></div></div>
@@ -179,5 +180,5 @@ function end(){run=false;if(Duo.active()&&Duo.finish(score)){upd();return}const 
 best=load('best');upd();
 showOv('🔢 Quick Count','','Emoji flash on screen for a moment. Count them fast, then pick the right number!<br>Later rounds add sneaky extras: count only the one you are asked about.',[{t:'▶ Start',f:start}]);
 Duo.addButtons($('#ovB'),{game:'quick-count',start:duoStart,hw:true,cpu:[60,200],unit:' pts'});
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

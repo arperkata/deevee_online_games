@@ -43,7 +43,8 @@ button.go.alt{background:linear-gradient(#ffb21f,#f07a0a);box-shadow:0 5px 0 #a9
 #board{width:min(94vw,calc((100dvh - 290px)*400/560),400px);aspect-ratio:400/560;border-radius:20px;border:5px solid #ffe14a;box-shadow:0 8px 0 #4a0f5a,0 14px 24px rgba(0,0,0,.4);overflow:hidden;background:#14407a}
 #board canvas{width:100%;height:100%;display:block;touch-action:none}
 @media (orientation:landscape) and (max-height:520px){#board{width:calc((100dvh - 66px)*400/560)}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <div id="top"><div class="pill">🪙 <b id="coins">1000</b></div><div class="pill">🏆 <b id="best">1000</b></div><button class="mute" id="mute" aria-label="Mute">🔊</button></div>
 <div id="main">
@@ -139,5 +140,5 @@ $('drop').onclick=dropCoin;
 cv.addEventListener('pointerdown',e=>{dropCoin();e.preventDefault()});
 addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='Enter')&&!document.querySelector('.ov.show')){e.preventDefault();dropCoin()}});
 init();buildBets();showCoins();requestAnimationFrame(frame);
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

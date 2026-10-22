@@ -63,7 +63,8 @@ body{background:linear-gradient(#ff7fb0,#ffdcec) fixed}
 #btns{display:flex;gap:12px;width:100%}
 #btns .btn{flex:1;font-size:clamp(20px,5.5vw,28px);min-height:56px}
 @media (max-height:480px){#main{max-width:none;flex-direction:row;flex-wrap:wrap;justify-content:center;align-content:center;gap:6px}#cards{width:100%}.pc{padding:2px 6px 4px}.pc .sc{font-size:30px}#felt{width:min(60%,420px);padding:8px;flex-direction:row;flex-wrap:wrap;justify-content:center}#dice{--dsz:50px}#btns{width:34%;flex-direction:column}#btns .btn{min-height:44px;font-size:18px;padding:4px}#msg{min-height:26px;font-size:13px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 <div id="top"><div class="pill" id="pMode">🐷 Pig Dice</div><div class="pill">🏆 Wins <b id="bw">0</b></div><div class="pill">⚡ Fewest turns <b id="bs">-</b></div></div>
 <div id="main"><div id="cards"></div>
@@ -191,5 +192,5 @@ function menu(){gen++;over=true;ui();ov('🐷 Pig Dice','','Roll the die and pil
 $('#roll').onclick=()=>{if(!over&&!busy&&!ai[cur])doRoll()};$('#hold').onclick=()=>{if(!ai[cur])doHold()};
 addEventListener('keydown',e=>{if(e.key===' '||e.key==='r'||e.key==='Enter'){e.preventDefault();if(!over&&!busy&&!ai[cur])doRoll()}else if(e.key==='h'&&!ai[cur])doHold()});
 wins=load('wins');bestT=load('bestT');mkDice();menu();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

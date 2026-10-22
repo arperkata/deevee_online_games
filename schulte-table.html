@@ -50,7 +50,8 @@ body{flex-direction:row;justify-content:center}
 .c.bad{background:linear-gradient(#ff8a8a,#d63030);color:#fff!important}
 .c.hint{animation:hint .6s 2}
 @keyframes hint{50%{background:#ffd84a}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 
 <div id="top"><div class="pill">⏱ <b id="tm">0.0</b></div><div class="pill">👉 <b id="nx">1</b></div><div class="pill">❌ <b id="ms">0</b></div><div class="pill">🏆 <b id="bs">-</b></div></div>
@@ -170,5 +171,5 @@ function finish(){run=false;clearInterval(timer);const t=now();upd();$('#tm').te
  setTimeout(()=>showOv(nb?'🏆 New Best!':'🎉 Done!','⭐'.repeat(st),'Grid '+N+'×'+N+'<br>Time: <b>'+t.toFixed(1)+'s</b> &nbsp; Best: <b>'+best.toFixed(1)+'s</b><br>Mistakes: '+miss,
   [{t:'▶ Play Again',f:()=>start(N)},{t:'Change size',c:'o',f:menu}]),700)}
 menu();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

@@ -32,7 +32,8 @@ canvas{position:fixed;left:0;top:0;width:100%;height:100%;touch-action:none}
 @media (max-height:480px){.ov{padding:8px 12px}.card{flex-direction:row;flex-wrap:wrap;justify-content:center;max-height:calc(100vh - 16px);width:min(94vw,640px)}.card h1,.card p,.stars{flex:1 1 100%}.card .btn{width:auto;flex:1 1 auto;padding:8px 14px;font-size:16px}html,body{overflow-y:auto}}
 #hud{position:fixed;left:0;right:0;top:0;padding:52px 8px 0;pointer-events:none;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
 @media (max-height:480px){#hud{padding-top:6px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <canvas id="cv"></canvas>
 <a class="home" href="index.html">⌂ Home</a><button id="mute">🔊</button>
 <div id="hud"><div class="pill">⭐ <b id="sc">0</b></div><div class="pill">🏆 <b id="bs">0</b></div><div class="pill">⌨️ <b id="wpm">0</b> WPM</div><div class="pill">🎯 <b id="acc">100</b>%</div><div class="pill" id="lives">❤️❤️❤️❤️❤️</div><div class="pill">🔥 <b id="cb">0</b></div></div>
@@ -160,5 +161,5 @@ P.forEach(p=>{g.globalAlpha=Math.max(0,p.l*1.5);g.fillStyle=p.c;g.beginPath();g.
 if(flash>0){g.fillStyle='rgba(255,80,80,'+flash+')';g.fillRect(0,0,W,H)}}
 $('#go').onclick=startGame;stats();
 Duo.addButtons($('#ov .card'),{game:'typing-rain',start:()=>startGame(),cpu:[300,1400],hw:true,unit:' pts'});
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

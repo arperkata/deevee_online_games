@@ -61,7 +61,8 @@ body{background:linear-gradient(#ffd0f0,#bfe8ff) fixed}
 @media (min-aspect-ratio:12/10){
 #app{flex-direction:row;padding-top:6px}#panel{width:230px;justify-content:center;padding-top:54px}#board{padding-left:6px}
 }
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Mute">🔊</button>
 <div id="app"><div id="board"><div id="grid"></div></div>
 <div id="panel"><div id="chips"><span class="chip">🪙 <b id="coins">0</b></span><span class="chip">⚡ <b id="inc">0</b>/s</span></div>
@@ -159,5 +160,5 @@ let away=0;if(sd){away=inc()*clamp((Date.now()-(S.ts||Date.now()))/1000,0,7200)*
 build();fit();render();setTimeout(fit,60);last=Date.now();setInterval(tick,200);
 showOv('🐾 Merge Pets',sd?'Welcome back!'+(away>1?'<br>Your pets earned <b>'+fmt(away)+'</b> 🪙 while you were away.':''):'Buy pets, drag or tap two <b>matching</b> pets to evolve them.<br>Pets earn coins. Reach the 🐲 dragon!','Play',null,()=>hideOv());
 
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

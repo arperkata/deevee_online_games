@@ -56,7 +56,8 @@ button.go:active{transform:translateY(4px);box-shadow:0 1px 0 #1c701c}
 #board.nt .card{transition:none}
 .slot{position:absolute;width:var(--cw);height:calc(var(--cw)*1.4);border-radius:calc(var(--cw)*.1);background:#0a5530;border:3px solid #5fd39a;display:flex;align-items:center;justify-content:center;font-size:calc(var(--cw)*.55);color:#8be8b8;font-weight:700}
 #win{position:fixed;inset:0;z-index:55;display:none;pointer-events:none}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <div id="top"><h1>Klondike</h1><span class="pill">Score <b id="sc">0</b></span><span class="pill">Moves <b id="mv">0</b></span><span class="pill">Best <b id="bs">0</b></span><button class="btn" id="undo">↶ Undo</button><button class="btn o" id="drawb">Draw 1</button><button class="btn g" id="newb">New</button><button class="btn r" id="finB" style="display:none">🏁 Done</button><button class="mute" id="mute">🔊</button></div>
 <div id="stage"><div id="board"></div></div>
@@ -322,5 +323,5 @@ function start(){
 }
 addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,200));
 fit();newGame();start();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

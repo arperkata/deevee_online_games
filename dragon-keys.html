@@ -43,6 +43,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .go:active{transform:translateY(4px)}
 .stars{font-size:clamp(40px,10vw,72px);margin:4px 0}
 </style>
+<link rel="stylesheet" href="dragon-theme.css">
 </head>
 <body>
 <a class="pill" id="hm" href="index.html">⌂ Home</a>
@@ -346,6 +347,6 @@ let last=0;function frame(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;u
 addEventListener('resize',resize);addEventListener('orientationchange',()=>setTimeout(resize,200));
 resize();requestAnimationFrame(frame);
 </script>
-<script src="mascot.js" defer></script>
+<script src="dragon-theme.js" defer></script>
 </body>
 </html>

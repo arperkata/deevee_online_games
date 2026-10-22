@@ -1,6 +1,6 @@
 # deevee_online_games
 
-158 quick, addictive brain games for kids and grown-ups. 130 of them have 2-player (with player names) and vs-Computer modes. Single-file HTML, no installs, works on phone, tablet, laptop and PC. Every game has a 3D dragon buddy (`mascot.js`).
+158 quick, addictive brain games for kids and grown-ups. 130 of them have 2-player (with player names) and vs-Computer modes. Single-file HTML, no installs, works on phone, tablet, laptop and PC. Every game wears a dragon theme (`dragon-theme.css` + `dragon-theme.js`): emerald and ember colours, dragon-scale texture, flame-glow edge and floating embers, all drawn behind the games.
 
 **Play online:** https://arperkata.github.io/deevee_online_games/
 

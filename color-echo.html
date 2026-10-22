@@ -31,7 +31,8 @@ button.go{font:700 clamp(20px,5vw,28px) inherit;font-family:inherit;margin-top:1
 button.go:active{transform:translateY(4px);box-shadow:0 2px 0 #1c701c}
 @media (max-height:500px){h1{display:none}#top{padding:4px 8px 0}#hud{min-height:28px;margin:0}}
 .duoPill{top:auto!important;bottom:6px}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <div id="top"><a class="home" href="index.html">⌂ Home</a><h1>Color Echo</h1><span class="pill">Round <b id="rn">0</b></span><span class="pill">Best <b id="bs">0</b></span><button class="mute" id="mute" aria-label="Sound">🔊</button></div>
 <div id="hud">Watch, then repeat!</div>
 <div id="stage"><div id="pads">
@@ -152,5 +153,5 @@ pads.forEach(p=>p.onclick=async()=>{
 });
 $('go').onclick=()=>{rng=Math.random;seq=[];$('msg').classList.add('hide');add()};
 Duo.addButtons($('box'),{game:'color-echo',start:()=>{duoSeed();seq=[];$('msg').classList.add('hide');add()},hw:true,cpu:[4,10],unit:' steps',fmt:v=>v+' steps'});
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

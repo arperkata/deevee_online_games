@@ -33,7 +33,8 @@ h1{margin:0;font-size:clamp(22px,3vw,34px);color:#fff;text-shadow:0 3px 0 #1b4f8
 @media (max-height:480px){#top{min-height:48px;padding-top:4px}h1{display:none}.big{font-size:40px}.box{padding:8px 18px 12px}.btn{margin-top:6px}.rules{margin:2px auto 4px}}
 @media (max-width:760px){h1{display:none}}
 @media (min-width:900px){#top{padding-left:110px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <div id="top"><h1>🪨 Mancala</h1><span class="pill" id="turn">&nbsp;</span><span class="pill" id="sc"></span><span class="pill">Best<b id="bs">0</b></span><button class="ib" id="mute" aria-label="Sound">🔊</button><button class="ib" id="menu" aria-label="Menu">☰</button></div>
 <div id="stage"><canvas id="cv"></canvas></div>
@@ -203,5 +204,5 @@ function draw(t){
 
 $('setup').style.display='flex';
 window.addEventListener('load',()=>{over=true;reset();fit();requestAnimationFrame(frame)});
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

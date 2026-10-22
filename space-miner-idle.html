@@ -59,7 +59,8 @@ canvas{width:min(100%,560px);aspect-ratio:480/220;border-radius:18px;box-shadow:
 @media (min-aspect-ratio:12/10){
 #app{flex-direction:row;padding-top:6px}#left{width:48%;padding-top:54px;justify-content:flex-start}#right{padding-top:54px}
 }
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a><button id="mute" aria-label="Mute">🔊</button>
 <div id="app"><div id="left"><canvas id="c"></canvas>
 <div id="chips"><span class="chip">💎 <b id="ore">0</b></span><span class="chip">⚡ <b id="cps">0</b>/s</span><span class="chip">⛏️ <b id="tp">1</b>/tap</span></div></div>
@@ -148,5 +149,5 @@ let away=0;if(sd){away=cpsF()*clamp((Date.now()-(S.ts||Date.now()))/1000,0,28800
 build();render();last=Date.now();setInterval(tick,200);requestAnimationFrame(draw);
 showOv('🚀 Space Miner',sd?'Welcome back, captain!'+(away>1?'<br>Your drones mined <b>'+fmt(away)+'</b> 💎 while you were away.':''):'Tap the planet to mine 💎, buy drones and lasers, then unlock new planets.<br>Reach the 🌌 Galaxy Core!','Launch!',null,()=>{hideOv();last=Date.now()});
 
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

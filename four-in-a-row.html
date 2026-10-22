@@ -27,7 +27,8 @@ body{background:linear-gradient(#27a2e8,#bdeafc) fixed;font-family:'Fredoka','Tr
 canvas{display:block;margin:6px auto 0;width:min(96vw,calc((100vh - 120px)*700/680));height:auto;touch-action:none;filter:drop-shadow(0 8px 0 #0c2c58) drop-shadow(0 14px 16px rgba(0,0,0,.35))}
 @media(max-width:620px){#bar{padding:54px 6px 0}}
 @media(max-height:520px){#bar{min-height:0;padding:6px 6px 0 112px;flex-wrap:nowrap;font-size:11px}#bar b{font-size:16px}#bar span{padding:0 8px}.btn.sm{min-height:36px}.home{min-height:36px;padding:0 12px}#ov{gap:4px}.big{font-size:48px}#ov h1{font-size:28px}.stars{font-size:22px}#ov p{font-size:15px}#ov .btn{font-size:17px;padding:6px 16px}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <div id="bar"><span id="tn" style="min-width:120px">Turn<b id="tnb" style="font-size:16px">-</b></span><span class="so">Wins<b id="w">0</b></span><span class="so">Streak 🔥<b id="st">0</b></span><span class="so">Score<b id="sc">0</b></span><span class="so">Best<b id="bs">0</b></span><span class="tp" style="display:none"><i id="pa1" style="font-style:normal">-</i><b id="pa2">0</b></span><span class="tp" style="display:none"><i id="pb1" style="font-style:normal">-</i><b id="pb2">0</b></span><button id="mute" class="btn sm">🔊</button></div>
 <canvas id="c" width="700" height="680"></canvas>
@@ -172,5 +173,5 @@ if(win){x.strokeStyle='#fff';x.lineWidth=8;x.globalAlpha=.6+.4*Math.sin(fr/5);fo
 parts=parts.filter(p=>p.l>0);for(const p of parts){p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.l--;x.globalAlpha=Math.min(1,p.l/20);x.fillStyle=p.c;x.beginPath();x.arc(p.x,p.y,6,0,7);x.fill()}x.globalAlpha=1;
 requestAnimationFrame(draw)}
 reset();over=true;ui();showOv('');fit();draw();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

@@ -33,7 +33,8 @@ h1{margin:0;font-size:clamp(22px,4.5vw,40px);color:#fff;text-shadow:0 3px 0 #0b3
 button.go{font:700 clamp(20px,5vw,28px) inherit;font-family:inherit;margin-top:14px;padding:.4em 1.5em;border:0;border-radius:999px;color:#fff;background:linear-gradient(#5fe35f,#25a025);box-shadow:0 6px 0 #1c701c;cursor:pointer;text-shadow:0 2px 0 #1c701c}
 button.go:active{transform:translateY(4px);box-shadow:0 2px 0 #1c701c}
 @media (max-height:500px){h1{display:none}#top{padding:4px 8px 0}}
-</style></head><body>
+</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <div id="top"><a class="home" href="index.html">⌂ Home</a><h1>Memory Match</h1><span class="pill" id="lvP">Level <b id="lv">1</b></span><span class="pill" id="mvP">Moves <b id="mv">0</b></span><span class="pill" id="bsP">Best <b id="bs">0</b></span><span class="pill" id="p1" style="display:none"></span><span class="pill" id="p2" style="display:none"></span><button class="mute" id="menuBtn">☰ Menu</button><button class="mute" id="mute" aria-label="Sound">🔊</button></div>
 <div id="stage"><div id="grid"></div></div>
 <canvas id="fx"></canvas>
@@ -196,5 +197,5 @@ function showMenu(){VM=null;solo0=true;setVsUi(false);$('lv').textContent=1;buil
   $('msg').style.display='flex'}
 $('menuBtn').onclick=()=>{beep(520);showMenu()};
 showMenu();
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>

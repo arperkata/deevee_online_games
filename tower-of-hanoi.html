@@ -48,7 +48,8 @@ button.go:active{transform:translateY(4px);box-shadow:0 2px 0 #1c701c}
 .d{position:relative;z-index:1;height:var(--dh);border-radius:calc(var(--dh)/2);border:3px solid rgba(0,0,0,.35);box-shadow:inset 0 calc(var(--dh)*.18) 0 rgba(255,255,255,.55),0 3px 0 rgba(0,0,0,.35);transition:transform .15s;margin-bottom:2px}
 .d.lift{transform:translateY(calc(var(--dh)*-.6));filter:brightness(1.15);outline:4px solid #ffe14a}
 .d.drop{animation:dr .35s}
-@keyframes dr{0%{transform:translateY(-30px)}60%{transform:translateY(4px)}100%{transform:none}}</style></head><body>
+@keyframes dr{0%{transform:translateY(-30px)}60%{transform:translateY(4px)}100%{transform:none}}</style><link rel="stylesheet" href="dragon-theme.css">
+</head><body>
 <a class="home" href="index.html">⌂ Home</a>
 <div id="top"><h1>Tower of Hanoi</h1><span class="pill">Discs <b id="nd">3</b></span><span class="pill">Moves <b id="mv">0</b></span><span class="pill">Optimal <b id="op">7</b></span><span class="pill">Best <b id="bs">0</b></span><button class="mute" id="mute" aria-label="Sound">🔊</button></div>
 <div id="stage"><div id="wrap"><div id="pegs"><div class="tw" data-l="START"></div><div class="tw" data-l="HELPER"></div><div class="tw goal" data-l="⭐ GOAL"></div></div></div>
@@ -186,5 +187,5 @@ function win(){
 setup(3);
 duoW=Duo.addButtons($('box'),{game:'tower-of-hanoi',start:()=>{$('msg').style.display='none';started=true;score=0;streak=0;setup(5)},cpu:[31,60],hw:false,unit:' moves',fmt:v=>v+' moves'});
 startScreen('🗼','Tower of Hanoi','Move the whole stack to the GOAL tower. Tap a tower to lift its top disc, then tap where to drop it. Never put a big disc on a small one!',()=>{started=true;score=0;streak=0;setup(3)});
-</script><script src="mascot.js" defer></script>
+</script><script src="dragon-theme.js" defer></script>
 </body></html>
